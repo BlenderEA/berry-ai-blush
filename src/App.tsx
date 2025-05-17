@@ -13,6 +13,7 @@ import CommunityPage from "./pages/CommunityPage";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import ContentGuidelines from "./pages/ContentGuidelines";
+import Whitepaper from "./pages/Whitepaper";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/content-guidelines" element={<ContentGuidelines />} />
+          <Route path="/whitepaper" element={<Whitepaper />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
