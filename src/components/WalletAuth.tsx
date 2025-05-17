@@ -24,11 +24,12 @@ const WalletAuth: React.FC = () => {
     setLoading(walletType);
     
     try {
+      console.log(`Starting wallet auth process for ${walletType}...`);
       const success = await handleWalletAuth(walletType);
       if (success) {
         toast.success(`Connected to ${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet`);
       } else {
-        toast.error('Failed to connect wallet');
+        toast.error('Failed to connect wallet. Please try again.');
       }
     } catch (error) {
       console.error('Wallet connection error:', error);

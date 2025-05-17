@@ -15,49 +15,54 @@ export const isWalletInstalled = (walletType: WalletType): boolean => {
   return false;
 };
 
+// Get wallet provider
+const getWalletProvider = (walletType: WalletType): any => {
+  if (typeof window === 'undefined') return null;
+  
+  if (walletType === 'phantom') {
+    // @ts-ignore - Phantom is not typed
+    const phantomProvider = window.phantom?.solana;
+    if (!phantomProvider?.isPhantom) {
+      console.error('Phantom is not installed or detected properly');
+      return null;
+    }
+    return phantomProvider;
+  } 
+  else if (walletType === 'solflare') {
+    // @ts-ignore - Solflare is not typed
+    const solflareProvider = window.solflare;
+    if (!(solflareProvider as any)?.isSolflare) {
+      console.error('Solflare is not installed or detected properly');
+      return null;
+    }
+    return solflareProvider as any;
+  }
+  
+  return null;
+};
+
 // Connect to wallet
 export const connectWallet = async (walletType: WalletType): Promise<string | null> => {
   try {
-    if (typeof window === 'undefined') return null;
+    const provider = getWalletProvider(walletType);
     
-    let provider;
-    
-    if (walletType === 'phantom') {
-      if (!('phantom' in window)) {
+    if (!provider) {
+      if (walletType === 'phantom') {
         window.open('https://phantom.app/', '_blank');
-        return null;
-      }
-      
-      // @ts-ignore - Phantom is not typed
-      const phantomProvider = window.phantom?.solana;
-      
-      if (!phantomProvider?.isPhantom) {
-        throw new Error('Phantom wallet not found');
-      }
-      
-      const { publicKey } = await phantomProvider.connect();
-      return publicKey.toString();
-    } 
-    else if (walletType === 'solflare') {
-      if (!('solflare' in window)) {
+      } else if (walletType === 'solflare') {
         window.open('https://solflare.com/', '_blank');
-        return null;
       }
-      
-      // @ts-ignore - Solflare is not typed
-      const solflareProvider = window.solflare;
-      
-      // Add type assertion to fix TypeScript error
-      if (!(solflareProvider as any)?.isSolflare) {
-        throw new Error('Solflare wallet not found');
-      }
-      
-      // Add type assertion for connect method
-      const { publicKey } = await (solflareProvider as any).connect();
-      return publicKey.toString();
+      return null;
     }
-
-    return null;
+    
+    console.log(`Attempting to connect to ${walletType}...`);
+    
+    // Connect to the wallet
+    const response = await provider.connect();
+    const publicKey = response.publicKey.toString();
+    
+    console.log(`Connected to ${walletType} with public key: ${publicKey}`);
+    return publicKey;
   } catch (error) {
     console.error(`Error connecting to ${walletType}:`, error);
     return null;
@@ -70,33 +75,21 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     const encoder = new TextEncoder();
     const encodedMessage = encoder.encode(message);
     
-    let provider;
-    let publicKey;
-    
-    if (walletType === 'phantom') {
-      // @ts-ignore - Phantom is not typed
-      provider = window.phantom?.solana;
-      if (!provider || !provider.isPhantom) {
-        throw new Error('Phantom wallet not found');
-      }
-      publicKey = provider.publicKey.toString();
-    } 
-    else if (walletType === 'solflare') {
-      // @ts-ignore - Solflare is not typed
-      provider = window.solflare;
-      // Add type assertion to fix potential TypeScript errors
-      if (!(provider as any) || !(provider as any).isSolflare) {
-        throw new Error('Solflare wallet not found');
-      }
-      publicKey = (provider as any).publicKey.toString();
-    }
-
+    const provider = getWalletProvider(walletType);
     if (!provider) {
       throw new Error(`${walletType} wallet not found`);
     }
 
-    // Sign the message with type assertion
-    const { signature } = await (provider as any).signMessage(encodedMessage);
+    let publicKey = '';
+    
+    if (walletType === 'phantom') {
+      publicKey = provider.publicKey.toString();
+    } else if (walletType === 'solflare') {
+      publicKey = provider.publicKey.toString();
+    }
+
+    // Sign the message
+    const { signature } = await provider.signMessage(encodedMessage);
     
     return {
       signature: Buffer.from(signature).toString('hex'),

@@ -9,25 +9,29 @@ export const useWalletAuth = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Check current auth state
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      console.log('Auth state changed:', event, currentSession?.user?.id);
+      setSession(currentSession);
       
-      if (session?.user?.user_metadata?.wallet_address) {
-        setWalletAddress(session.user.user_metadata.wallet_address);
-      }
-      setLoading(false);
-    });
-
-    // Set up auth listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      
-      if (session?.user?.user_metadata?.wallet_address) {
-        setWalletAddress(session.user.user_metadata.wallet_address);
+      if (currentSession?.user?.user_metadata?.wallet_address) {
+        setWalletAddress(currentSession.user.user_metadata.wallet_address);
       } else {
         setWalletAddress(null);
       }
+      
+      setLoading(false);
+    });
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log('Current session:', currentSession?.user?.id);
+      setSession(currentSession);
+      
+      if (currentSession?.user?.user_metadata?.wallet_address) {
+        setWalletAddress(currentSession.user.user_metadata.wallet_address);
+      }
+      
       setLoading(false);
     });
 
