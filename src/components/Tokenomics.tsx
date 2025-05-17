@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,11 +14,18 @@ const Tokenomics = () => {
   const contractAddress = "6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump";
   
   const tokenInfo = [
-    { label: "Token Name", value: "Busty Berry" },
-    { label: "Symbol", value: "$BUSTYBERRY" },
+    { label: "Token Name", value: "Busty Berry Token" },
+    { label: "Symbol", value: "$BUSTY" },
     { label: "Total Supply", value: "1,000,000,000" },
     { label: "Blockchain", value: "Solana" },
-    { label: "Listed On", value: "Jupiter, Raydium" },
+    { label: "Standard", value: "SPL Token" },
+  ];
+  
+  const tokenUtility = [
+    "Platform payments and subscriptions",
+    "Governance voting power",
+    "Staking rewards and premium features", 
+    "Community incentives and rewards"
   ];
   
   const tokenDistribution = [
@@ -46,10 +54,10 @@ const Tokenomics = () => {
       <div className="container mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            <span className="gradient-text">$BUSTYBERRY</span> Tokenomics
+            <span className="gradient-text">$BUSTY</span> Tokenomics
           </h2>
           <p className="text-lg text-gray-300">
-            Our token is designed for sustainability, community engagement, and long-term growth.
+            Our token is designed to power a decentralized creator economy with transparency, community governance, and long-term sustainability.
           </p>
         </div>
         
@@ -68,6 +76,15 @@ const Tokenomics = () => {
                   </li>
                 ))}
               </ul>
+              
+              <div className="mt-6">
+                <h3 className="text-lg font-medium mb-3">Token Utility</h3>
+                <ul className="list-disc pl-5 space-y-2 text-gray-300">
+                  {tokenUtility.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
               
               <div className="mt-6 p-4 rounded-lg bg-dark border border-dark-border">
                 <div className="flex justify-between items-center mb-2">
@@ -119,10 +136,18 @@ const Tokenomics = () => {
                 ))}
               </div>
               
+              <div className="mt-8 p-4 bg-dark-lighter rounded-lg border border-dark-border">
+                <h3 className="font-medium mb-2">Deflationary Mechanisms</h3>
+                <ul className="list-disc pl-5 space-y-2 text-gray-300">
+                  <li>Transaction burn mechanism</li>
+                  <li>Regular token buyback and burn</li>
+                </ul>
+              </div>
+              
               <div className="mt-8 flex justify-center">
                 <Link to="/token">
                   <Button className="berry-button group">
-                    Buy $BUSTYBERRY
+                    Buy $BUSTY
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </Link>

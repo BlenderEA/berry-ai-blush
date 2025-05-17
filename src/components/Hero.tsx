@@ -16,25 +16,25 @@ const Hero = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-            <span className="gradient-text">The Juiciest </span> 
-            <span className="text-white">Memecoin with AI Spice</span>
+            <span className="gradient-text">Decentralizing </span> 
+            <span className="text-white">the Creator Economy</span>
           </h1>
           
           <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            $BUSTYBERRY combines the thrilling world of Solana memecoins with
-            enticing AI chat personalities that will keep you coming back for more.
+            BustyBerry is a decentralized, blockchain-based platform empowering adult content creators 
+            on Solana with low fees, creator ownership, and community governance.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/token">
               <Button className="berry-button group min-w-[180px]">
-                Buy $BUSTYBERRY
+                Buy $BUSTY
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
-            <Link to="/ai-chat">
+            <Link to="/creators">
               <Button variant="outline" className="secondary-button min-w-[180px]">
-                Meet Our AI Berries
+                For Creators
               </Button>
             </Link>
           </div>
@@ -42,7 +42,7 @@ const Hero = () => {
           <div className="mt-12">
             <div className="inline-block p-2 px-4 rounded-full bg-dark-lighter border border-dark-border">
               <p className="text-sm md:text-base text-gray-300">
-                <span className="text-berry font-medium">30,000+</span> holders and growing!
+                <span className="text-berry font-medium">2-5%</span> platform fees vs 20-30% on traditional platforms
               </p>
             </div>
           </div>
