@@ -140,7 +140,7 @@ const Token = () => {
               </Card>
             </div>
             
-            {/* Add chart section with DEXScreener */}
+            {/* Live chart section with DEXScreener */}
             <div className="mb-12">
               <BustyBerryChart />
             </div>
@@ -306,31 +306,6 @@ const Token = () => {
                   </Card>
                 </TabsContent>
               </Tabs>
-            </div>
-            
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-6">Live Market Data</h2>
-              <div className="bg-dark-lighter p-8 rounded-xl border border-dark-border flex items-center justify-center">
-                <p className="text-gray-300">
-                  Chart integration coming soon. Check price on 
-                  <a 
-                    href="https://birdeye.so/" 
-                    className="text-berry hover:text-berry-light ml-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Birdeye
-                  </a> or 
-                  <a 
-                    href="https://dexscreener.com/" 
-                    className="text-berry hover:text-berry-light ml-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    DexScreener
-                  </a>
-                </p>
-              </div>
             </div>
           </div>
         </section>
