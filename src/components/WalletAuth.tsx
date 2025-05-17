@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
-import { Wallet, Dollar } from 'lucide-react';
+import { Wallet, DollarSign } from 'lucide-react';
 import { handleWalletAuth, isWalletInstalled, disconnectWallet, WalletType } from '@/utils/wallet';
 import { useWalletAuth } from '@/hooks/use-wallet-auth';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -72,7 +72,7 @@ const WalletAuth: React.FC = () => {
             <div className="mt-3 mb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <Dollar className="h-4 w-4 mr-2 text-berry" />
+                  <DollarSign className="h-4 w-4 mr-2 text-berry" />
                   <span className="text-sm font-medium">$BUSTY Balance:</span>
                 </div>
                 {balanceLoading ? (
