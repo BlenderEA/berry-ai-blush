@@ -28,11 +28,11 @@ const Tokenomics = () => {
     "Community incentives and rewards"
   ];
   
+  // Updated token distribution percentages as requested
   const tokenDistribution = [
-    { category: "Public Sale", percentage: 40, color: "bg-berry" },
-    { category: "Liquidity", percentage: 30, color: "bg-berry-purple" },
+    { category: "Public Sale", percentage: 75, color: "bg-berry" },
     { category: "Team", percentage: 10, color: "bg-indigo-500" },
-    { category: "Marketing", percentage: 15, color: "bg-pink-500" },
+    { category: "Marketing", percentage: 10, color: "bg-pink-500" },
     { category: "Development", percentage: 5, color: "bg-violet-500" },
   ];
   
