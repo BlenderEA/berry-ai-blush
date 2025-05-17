@@ -4,28 +4,56 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const personalities = [
   {
-    id: 'sweet-berry',
-    name: 'Sweet Berry',
-    description: 'The girl next door with a hidden wild side. Sweet, innocent, but always ready to surprise you.',
-    avatarColor: 'bg-purple-300',
-    avatarText: '💋',
+    id: 'blueberry-babe',
+    name: 'Blueberry Babe',
+    description: 'Sweet and playful with a mischievous side. She loves talking about her day while surrounded by blueberries.',
+    avatarSrc: '/lovable-uploads/0a8988bd-61e8-4bc1-a2b0-f4bb4b83e799.png',
+    avatarColor: 'bg-blue-300',
+    avatarText: '💙',
   },
   {
-    id: 'sassy-berry',
-    name: 'Sassy Berry',
-    description: 'Bold, confident, and always speaks her mind. She\'ll tease you and keep you on your toes.',
+    id: 'berry-bold',
+    name: 'Berry Bold',
+    description: 'Confident and straightforward. She doesn\'t beat around the bush and always tells you what she thinks.',
+    avatarSrc: '/lovable-uploads/0ae62df3-dbef-4830-b9d2-215f5ac5fb43.png',
+    avatarColor: 'bg-blue-400',
+    avatarText: '😎',
+  },
+  {
+    id: 'white-berry',
+    name: 'White Berry',
+    description: 'Elegant and sophisticated with a touch of innocence. She loves deep conversations about life and dreams.',
+    avatarSrc: '/lovable-uploads/dd62bd68-7508-43dd-86fc-6dde896d8568.png',
+    avatarColor: 'bg-indigo-200',
+    avatarText: '✨',
+  },
+  {
+    id: 'blue-frost',
+    name: 'Blue Frost',
+    description: 'Cool and collected with a warm heart. She\'ll listen to your problems and offer thoughtful advice.',
+    avatarSrc: '/lovable-uploads/87c037c1-9bd0-4e88-bc99-48e731a52160.png',
+    avatarColor: 'bg-blue-500',
+    avatarText: '❄️',
+  },
+  {
+    id: 'raspberry-queen',
+    name: 'Raspberry Queen',
+    description: 'Vivacious and full of life. She loves to share her joy and excitement about the little things.',
+    avatarSrc: '/lovable-uploads/bff1c9ab-ee76-4e59-9da2-6108d4000c9d.png',
     avatarColor: 'bg-pink-400',
-    avatarText: '😈',
+    avatarText: '👑',
   },
   {
-    id: 'spicy-berry',
-    name: 'Spicy Berry',
-    description: 'The adventurous one who loves to push boundaries. Intense, passionate, and always direct.',
-    avatarColor: 'bg-red-400',
-    avatarText: '🔥',
+    id: 'blackberry-dream',
+    name: 'Blackberry Dream',
+    description: 'Mysterious and alluring. She speaks in riddles and loves to challenge your thinking.',
+    avatarSrc: '/lovable-uploads/3ddf135c-0506-43d5-a67b-e067f6fa8dcc.png',
+    avatarColor: 'bg-purple-400',
+    avatarText: '🌙',
   },
 ];
 
@@ -48,16 +76,21 @@ const AIPersonalities = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {personalities.map((personality) => (
-            <Card key={personality.id} className="glass-card overflow-hidden border-dark-border hover:border-berry/30 transition-all duration-300">
+            <Card key={personality.id} className="glass-card overflow-hidden border-dark-border hover:border-berry/30 transition-all duration-300 hover:-translate-y-1">
               <div className="p-6 flex flex-col items-center">
-                <div className={`w-20 h-20 rounded-full ${personality.avatarColor} flex items-center justify-center text-4xl mb-4`}>
-                  {personality.avatarText}
+                <div className="mb-4 relative w-24 h-24 rounded-full overflow-hidden border-2 border-berry/30">
+                  <Avatar className="w-full h-full">
+                    <AvatarImage src={personality.avatarSrc} alt={personality.name} className="object-cover" />
+                    <AvatarFallback className={`${personality.avatarColor} text-4xl`}>
+                      {personality.avatarText}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 <h3 className="text-2xl font-bold mb-2">{personality.name}</h3>
                 <p className="text-gray-300 text-center mb-6">
                   {personality.description}
                 </p>
-                <Link to="/ai-chat" className="mt-auto w-full">
+                <Link to={`/ai-chat?personality=${personality.id}`} className="mt-auto w-full">
                   <Button variant="outline" className="w-full border-gray-700 hover:bg-dark-card hover:text-berry">
                     Chat Now
                   </Button>

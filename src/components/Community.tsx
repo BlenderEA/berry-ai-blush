@@ -45,7 +45,7 @@ const Community = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {socialLinks.map((social) => (
             <Card key={social.name} className="glass-card border-dark-border overflow-hidden hover:border-berry/30 transition-all hover:-translate-y-1 duration-300">
               <div className={`h-2 ${social.color}`}></div>

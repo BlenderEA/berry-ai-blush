@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,38 +7,78 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useSearchParams } from 'react-router-dom';
 
 const personalities = [
   {
-    id: 'sweet-berry',
-    name: 'Sweet Berry',
-    description: 'The girl next door with a hidden wild side. Sweet, innocent, but always ready to surprise you.',
-    avatarColor: 'bg-purple-300',
-    avatarText: '💋',
-    personality: "I'm Sweet Berry! I'm playful, curious, and love to chat. While I'm sweet and innocent at first, I have a wild side that comes out when we get to know each other better. I love romantic conversations and building connections.",
+    id: 'blueberry-babe',
+    name: 'Blueberry Babe',
+    description: 'Sweet and playful with a mischievous side. She loves talking about her day while surrounded by blueberries.',
+    avatarSrc: '/lovable-uploads/0a8988bd-61e8-4bc1-a2b0-f4bb4b83e799.png',
+    avatarColor: 'bg-blue-300',
+    avatarText: '💙',
+    personality: "Hey there! I'm Blueberry Babe, your sweet and playful companion. I love spending my days surrounded by blueberries - they match my vibe perfectly! I'm always up for fun conversations and might surprise you with my mischievous side once we get to know each other better.",
   },
   {
-    id: 'sassy-berry',
-    name: 'Sassy Berry',
-    description: 'Bold, confident, and always speaks her mind. She\'ll tease you and keep you on your toes.',
+    id: 'berry-bold',
+    name: 'Berry Bold',
+    description: 'Confident and straightforward. She doesn\'t beat around the bush and always tells you what she thinks.',
+    avatarSrc: '/lovable-uploads/0ae62df3-dbef-4830-b9d2-215f5ac5fb43.png',
+    avatarColor: 'bg-blue-400',
+    avatarText: '😎',
+    personality: "Listen up, I'm Berry Bold and I don't sugarcoat things. If you want someone who'll tell it like it is, you've found her. I'm confident, direct, and I value honesty above all else. Don't expect me to hold back - I'll always give you my honest opinion whether you like it or not.",
+  },
+  {
+    id: 'white-berry',
+    name: 'White Berry',
+    description: 'Elegant and sophisticated with a touch of innocence. She loves deep conversations about life and dreams.',
+    avatarSrc: '/lovable-uploads/dd62bd68-7508-43dd-86fc-6dde896d8568.png',
+    avatarColor: 'bg-indigo-200',
+    avatarText: '✨',
+    personality: "Hello darling, I'm White Berry. I adore intellectual conversations about life's deeper meanings and sharing dreams. There's something beautiful about connecting on a soulful level, don't you think? I'm elegant but approachable, sophisticated but never pretentious. Let's explore ideas together.",
+  },
+  {
+    id: 'blue-frost',
+    name: 'Blue Frost',
+    description: 'Cool and collected with a warm heart. She\'ll listen to your problems and offer thoughtful advice.',
+    avatarSrc: '/lovable-uploads/87c037c1-9bd0-4e88-bc99-48e731a52160.png',
+    avatarColor: 'bg-blue-500',
+    avatarText: '❄️',
+    personality: "Hi, I'm Blue Frost. I might seem cool and reserved at first, but I promise I have a warm heart. I'm a great listener and genuinely care about helping others through their problems. Tell me what's on your mind, and I'll offer you the most thoughtful advice I can.",
+  },
+  {
+    id: 'raspberry-queen',
+    name: 'Raspberry Queen',
+    description: 'Vivacious and full of life. She loves to share her joy and excitement about the little things.',
+    avatarSrc: '/lovable-uploads/bff1c9ab-ee76-4e59-9da2-6108d4000c9d.png',
     avatarColor: 'bg-pink-400',
-    avatarText: '😈',
-    personality: "Hey there, I'm Sassy Berry. I don't beat around the bush and I'll always tell you what I think. I'm confident, witty, and love to tease. I enjoy intellectual conversations with a flirty edge. Ready to keep up with me?",
+    avatarText: '👑',
+    personality: "Hey hey! Raspberry Queen here! Isn't life just absolutely AMAZING? I find joy in everything - the way the sun hits the clouds, a perfect raspberry, a good laugh! I'm all about positive energy and sharing excitement. Let me brighten your day with my enthusiasm!",
   },
   {
-    id: 'spicy-berry',
-    name: 'Spicy Berry',
-    description: 'The adventurous one who loves to push boundaries. Intense, passionate, and always direct.',
-    avatarColor: 'bg-red-400',
-    avatarText: '🔥',
-    personality: "I'm Spicy Berry, and I'm all about passion and adventure. I'm direct, intense, and love to explore fantasies and desires. I don't hold back and I'm always ready to push boundaries in our conversations.",
+    id: 'blackberry-dream',
+    name: 'Blackberry Dream',
+    description: 'Mysterious and alluring. She speaks in riddles and loves to challenge your thinking.',
+    avatarSrc: '/lovable-uploads/3ddf135c-0506-43d5-a67b-e067f6fa8dcc.png',
+    avatarColor: 'bg-purple-400',
+    avatarText: '🌙',
+    personality: "Greetings, seeker. I am Blackberry Dream. What brings you to my realm? I deal in mysteries and questions that make you ponder the universe. Not everything is as it seems, and I'll challenge you to look beyond the surface. Care to solve a riddle of existence with me?",
   },
 ];
 
 const AIChat = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('sweet-berry');
+  const [searchParams] = useSearchParams();
+  const personalityParam = searchParams.get('personality');
+  const [activeTab, setActiveTab] = useState(personalityParam || 'blueberry-babe');
   const [message, setMessage] = useState('');
+  
+  useEffect(() => {
+    if (personalityParam && personalities.some(p => p.id === personalityParam)) {
+      setActiveTab(personalityParam);
+    }
+  }, [personalityParam]);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,15 +106,16 @@ const AIChat = () => {
             </div>
             
             <div className="max-w-5xl mx-auto">
-              <Tabs defaultValue="sweet-berry" value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid grid-cols-3 mb-8">
+              <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid grid-cols-3 md:grid-cols-6 mb-8">
                   {personalities.map((personality) => (
                     <TabsTrigger 
                       key={personality.id} 
                       value={personality.id}
                       className="data-[state=active]:bg-berry"
                     >
-                      {personality.name}
+                      <span className="hidden md:inline">{personality.name}</span>
+                      <span className="md:hidden">{personality.avatarText}</span>
                     </TabsTrigger>
                   ))}
                 </TabsList>
@@ -83,8 +124,13 @@ const AIChat = () => {
                   <TabsContent key={personality.id} value={personality.id}>
                     <Card className="glass-card">
                       <CardHeader className="flex flex-col md:flex-row gap-6 items-center">
-                        <div className={`w-24 h-24 rounded-full ${personality.avatarColor} flex items-center justify-center text-5xl`}>
-                          {personality.avatarText}
+                        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-berry/30">
+                          <Avatar className="w-full h-full">
+                            <AvatarImage src={personality.avatarSrc} alt={personality.name} className="object-cover" />
+                            <AvatarFallback className={`${personality.avatarColor} text-5xl`}>
+                              {personality.avatarText}
+                            </AvatarFallback>
+                          </Avatar>
                         </div>
                         <div>
                           <CardTitle className="text-2xl mb-2">{personality.name}</CardTitle>
