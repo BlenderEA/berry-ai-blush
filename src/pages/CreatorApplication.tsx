@@ -185,11 +185,11 @@ const CreatorApplication = () => {
               <div className="mt-8 text-center text-sm text-gray-400">
                 <p>
                   By submitting this application, you confirm that you are at least 18 years old and agree to our{" "}
-                  <Link to="#" className="text-berry hover:underline">
+                  <Link to="/terms" className="text-berry hover:underline">
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link to="#" className="text-berry hover:underline">
+                  <Link to="/content-guidelines" className="text-berry hover:underline">
                     Content Guidelines
                   </Link>
                   .

@@ -11,6 +11,8 @@ import Creators from "./pages/Creators";
 import CreatorApplication from "./pages/CreatorApplication";
 import CommunityPage from "./pages/CommunityPage";
 import NotFound from "./pages/NotFound";
+import TermsOfService from "./pages/TermsOfService";
+import ContentGuidelines from "./pages/ContentGuidelines";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/creators" element={<Creators />} />
           <Route path="/apply-as-creator" element={<CreatorApplication />} />
           <Route path="/community" element={<CommunityPage />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/content-guidelines" element={<ContentGuidelines />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
