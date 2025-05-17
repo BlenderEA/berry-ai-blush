@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import ContentGuidelines from "./pages/ContentGuidelines";
 import Whitepaper from "./pages/Whitepaper";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -28,7 +29,14 @@ const App = () => (
           <Route path="/ai-chat" element={<AIChat />} />
           <Route path="/token" element={<Token />} />
           <Route path="/creators" element={<Creators />} />
-          <Route path="/apply-as-creator" element={<CreatorApplication />} />
+          <Route 
+            path="/apply-as-creator" 
+            element={
+              <ProtectedRoute redirectTo="/">
+                <CreatorApplication />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/content-guidelines" element={<ContentGuidelines />} />

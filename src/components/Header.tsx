@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Menu, X, Users } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import WalletAuth from '@/components/WalletAuth';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -68,13 +68,9 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* CTA Button */}
+        {/* Wallet Auth Button - Desktop */}
         <div className="hidden md:block">
-          <Link to="/apply-as-creator">
-            <Button className="berry-button">
-              Apply as Creator
-            </Button>
-          </Link>
+          <WalletAuth />
         </div>
 
         {/* Mobile Menu Button */}
@@ -110,11 +106,7 @@ const Header = () => {
               </Link>
             ))}
             <div className="pt-2">
-              <Link to="/apply-as-creator" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="berry-button w-full">
-                  Apply as Creator
-                </Button>
-              </Link>
+              <WalletAuth />
             </div>
           </div>
         </div>
