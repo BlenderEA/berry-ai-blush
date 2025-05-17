@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 
 const Hero = () => {
   return (
@@ -32,10 +32,18 @@ const Hero = () => {
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
+            
             <Link to="/creators">
-              <Button variant="outline" className="secondary-button min-w-[180px]">
+              <Button variant="outline" className="secondary-button min-w-[180px] group">
                 For Creators
               </Button>
+            </Link>
+          </div>
+          
+          <div className="mt-6">
+            <Link to="/token" className="inline-flex items-center text-berry hover:text-berry-hover transition-colors">
+              <BookOpen className="mr-2 h-4 w-4" />
+              <span className="underline underline-offset-4">Learn about $BUSTY</span>
             </Link>
           </div>
           

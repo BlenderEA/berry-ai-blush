@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Users } from 'lucide-react';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -29,6 +29,7 @@ const Header = () => {
     { name: 'Home', path: '/' },
     { name: 'AI Chat', path: '/ai-chat' },
     { name: 'Token', path: '/token' },
+    { name: 'Creators', path: '/creators' },
     { name: 'Community', path: '/community' },
   ];
 
@@ -70,7 +71,7 @@ const Header = () => {
         <div className="hidden md:block">
           <Link to="/token">
             <Button className="berry-button">
-              Buy $BUSTYBERRY
+              Buy $BUSTY
             </Button>
           </Link>
         </div>
@@ -110,7 +111,7 @@ const Header = () => {
             <div className="pt-2">
               <Link to="/token" onClick={() => setMobileMenuOpen(false)}>
                 <Button className="berry-button w-full">
-                  Buy $BUSTYBERRY
+                  Buy $BUSTY
                 </Button>
               </Link>
             </div>
