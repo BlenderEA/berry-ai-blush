@@ -4,15 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ChartLine, ExternalLink, TrendingUp, TrendingDown, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from '@/components/ui/chart';
-import { Skeleton } from '@/components/ui/skeleton';
 
 const BustyBerryChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const scriptRef = useRef<HTMLScriptElement | null>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [chartError, setChartError] = useState(false);
@@ -62,10 +57,18 @@ const BustyBerryChart = () => {
         chartElement.setAttribute('data-height', '560');
         chartContainerRef.current.appendChild(chartElement);
         
+        // Clean up any existing script to avoid duplicates
+        if (scriptRef.current && document.body.contains(scriptRef.current)) {
+          document.body.removeChild(scriptRef.current);
+        }
+        
         // Load DEXScreener embed script
         const script = document.createElement('script');
         script.src = 'https://widgets.dexscreener.com/latest/widget.js';
         script.async = true;
+        
+        // Store script reference for cleanup
+        scriptRef.current = script;
         
         // Set loading state based on script load events
         script.onload = () => {
@@ -102,12 +105,9 @@ const BustyBerryChart = () => {
     
     // Clean up function to remove script when component unmounts
     return () => {
-      const scripts = document.querySelectorAll('script[src="https://widgets.dexscreener.com/latest/widget.js"]');
-      scripts.forEach(script => {
-        if (document.body.contains(script)) {
-          document.body.removeChild(script);
-        }
-      });
+      if (scriptRef.current && document.body.contains(scriptRef.current)) {
+        document.body.removeChild(scriptRef.current);
+      }
     };
   }, [toast]);
 
