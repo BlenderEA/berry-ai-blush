@@ -1,10 +1,9 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Telegram, Twitter, Discord } from 'lucide-react';
+import { ExternalLink, MessageSquare, Twitter, MessageCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const CommunityPage = () => {
@@ -12,7 +11,7 @@ const CommunityPage = () => {
     {
       id: 'telegram',
       name: "Telegram",
-      icon: Telegram,
+      icon: MessageSquare,
       link: "https://t.me/bustyberrycoin",
       color: "bg-[#0088cc]",
       members: "15K+",
@@ -40,7 +39,7 @@ const CommunityPage = () => {
     {
       id: 'discord',
       name: "Discord",
-      icon: Discord,
+      icon: MessageCircle,
       link: "https://discord.gg/bustyberry",
       color: "bg-[#7289DA]",
       members: "8K+",
