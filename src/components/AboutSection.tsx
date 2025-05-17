@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Dollar, MessageCircle } from 'lucide-react';
+import { DollarSign, MessageCircle } from 'lucide-react';
 
 const AboutSection = () => {
   return (
@@ -19,7 +19,7 @@ const AboutSection = () => {
           <Card className="glass-card hover:border-berry/30 transition-all hover:-translate-y-1 duration-300">
             <CardHeader>
               <div className="h-12 w-12 rounded-full bg-berry/20 flex items-center justify-center mb-4">
-                <Dollar className="h-6 w-6 text-berry" />
+                <DollarSign className="h-6 w-6 text-berry" />
               </div>
               <CardTitle className="text-2xl">Memecoin With Potential</CardTitle>
             </CardHeader>

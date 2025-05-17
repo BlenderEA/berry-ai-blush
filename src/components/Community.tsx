@@ -2,27 +2,27 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { telegram, twitter, discord } from 'lucide-react';
+import { Telegram, Twitter, Discord, ExternalLink } from 'lucide-react';
 
 const Community = () => {
   const socialLinks = [
     {
       name: "Telegram",
-      icon: telegram,
+      icon: Telegram,
       link: "https://t.me/bustyberrycoin",
       color: "bg-[#0088cc]",
       members: "15K+"
     },
     {
       name: "Twitter",
-      icon: twitter,
+      icon: Twitter,
       link: "https://twitter.com/bustyberrycoin",
       color: "bg-[#1DA1F2]", 
       members: "22K+"
     },
     {
       name: "Discord",
-      icon: discord,
+      icon: Discord,
       link: "https://discord.gg/bustyberry",
       color: "bg-[#7289DA]",
       members: "8K+"

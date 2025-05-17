@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, telegram, twitter, discord } from 'lucide-react';
+import { ExternalLink, Telegram, Twitter, Discord } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const CommunityPage = () => {
@@ -12,7 +12,7 @@ const CommunityPage = () => {
     {
       id: 'telegram',
       name: "Telegram",
-      icon: telegram,
+      icon: Telegram,
       link: "https://t.me/bustyberrycoin",
       color: "bg-[#0088cc]",
       members: "15K+",
@@ -26,7 +26,7 @@ const CommunityPage = () => {
     {
       id: 'twitter',
       name: "Twitter",
-      icon: twitter,
+      icon: Twitter,
       link: "https://twitter.com/bustyberrycoin",
       color: "bg-[#1DA1F2]", 
       members: "22K+",
@@ -40,7 +40,7 @@ const CommunityPage = () => {
     {
       id: 'discord',
       name: "Discord",
-      icon: discord,
+      icon: Discord,
       link: "https://discord.gg/bustyberry",
       color: "bg-[#7289DA]",
       members: "8K+",
