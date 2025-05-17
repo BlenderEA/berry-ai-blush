@@ -11,11 +11,6 @@ export const connectWallet = async (walletType: WalletType): Promise<string | nu
     
     if (!provider) {
       console.error(`${walletType} wallet provider not found`);
-      if (walletType === 'phantom') {
-        window.open('https://phantom.app/', '_blank');
-      } else if (walletType === 'solflare') {
-        window.open('https://solflare.com/', '_blank');
-      }
       return null;
     }
     
@@ -44,13 +39,7 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
       throw new Error(`${walletType} wallet not found`);
     }
 
-    let publicKey = '';
-    
-    if (walletType === 'phantom') {
-      publicKey = provider.publicKey.toString();
-    } else if (walletType === 'solflare') {
-      publicKey = provider.publicKey.toString();
-    }
+    let publicKey = provider.publicKey.toString();
 
     console.log(`Signing message with ${walletType} wallet...`);
     
@@ -58,13 +47,9 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     const { signature } = await provider.signMessage(encodedMessage);
     console.log('Got signature:', signature);
     
-    // Convert signature to hex string without using Buffer
+    // Convert Uint8Array signature to hex string properly
     const signatureHex = Array.from(signature)
-      .map(b => {
-        // Convert to hex and pad with leading zeros if needed
-        const hex = b.toString(16);
-        return hex.length === 1 ? '0' + hex : hex;
-      })
+      .map(b => b.toString(16).padStart(2, '0'))
       .join('');
     
     console.log('Converted signature to hex:', signatureHex);

@@ -1,12 +1,22 @@
 
 import { WalletType, WalletProvider } from './types';
 
+// Add declaration for Phantom global type
+declare global {
+  interface Window {
+    phantom?: {
+      solana?: any;
+    };
+    solflare?: any;
+  }
+}
+
 // Check if wallet is installed
 export const isWalletInstalled = (walletType: WalletType): boolean => {
   if (typeof window === 'undefined') return false;
   
   if (walletType === 'phantom') {
-    // Fix: Check for phantom in window and solana property
+    // Check for phantom in window and solana property
     return window && 'phantom' in window && window.phantom?.solana;
   } else if (walletType === 'solflare') {
     return window && 'solflare' in window;
@@ -20,7 +30,6 @@ export const getWalletProvider = (walletType: WalletType): WalletProvider | null
   
   if (walletType === 'phantom') {
     // Improved access to phantom provider
-    // @ts-ignore - Phantom is not typed
     const phantomProvider = window.phantom?.solana;
     if (!phantomProvider?.isPhantom) {
       console.error('Phantom is not installed or detected properly');
@@ -29,7 +38,6 @@ export const getWalletProvider = (walletType: WalletType): WalletProvider | null
     return phantomProvider;
   } 
   else if (walletType === 'solflare') {
-    // @ts-ignore - Solflare is not typed
     const solflareProvider = window.solflare;
     if (!(solflareProvider as any)?.isSolflare) {
       console.error('Solflare is not installed or detected properly');

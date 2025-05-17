@@ -27,15 +27,19 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
       .maybeSingle();
 
     if (existingUser) {
-      // User exists, sign in
-      console.log('User exists, attempting to sign in with:', {
-        email: `${walletAddress}@wallet.bustyberry.com`,
-        password: signedData.signature.substring(0, 20)
-      });
+      // User exists, sign in with custom credentials
+      console.log('User exists, attempting to sign in');
+      
+      // Create a base64-safe version of the wallet address for email
+      const safeWalletAddress = walletAddress.toLowerCase().replace(/[+/=]/g, '');
+      const email = `${safeWalletAddress}@wallet.bustyberry.com`;
+      const password = signedData.signature.substring(0, 20);
+      
+      console.log('Signing in with:', { email });
       
       const { error } = await supabase.auth.signInWithPassword({
-        email: `${walletAddress}@wallet.bustyberry.com`,
-        password: signedData.signature.substring(0, 20)
+        email,
+        password
       });
       
       if (error) {
@@ -43,17 +47,17 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
         throw error;
       }
     } else {
-      // Create new user account
-      console.log('Creating new user with:', {
-        email: `${walletAddress}@wallet.bustyberry.com`,
-        password: signedData.signature.substring(0, 20),
-        wallet_address: walletAddress,
-        wallet_type: walletType
-      });
+      // Create new user account with safe email address
+      const safeWalletAddress = walletAddress.toLowerCase().replace(/[+/=]/g, '');
+      const email = `${safeWalletAddress}@wallet.bustyberry.com`;
+      const password = signedData.signature.substring(0, 20);
+      
+      console.log('Creating new user with wallet:', walletAddress);
+      console.log('Using email:', email);
       
       const { error: signUpError, data } = await supabase.auth.signUp({
-        email: `${walletAddress}@wallet.bustyberry.com`,
-        password: signedData.signature.substring(0, 20),
+        email,
+        password,
         options: {
           data: {
             wallet_address: walletAddress,
