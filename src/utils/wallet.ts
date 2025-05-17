@@ -95,6 +95,7 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     console.log('Got signature:', signature);
     
     // Convert signature to hex string without using Buffer
+    // Fix: toString(16) doesn't take arguments in TypeScript's number type
     const signatureHex = Array.from(signature)
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
