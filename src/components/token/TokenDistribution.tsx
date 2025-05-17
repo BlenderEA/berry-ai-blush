@@ -9,10 +9,9 @@ interface DistributionItem {
 
 const TokenDistribution: React.FC = () => {
   const tokenDistribution: DistributionItem[] = [
-    { category: "Public Sale", percentage: 40, color: "bg-gradient-to-r from-berry to-berry-light" },
-    { category: "Liquidity", percentage: 30, color: "bg-gradient-to-r from-berry-purple to-indigo-400" },
-    { category: "Team", percentage: 10, color: "bg-gradient-to-r from-indigo-500 to-indigo-300" },
-    { category: "Marketing", percentage: 15, color: "bg-gradient-to-r from-pink-500 to-pink-300" },
+    { category: "Public Sale", percentage: 75, color: "bg-gradient-to-r from-berry to-berry-light" },
+    { category: "Team", percentage: 10, color: "bg-gradient-to-r from-berry-purple to-indigo-400" },
+    { category: "Marketing", percentage: 10, color: "bg-gradient-to-r from-pink-500 to-pink-300" },
     { category: "Development", percentage: 5, color: "bg-gradient-to-r from-violet-500 to-violet-300" }
   ];
 
