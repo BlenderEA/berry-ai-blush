@@ -4,11 +4,13 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useSearchParams } from 'react-router-dom';
+import ChatWindow from '@/components/chat/ChatWindow';
+import { useWalletAuth } from '@/hooks/use-wallet-auth';
+import { Button } from '@/components/ui/button';
+import { Wallet } from 'lucide-react';
+import WalletAuth from '@/components/WalletAuth';
 
 const personalities = [
   {
@@ -68,29 +70,16 @@ const personalities = [
 ];
 
 const AIChat = () => {
-  const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const personalityParam = searchParams.get('personality');
   const [activeTab, setActiveTab] = useState(personalityParam || 'blueberry-babe');
-  const [message, setMessage] = useState('');
+  const { walletAddress } = useWalletAuth();
   
   useEffect(() => {
     if (personalityParam && personalities.some(p => p.id === personalityParam)) {
       setActiveTab(personalityParam);
     }
   }, [personalityParam]);
-  
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-    
-    toast({
-      title: "Feature Coming Soon",
-      description: "Our AI chat functionality is still under development. Check back soon!",
-    });
-    
-    setMessage('');
-  };
   
   return (
     <div className="min-h-screen bg-dark text-white">
@@ -100,9 +89,16 @@ const AIChat = () => {
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <h1 className="text-3xl md:text-5xl font-bold mb-4">Chat with Our <span className="gradient-text">AI Berries</span></h1>
-              <p className="text-lg text-gray-300">
+              <p className="text-lg text-gray-300 mb-6">
                 Each of our AI personalities offers a unique experience. Choose your favorite and start chatting!
               </p>
+              
+              {!walletAddress && (
+                <div className="bg-dark-lighter p-4 rounded-lg border border-berry/30 mb-8">
+                  <p className="text-sm mb-3">Connect your wallet to access AI chat features</p>
+                  <WalletAuth />
+                </div>
+              )}
             </div>
             
             <div className="max-w-5xl mx-auto">
@@ -148,28 +144,16 @@ const AIChat = () => {
                         </div>
                         
                         <div className="mb-6 p-6 bg-dark-lighter rounded-lg border border-dark-border">
-                          <h3 className="text-lg font-semibold mb-3">Chat Preview</h3>
-                          <div className="bg-dark rounded-lg p-4 h-60 flex items-center justify-center">
-                            <p className="text-gray-400 text-center">
-                              AI chat functionality coming soon!<br/>
-                              Hold $BUSTYBERRY tokens to get early access.
-                            </p>
-                          </div>
+                          <h3 className="text-lg font-semibold mb-3">Chat</h3>
                           
-                          <form onSubmit={handleSendMessage} className="mt-4 flex gap-2">
-                            <Input
-                              placeholder="Type your message..."
-                              value={message}
-                              onChange={(e) => setMessage(e.target.value)}
-                              className="bg-dark border-dark-border"
-                            />
-                            <Button 
-                              type="submit" 
-                              className="bg-berry hover:bg-berry-light"
-                            >
-                              Send
-                            </Button>
-                          </form>
+                          <ChatWindow
+                            personalityId={personality.id}
+                            personalityName={personality.name}
+                            avatarSrc={personality.avatarSrc}
+                            avatarFallback={personality.avatarText}
+                            avatarColor={personality.avatarColor}
+                            personality={personality.personality}
+                          />
                         </div>
                       </CardContent>
                     </Card>
