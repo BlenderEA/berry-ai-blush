@@ -1,29 +1,30 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageSquare, Twitter, MessageCircle, ExternalLink } from 'lucide-react';
+import { MessageSquare, Twitter, ExternalLink } from 'lucide-react';
 
 const Community = () => {
   const socialLinks = [
     {
       name: "Telegram",
       icon: MessageSquare,
-      link: "https://t.me/bustyberrycoin",
+      link: "https://t.me/BustyBerry1",
       color: "bg-[#0088cc]",
       members: "15K+"
     },
     {
-      name: "Twitter",
+      name: "X (Twitter)",
       icon: Twitter,
-      link: "https://twitter.com/bustyberrycoin",
+      link: "https://x.com/BustyBerryAI",
       color: "bg-[#1DA1F2]", 
       members: "22K+"
     },
     {
-      name: "Discord",
-      icon: MessageCircle,
-      link: "https://discord.gg/bustyberry",
-      color: "bg-[#7289DA]",
+      name: "X Community",
+      icon: ExternalLink,
+      link: "https://x.com/i/communities/1922803262262215153",
+      color: "bg-[#1DA1F2]",
       members: "8K+"
     }
   ];

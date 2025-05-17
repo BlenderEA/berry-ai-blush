@@ -1,9 +1,10 @@
+
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, MessageSquare, Twitter, MessageCircle } from 'lucide-react';
+import { ExternalLink, MessageSquare, Twitter } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const CommunityPage = () => {
@@ -12,24 +13,22 @@ const CommunityPage = () => {
       id: 'telegram',
       name: "Telegram",
       icon: MessageSquare,
-      link: "https://t.me/bustyberrycoin",
+      link: "https://t.me/BustyBerry1",
       color: "bg-[#0088cc]",
       members: "15K+",
       description: "Join our Telegram community for real-time updates, direct communication with the team, and a vibrant community of $BUSTYBERRY enthusiasts.",
       groups: [
-        { name: "Main Channel", link: "https://t.me/bustyberrycoin" },
-        { name: "Announcements", link: "https://t.me/bustyberryann" },
-        { name: "Price Discussion", link: "https://t.me/bustyberryprice" }
+        { name: "Main Channel", link: "https://t.me/BustyBerry1" }
       ]
     },
     {
       id: 'twitter',
-      name: "Twitter",
+      name: "X (Twitter)",
       icon: Twitter,
-      link: "https://twitter.com/bustyberrycoin",
+      link: "https://x.com/BustyBerryAI",
       color: "bg-[#1DA1F2]", 
       members: "22K+",
-      description: "Follow us on Twitter for the latest announcements, memes, and to participate in our Twitter campaigns and giveaways.",
+      description: "Follow us on X (formerly Twitter) for the latest announcements, memes, and to participate in our campaigns and giveaways.",
       latestTweets: [
         "Exciting news coming soon! The juiciest memecoin is about to get even juicier! #BUSTYBERRY",
         "Thank you for 20K followers! The $BUSTYBERRY community is growing faster than we expected!",
@@ -37,13 +36,13 @@ const CommunityPage = () => {
       ]
     },
     {
-      id: 'discord',
-      name: "Discord",
-      icon: MessageCircle,
-      link: "https://discord.gg/bustyberry",
-      color: "bg-[#7289DA]",
+      id: 'xcommunity',
+      name: "X Community",
+      icon: ExternalLink,
+      link: "https://x.com/i/communities/1922803262262215153",
+      color: "bg-[#1DA1F2]",
       members: "8K+",
-      description: "Our Discord server is the place for deeper discussions on development, feature requests, and connecting with fellow community members.",
+      description: "Our X Community is the place for deeper discussions on development, feature requests, and connecting with fellow community members.",
       channels: [
         "🍓 general-chat",
         "🧠 development",
@@ -141,7 +140,7 @@ const CommunityPage = () => {
                         
                         {social.id === 'twitter' && (
                           <div>
-                            <h4 className="text-lg font-medium mb-3">Latest Tweets</h4>
+                            <h4 className="text-lg font-medium mb-3">Latest Posts</h4>
                             <div className="space-y-3">
                               {social.latestTweets?.map((tweet, index) => (
                                 <div 
@@ -155,9 +154,9 @@ const CommunityPage = () => {
                           </div>
                         )}
                         
-                        {social.id === 'discord' && (
+                        {social.id === 'xcommunity' && (
                           <div>
-                            <h4 className="text-lg font-medium mb-3">Discord Channels</h4>
+                            <h4 className="text-lg font-medium mb-3">Community Channels</h4>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {social.channels?.map((channel, index) => (
                                 <div 

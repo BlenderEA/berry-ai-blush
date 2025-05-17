@@ -30,7 +30,10 @@ const CreatorApplication = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
+    // Simulate form submission with updated email destination
+    console.log('Sending form data to: b11756840@gmail.com');
+    console.log('Form data:', formData);
+    
     setTimeout(() => {
       setIsSubmitting(false);
       toast({
