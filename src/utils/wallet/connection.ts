@@ -5,9 +5,12 @@ import { getWalletProvider } from './providers';
 // Connect to wallet
 export const connectWallet = async (walletType: WalletType): Promise<string | null> => {
   try {
+    console.log(`Starting connection to ${walletType}...`);
+    
     const provider = getWalletProvider(walletType);
     
     if (!provider) {
+      console.error(`${walletType} wallet provider not found`);
       if (walletType === 'phantom') {
         window.open('https://phantom.app/', '_blank');
       } else if (walletType === 'solflare') {
@@ -56,7 +59,6 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     console.log('Got signature:', signature);
     
     // Convert signature to hex string without using Buffer
-    // Fix: toString(16) doesn't take arguments in TypeScript's number type
     const signatureHex = Array.from(signature)
       .map(b => {
         // Convert to hex and pad with leading zeros if needed

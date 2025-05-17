@@ -13,7 +13,9 @@ const WalletAuth: React.FC = () => {
   
   const handleConnect = async (walletType: WalletType) => {
     if (!isWalletInstalled(walletType)) {
-      toast.error(`${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet is not installed`);
+      toast.error(`${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet is not installed`, {
+        description: "Please install the wallet extension and refresh the page"
+      });
       window.open(
         walletType === 'phantom' ? 'https://phantom.app/' : 'https://solflare.com/',
         '_blank'
@@ -29,11 +31,15 @@ const WalletAuth: React.FC = () => {
       if (success) {
         toast.success(`Connected to ${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet`);
       } else {
-        toast.error('Failed to connect wallet. Please try again.');
+        toast.error('Failed to connect wallet. Please try again.', {
+          description: "Make sure your wallet is unlocked and try again."
+        });
       }
     } catch (error) {
       console.error('Wallet connection error:', error);
-      toast.error('Error connecting wallet');
+      toast.error('Error connecting wallet', {
+        description: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
     } finally {
       setLoading(null);
     }
