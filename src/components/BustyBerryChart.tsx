@@ -43,68 +43,72 @@ const BustyBerryChart = () => {
     fetchPriceData();
   }, []);
 
-  useEffect(() => {
-    // Create DEXScreener embed
-    const loadDexScreenerChart = async () => {
-      try {
-        if (chartContainerRef.current) {
-          setIsLoading(true);
-          setChartError(false);
-          
-          // Clear any previous chart
-          chartContainerRef.current.innerHTML = '';
-          
-          // Add chart container with DEXScreener's expected format
-          const chartElement = document.createElement('div');
-          chartElement.className = 'dexscreener-embed-chart';
-          chartElement.setAttribute('data-pairAddress', 'nxt6pyiaph5wisdmbfuc7zrqkj5btyqco6rypm5bmkw');
-          chartElement.setAttribute('data-chain', 'solana');
-          chartElement.setAttribute('data-theme', 'dark');
-          chartElement.setAttribute('data-height', '560');
-          chartContainerRef.current.appendChild(chartElement);
-          
-          // Load DEXScreener embed script
-          const script = document.createElement('script');
-          script.src = 'https://widgets.dexscreener.com/latest/widget.js';
-          script.async = true;
-          
-          // Set loading state based on script load events
-          script.onload = () => {
-            setIsLoading(false);
-          };
-          
-          script.onerror = () => {
-            setIsLoading(false);
-            setChartError(true);
-            toast({
-              title: "Chart Loading Error",
-              description: "Unable to load the DEXScreener chart. Please try again later.",
-              variant: "destructive"
-            });
-          };
-          
-          document.body.appendChild(script);
-          
-          // Clean up
-          return () => {
-            if (document.body.contains(script)) {
-              document.body.removeChild(script);
-            }
-          };
-        }
-      } catch (error) {
-        console.error('Error loading DEXScreener chart:', error);
-        setIsLoading(false);
-        setChartError(true);
-        toast({
-          title: "Chart Loading Error",
-          description: "Unable to load the DEXScreener chart. Please try again later.",
-          variant: "destructive"
-        });
+  // Extract loadDexScreenerChart to component scope so it can be called from button click handler
+  const loadDexScreenerChart = async () => {
+    try {
+      if (chartContainerRef.current) {
+        setIsLoading(true);
+        setChartError(false);
+        
+        // Clear any previous chart
+        chartContainerRef.current.innerHTML = '';
+        
+        // Add chart container with DEXScreener's expected format
+        const chartElement = document.createElement('div');
+        chartElement.className = 'dexscreener-embed-chart';
+        chartElement.setAttribute('data-pairAddress', 'nxt6pyiaph5wisdmbfuc7zrqkj5btyqco6rypm5bmkw');
+        chartElement.setAttribute('data-chain', 'solana');
+        chartElement.setAttribute('data-theme', 'dark');
+        chartElement.setAttribute('data-height', '560');
+        chartContainerRef.current.appendChild(chartElement);
+        
+        // Load DEXScreener embed script
+        const script = document.createElement('script');
+        script.src = 'https://widgets.dexscreener.com/latest/widget.js';
+        script.async = true;
+        
+        // Set loading state based on script load events
+        script.onload = () => {
+          setIsLoading(false);
+        };
+        
+        script.onerror = () => {
+          setIsLoading(false);
+          setChartError(true);
+          toast({
+            title: "Chart Loading Error",
+            description: "Unable to load the DEXScreener chart. Please try again later.",
+            variant: "destructive"
+          });
+        };
+        
+        document.body.appendChild(script);
       }
-    };
-    
+    } catch (error) {
+      console.error('Error loading DEXScreener chart:', error);
+      setIsLoading(false);
+      setChartError(true);
+      toast({
+        title: "Chart Loading Error",
+        description: "Unable to load the DEXScreener chart. Please try again later.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  useEffect(() => {
+    // Create DEXScreener embed when component mounts
     loadDexScreenerChart();
+    
+    // Clean up function to remove script when component unmounts
+    return () => {
+      const scripts = document.querySelectorAll('script[src="https://widgets.dexscreener.com/latest/widget.js"]');
+      scripts.forEach(script => {
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
+      });
+    };
   }, [toast]);
 
   return (
@@ -156,9 +160,7 @@ const BustyBerryChart = () => {
                   title: "Chart Refreshed",
                   description: "Price chart data has been updated.",
                 });
-                if (chartContainerRef.current) {
-                  loadDexScreenerChart();
-                }
+                loadDexScreenerChart();
               }}
             >
               Refresh Chart
