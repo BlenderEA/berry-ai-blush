@@ -33,9 +33,9 @@ const Hero = () => {
               </Button>
             </Link>
             
-            <Link to="/creators">
+            <Link to="/apply-as-creator">
               <Button variant="outline" className="secondary-button min-w-[180px] group">
-                For Creators
+                Apply as Creator
               </Button>
             </Link>
           </div>

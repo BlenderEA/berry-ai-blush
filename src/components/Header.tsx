@@ -69,9 +69,9 @@ const Header = () => {
 
         {/* CTA Button */}
         <div className="hidden md:block">
-          <Link to="/token">
+          <Link to="/apply-as-creator">
             <Button className="berry-button">
-              Buy $BUSTY
+              Apply as Creator
             </Button>
           </Link>
         </div>
@@ -109,9 +109,9 @@ const Header = () => {
               </Link>
             ))}
             <div className="pt-2">
-              <Link to="/token" onClick={() => setMobileMenuOpen(false)}>
+              <Link to="/apply-as-creator" onClick={() => setMobileMenuOpen(false)}>
                 <Button className="berry-button w-full">
-                  Buy $BUSTY
+                  Apply as Creator
                 </Button>
               </Link>
             </div>
