@@ -101,18 +101,19 @@ const BustyBerryChart = () => {
               </span>
             </CardDescription>
           </div>
-          <TabsList className="grid grid-cols-4 w-full sm:w-auto">
-            {timeframes.map((timeframe) => (
-              <TabsTrigger 
-                key={timeframe.id} 
-                value={timeframe.id}
-                onClick={() => setActiveTimeframe(timeframe.id)}
-                className={activeTimeframe === timeframe.id ? 'bg-berry text-white' : ''}
-              >
-                {timeframe.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <Tabs defaultValue={activeTimeframe} value={activeTimeframe} onValueChange={setActiveTimeframe}>
+            <TabsList className="grid grid-cols-4 w-full sm:w-auto">
+              {timeframes.map((timeframe) => (
+                <TabsTrigger 
+                  key={timeframe.id} 
+                  value={timeframe.id}
+                  className={activeTimeframe === timeframe.id ? 'bg-berry text-white' : ''}
+                >
+                  {timeframe.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
       </CardHeader>
       <CardContent>
@@ -153,7 +154,7 @@ const BustyBerryChart = () => {
                     return (
                       <div className="bg-dark-lighter border border-dark-border rounded-md p-3 shadow-md">
                         <p className="text-gray-300">{formatDate(payload[0].payload.date)}</p>
-                        <p className="font-bold text-white">Price: ${payload[0].value.toFixed(8)}</p>
+                        <p className="font-bold text-white">Price: ${typeof payload[0].value === 'number' ? payload[0].value.toFixed(8) : payload[0].value}</p>
                         <p className="text-sm text-gray-300">Volume: ${payload[0].payload.volume.toLocaleString()}</p>
                       </div>
                     );
