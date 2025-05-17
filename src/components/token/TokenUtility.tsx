@@ -5,8 +5,6 @@ const TokenUtility: React.FC = () => {
   const utilities = [
     "Access to premium AI chat personalities",
     "Early access to new AI features and content",
-    "Governance voting on future development",
-    "Potential staking rewards (coming soon)",
     "Exclusive access to model content (planned)"
   ];
 

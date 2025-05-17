@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,8 +22,6 @@ const Tokenomics = () => {
   
   const tokenUtility = [
     "Platform payments and subscriptions",
-    "Governance voting power",
-    "Staking rewards and premium features", 
     "Community incentives and rewards"
   ];
   
