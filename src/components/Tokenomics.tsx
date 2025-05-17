@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,8 +9,8 @@ const Tokenomics = () => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   
-  // This would be the actual contract address
-  const contractAddress = "DUMMYSoL4ddREssH3re12345678901234567890";
+  // Updated contract address
+  const contractAddress = "6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump";
   
   const tokenInfo = [
     { label: "Token Name", value: "Busty Berry" },

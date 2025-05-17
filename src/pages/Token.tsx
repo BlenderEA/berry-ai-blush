@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,13 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import BustyBerryChart from '@/components/BustyBerryChart';
 
 const Token = () => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   
-  // This would be the actual contract address
-  const contractAddress = "DUMMYSoL4ddREssH3re12345678901234567890";
+  // Updated contract address
+  const contractAddress = "6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump";
   
   const copyToClipboard = () => {
     navigator.clipboard.writeText(contractAddress);
@@ -103,7 +103,7 @@ const Token = () => {
                   
                   <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <a 
-                      href="https://solscan.io/" 
+                      href={`https://solscan.io/token/${contractAddress}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block"
@@ -114,7 +114,7 @@ const Token = () => {
                       </Button>
                     </a>
                     <a 
-                      href="https://jup.ag/" 
+                      href={`https://jup.ag/swap/SOL-${contractAddress}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block"
@@ -125,7 +125,7 @@ const Token = () => {
                       </Button>
                     </a>
                     <a 
-                      href="https://raydium.io/swap/" 
+                      href={`https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${contractAddress}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block"
@@ -138,6 +138,11 @@ const Token = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+            
+            {/* Add chart section */}
+            <div className="mb-12">
+              <BustyBerryChart />
             </div>
             
             <div className="mb-12">
