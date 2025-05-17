@@ -5,10 +5,12 @@ export type WalletType = 'phantom' | 'solflare';
 
 // Check if wallet is installed
 export const isWalletInstalled = (walletType: WalletType): boolean => {
+  if (typeof window === 'undefined') return false;
+  
   if (walletType === 'phantom') {
-    return window && 'solana' in window && 'phantom' in (window as any).solana;
+    return window && 'phantom' in window && window.phantom?.solana?.isPhantom;
   } else if (walletType === 'solflare') {
-    return window && 'solana' in window && 'solflare' in (window as any).solana;
+    return window && 'solflare' in window && window.solflare?.isSolflare;
   }
   return false;
 };
@@ -16,19 +18,32 @@ export const isWalletInstalled = (walletType: WalletType): boolean => {
 // Connect to wallet
 export const connectWallet = async (walletType: WalletType): Promise<string | null> => {
   try {
+    console.info(`Starting connection to ${walletType}...`);
     let provider;
     
     if (walletType === 'phantom') {
-      provider = (window as any).solana?.phantom?.publicKey;
+      provider = window.phantom?.solana;
       if (!provider) {
-        await (window as any).solana.connect();
-        provider = (window as any).solana?.phantom;
+        console.error('Phantom provider not found');
+        return null;
+      }
+      
+      // Request connection if not already connected
+      if (!provider.isConnected) {
+        console.info(`Attempting to connect to ${walletType}...`);
+        await provider.connect();
       }
     } else if (walletType === 'solflare') {
-      provider = (window as any).solana?.solflare?.publicKey;
+      provider = window.solflare;
       if (!provider) {
-        await (window as any).solana.connect();
-        provider = (window as any).solana?.solflare;
+        console.error('Solflare provider not found');
+        return null;
+      }
+      
+      // Request connection if not already connected
+      if (!provider.isConnected) {
+        console.info(`Attempting to connect to ${walletType}...`);
+        await provider.connect();
       }
     }
 
@@ -38,6 +53,7 @@ export const connectWallet = async (walletType: WalletType): Promise<string | nu
 
     // Get public key
     const publicKey = provider.publicKey.toString();
+    console.info(`Connected to ${walletType} with public key: ${publicKey}`);
     return publicKey;
   } catch (error) {
     console.error(`Error connecting to ${walletType}:`, error);
@@ -53,20 +69,27 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     
     let provider;
     if (walletType === 'phantom') {
-      provider = (window as any).solana?.phantom;
+      provider = window.phantom?.solana;
     } else if (walletType === 'solflare') {
-      provider = (window as any).solana?.solflare;
+      provider = window.solflare;
     }
 
     if (!provider) {
       throw new Error(`${walletType} wallet not found`);
     }
 
+    console.info(`Signing message with ${walletType} wallet...`);
     // Sign the message
-    const { signature } = await provider.signMessage(encodedMessage);
+    const { signature } = await provider.signMessage(encodedMessage, 'utf8');
+    console.info('Got signature:', signature);
+    
+    // Convert signature to hex string
+    const signatureHex = Array.from(signature)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
     
     return {
-      signature: Buffer.from(signature).toString('hex'),
+      signature: signatureHex,
       publicKey: provider.publicKey.toString()
     };
   } catch (error) {
@@ -78,6 +101,8 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
 // Handle wallet authentication
 export const handleWalletAuth = async (walletType: WalletType): Promise<boolean> => {
   try {
+    console.info(`Starting wallet auth process for ${walletType}...`);
+    
     // Connect to wallet
     const walletAddress = await connectWallet(walletType);
     if (!walletAddress) return false;
@@ -99,7 +124,7 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
     if (existingUser) {
       // User exists, sign in
       const { error } = await supabase.auth.signInWithPassword({
-        email: `${walletAddress}@wallet.bustyberry.com`,
+        email: `${walletAddress.toLowerCase()}@wallet.bustyberry.com`,
         password: signedData.signature.substring(0, 20)
       });
       
@@ -107,7 +132,7 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
     } else {
       // Create new user account
       const { error: signUpError, data } = await supabase.auth.signUp({
-        email: `${walletAddress}@wallet.bustyberry.com`,
+        email: `${walletAddress.toLowerCase()}@wallet.bustyberry.com`,
         password: signedData.signature.substring(0, 20),
         options: {
           data: {
@@ -146,5 +171,47 @@ export const disconnectWallet = async (): Promise<void> => {
     await supabase.auth.signOut();
   } catch (error) {
     console.error("Error disconnecting wallet:", error);
+  }
+};
+
+// Fetch BUSTY token balance for connected wallet
+export const fetchTokenBalance = async (walletAddress: string): Promise<number> => {
+  try {
+    // BUSTY token mint address
+    const tokenMintAddress = "6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump";
+    
+    // Fetch token account info using Solana web3 RPC API
+    const response = await fetch('https://api.mainnet-beta.solana.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "getTokenAccountsByOwner",
+        "params": [
+          walletAddress,
+          {
+            "mint": tokenMintAddress
+          },
+          {
+            "encoding": "jsonParsed"
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    
+    // Extract balance from response
+    if (data.result?.value && data.result.value.length > 0) {
+      const accountInfo = data.result.value[0].account.data.parsed.info;
+      const balance = parseFloat(accountInfo.tokenAmount.amount) / 10 ** accountInfo.tokenAmount.decimals;
+      return balance;
+    }
+    
+    return 0; // Return 0 if no tokens found
+  } catch (error) {
+    console.error("Error fetching token balance:", error);
+    return 0;
   }
 };

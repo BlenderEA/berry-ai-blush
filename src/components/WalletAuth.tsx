@@ -1,43 +1,17 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
-import { Wallet } from 'lucide-react';
+import { Wallet, Dollar } from 'lucide-react';
 import { handleWalletAuth, isWalletInstalled, disconnectWallet, WalletType } from '@/utils/wallet';
-import { supabase } from '@/integrations/supabase/client';
-import { Session } from '@supabase/supabase-js';
+import { useWalletAuth } from '@/hooks/use-wallet-auth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const WalletAuth: React.FC = () => {
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<WalletType | null>(null);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const { walletAddress, tokenBalance, isAuthenticated, balanceLoading } = useWalletAuth();
   
-  useEffect(() => {
-    // Check current auth state
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      
-      if (session?.user?.user_metadata?.wallet_address) {
-        setWalletAddress(session.user.user_metadata.wallet_address);
-      }
-    });
-
-    // Set up auth listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      
-      if (session?.user?.user_metadata?.wallet_address) {
-        setWalletAddress(session.user.user_metadata.wallet_address);
-      } else {
-        setWalletAddress(null);
-      }
-    });
-
-    // Cleanup
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleConnect = async (walletType: WalletType) => {
     if (!isWalletInstalled(walletType)) {
       toast.error(`${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet is not installed`);
@@ -55,7 +29,7 @@ const WalletAuth: React.FC = () => {
       if (success) {
         toast.success(`Connected to ${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet`);
       } else {
-        toast.error('Failed to connect wallet');
+        toast.error('Make sure your wallet is unlocked and try again');
       }
     } catch (error) {
       console.error('Wallet connection error:', error);
@@ -79,21 +53,38 @@ const WalletAuth: React.FC = () => {
     return `${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
   };
 
-  if (session && walletAddress) {
+  if (isAuthenticated && walletAddress) {
     return (
       <Popover>
         <PopoverTrigger asChild>
-          <Button className="berry-button">
+          <Button className="berry-button flex items-center">
             <Wallet className="h-4 w-4 mr-2" />
             {truncateAddress(walletAddress)}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-52 bg-dark border-dark-border text-white">
+        <PopoverContent className="w-64 bg-dark border-dark-border text-white">
           <div className="flex flex-col gap-2">
             <p className="text-sm text-gray-300 mb-2">Connected Wallet</p>
             <p className="text-xs font-mono bg-dark-lighter p-2 rounded break-all">
               {walletAddress}
             </p>
+            
+            <div className="mt-3 mb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Dollar className="h-4 w-4 mr-2 text-berry" />
+                  <span className="text-sm font-medium">$BUSTY Balance:</span>
+                </div>
+                {balanceLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  <span className="font-bold text-berry">
+                    {tokenBalance !== null ? tokenBalance.toLocaleString() : '0'}
+                  </span>
+                )}
+              </div>
+            </div>
+            
             <Button 
               variant="destructive" 
               onClick={handleDisconnect} 
