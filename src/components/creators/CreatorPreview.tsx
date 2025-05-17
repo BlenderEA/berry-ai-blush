@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Image, Video, MessageSquare, Heart } from 'lucide-react';
+import { Image, Video, MessageSquare, Heart, Users } from 'lucide-react';
 
 const CreatorPreview = () => {
   const creators = [
