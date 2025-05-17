@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -85,10 +84,12 @@ const Creators = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button className="berry-button group min-w-[180px]">
-                  Apply as Creator
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
+                <Link to="/apply-as-creator">
+                  <Button className="berry-button group min-w-[180px]">
+                    Apply as Creator
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </Link>
                 <Link to="/token">
                   <Button variant="outline" className="secondary-button min-w-[180px]">
                     Learn About $BUSTY
@@ -333,10 +334,12 @@ const Creators = () => {
                   Own your content, connect directly with fans, and maximize your earnings.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
-                  <Button className="berry-button group min-w-[200px]">
-                    Apply as Creator
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
+                  <Link to="/apply-as-creator">
+                    <Button className="berry-button group min-w-[200px]">
+                      Apply as Creator
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  </Link>
                   <Link to="/community">
                     <Button variant="outline" className="secondary-button min-w-[200px]">
                       Join Our Community
