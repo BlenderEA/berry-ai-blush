@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -5,7 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Star, Heart, Shield, DollarSign, Users } from 'lucide-react';
+import { ArrowRight, Star, Heart, Shield, DollarSign, Users, Image, Video, Eye, MessageSquare } from 'lucide-react';
+import CreatorPreview from '@/components/creators/CreatorPreview';
+import CreatorInsights from '@/components/creators/CreatorInsights';
 
 const Creators = () => {
   const benefits = [
@@ -97,6 +100,38 @@ const Creators = () => {
                 </Link>
               </div>
             </div>
+          </div>
+        </section>
+        
+        {/* Creator Preview Section */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                <span className="gradient-text">Featured Creators</span>
+              </h2>
+              <p className="text-lg text-gray-300">
+                Preview what creator profiles will look like on our platform
+              </p>
+            </div>
+            
+            <CreatorPreview />
+          </div>
+        </section>
+        
+        {/* Future Features & Insights */}
+        <section className="py-16 bg-dark-lighter">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                <span className="gradient-text">Platform Evolution</span>
+              </h2>
+              <p className="text-lg text-gray-300">
+                A glimpse into the future of BustyBerry's creator ecosystem
+              </p>
+            </div>
+            
+            <CreatorInsights />
           </div>
         </section>
         
