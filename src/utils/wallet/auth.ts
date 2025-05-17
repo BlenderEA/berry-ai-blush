@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { WalletType } from './types';
 import { connectWallet, signMessage } from './connection';
+import { toast } from "sonner";
 
 // Handle wallet authentication
 export const handleWalletAuth = async (walletType: WalletType): Promise<boolean> => {
@@ -27,29 +28,48 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
       .maybeSingle();
 
     if (existingUser) {
-      // User exists, sign in with custom credentials
+      // User exists, sign in with custom token
       console.log('User exists, attempting to sign in');
       
-      // Create a base64-safe version of the wallet address for email
-      const safeWalletAddress = walletAddress.toLowerCase().replace(/[+/=]/g, '');
-      const email = `${safeWalletAddress}@wallet.bustyberry.com`;
-      const password = signedData.signature.substring(0, 20);
-      
-      console.log('Signing in with:', { email });
-      
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (error) {
-        console.error('Sign in error:', error);
-        throw error;
+      try {
+        // Create JWT signin with wallet address as the id
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: `wallet_${walletAddress.substring(0, 10)}@example.com`,
+          password: signedData.signature.substring(0, 20)
+        });
+        
+        if (error) {
+          console.error('Sign in error:', error);
+          
+          // If sign in fails, try to create the account first
+          const { error: signUpError } = await supabase.auth.signUp({
+            email: `wallet_${walletAddress.substring(0, 10)}@example.com`,
+            password: signedData.signature.substring(0, 20),
+            options: {
+              data: {
+                wallet_address: walletAddress,
+                wallet_type: walletType
+              }
+            }
+          });
+          
+          if (signUpError) {
+            toast.error("Authentication failed", {
+              description: "Could not authenticate with your wallet. Please try again."
+            });
+            console.error('Sign up error:', signUpError);
+            return false;
+          }
+        }
+        
+        return true;
+      } catch (authError) {
+        console.error('Authentication error:', authError);
+        return false;
       }
     } else {
-      // Create new user account with safe email address
-      const safeWalletAddress = walletAddress.toLowerCase().replace(/[+/=]/g, '');
-      const email = `${safeWalletAddress}@wallet.bustyberry.com`;
+      // Create new user account with valid email format
+      const email = `wallet_${walletAddress.substring(0, 10)}@example.com`;
       const password = signedData.signature.substring(0, 20);
       
       console.log('Creating new user with wallet:', walletAddress);
@@ -68,7 +88,10 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
 
       if (signUpError) {
         console.error('Sign up error:', signUpError);
-        throw signUpError;
+        toast.error("Account creation failed", {
+          description: signUpError.message
+        });
+        return false;
       }
 
       // Create entry in wallet_auth table
@@ -83,14 +106,24 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
         
         if (walletAuthError) {
           console.error('Wallet auth insert error:', walletAuthError);
-          throw walletAuthError;
+          toast.error("Wallet link failed", {
+            description: "Your wallet was authenticated but could not be linked to your account."
+          });
+          return false;
         }
+        
+        toast.success("Account created successfully", {
+          description: "Your wallet has been connected and your account is ready to use."
+        });
       }
     }
     
     return true;
   } catch (error) {
     console.error("Wallet authentication error:", error);
+    toast.error("Wallet connection failed", {
+      description: error instanceof Error ? error.message : "Unknown error occurred"
+    });
     return false;
   }
 };
@@ -99,7 +132,9 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
 export const disconnectWallet = async (): Promise<void> => {
   try {
     await supabase.auth.signOut();
+    toast.success("Wallet disconnected");
   } catch (error) {
     console.error("Error disconnecting wallet:", error);
+    toast.error("Error disconnecting wallet");
   }
 };

@@ -1,6 +1,7 @@
 
 import { WalletType, SignedMessage } from './types';
 import { getWalletProvider } from './providers';
+import { toast } from "sonner";
 
 // Connect to wallet
 export const connectWallet = async (walletType: WalletType): Promise<string | null> => {
@@ -11,6 +12,9 @@ export const connectWallet = async (walletType: WalletType): Promise<string | nu
     
     if (!provider) {
       console.error(`${walletType} wallet provider not found`);
+      toast.error(`${walletType} wallet not found`, {
+        description: "Please install the wallet extension and refresh the page."
+      });
       return null;
     }
     
@@ -24,6 +28,18 @@ export const connectWallet = async (walletType: WalletType): Promise<string | nu
     return publicKey;
   } catch (error) {
     console.error(`Error connecting to ${walletType}:`, error);
+    
+    // Check if the wallet is locked
+    if (error instanceof Error && error.message.includes('locked')) {
+      toast.error("Wallet is locked", {
+        description: "Please unlock your wallet and try again."
+      });
+    } else {
+      toast.error(`Failed to connect to ${walletType}`, {
+        description: "Make sure your wallet is unlocked and try again."
+      });
+    }
+    
     return null;
   }
 };
@@ -36,6 +52,9 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     
     const provider = getWalletProvider(walletType);
     if (!provider) {
+      toast.error(`${walletType} wallet not found`, {
+        description: "Please install the wallet extension and refresh the page."
+      });
       throw new Error(`${walletType} wallet not found`);
     }
 
@@ -48,9 +67,7 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     console.log('Got signature:', signature);
     
     // Convert Uint8Array signature to hex string properly
-    const signatureHex = Array.from(signature)
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
+    const signatureHex = Buffer.from(signature).toString('hex');
     
     console.log('Converted signature to hex:', signatureHex);
     
@@ -60,6 +77,17 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     };
   } catch (error) {
     console.error(`Error signing with ${walletType}:`, error);
+    
+    if (error instanceof Error && error.message.includes('rejected')) {
+      toast.error("Signature rejected", {
+        description: "You declined to sign the message. Please try again and approve the signature request."
+      });
+    } else {
+      toast.error(`Failed to sign message with ${walletType}`, {
+        description: "Please make sure your wallet is unlocked and try again."
+      });
+    }
+    
     return null;
   }
 };

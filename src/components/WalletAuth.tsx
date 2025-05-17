@@ -31,8 +31,8 @@ const WalletAuth: React.FC = () => {
       if (success) {
         toast.success(`Connected to ${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet`);
       } else {
-        toast.error('Failed to connect wallet. Please try again.', {
-          description: "Make sure your wallet is unlocked and try again."
+        toast.error('Failed to connect wallet', {
+          description: "Please make sure your wallet is unlocked and try again."
         });
       }
     } catch (error) {
