@@ -1,5 +1,6 @@
 
 import { WalletType } from './types';
+import { supabase } from '@/integrations/supabase/client';
 
 // Check if wallet is installed
 export const isWalletInstalled = (walletType: WalletType): boolean => {
@@ -99,7 +100,8 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
 // Disconnect wallet
 export const disconnectWallet = async (): Promise<void> => {
   try {
-    await window.supabase.auth.signOut();
+    // Use imported supabase client instead of window.supabase
+    await supabase.auth.signOut();
   } catch (error) {
     console.error("Error disconnecting wallet:", error);
   }
