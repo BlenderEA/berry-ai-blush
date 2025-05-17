@@ -47,11 +47,13 @@ export const connectWallet = async (walletType: WalletType): Promise<string | nu
       // @ts-ignore - Solflare is not typed
       const solflareProvider = window.solflare;
       
-      if (!solflareProvider?.isSolflare) {
+      // Add type assertion to fix TypeScript error
+      if (!(solflareProvider as any)?.isSolflare) {
         throw new Error('Solflare wallet not found');
       }
       
-      const { publicKey } = await solflareProvider.connect();
+      // Add type assertion for connect method
+      const { publicKey } = await (solflareProvider as any).connect();
       return publicKey.toString();
     }
 
@@ -82,18 +84,19 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     else if (walletType === 'solflare') {
       // @ts-ignore - Solflare is not typed
       provider = window.solflare;
-      if (!provider || !provider.isSolflare) {
+      // Add type assertion to fix potential TypeScript errors
+      if (!(provider as any) || !(provider as any).isSolflare) {
         throw new Error('Solflare wallet not found');
       }
-      publicKey = provider.publicKey.toString();
+      publicKey = (provider as any).publicKey.toString();
     }
 
     if (!provider) {
       throw new Error(`${walletType} wallet not found`);
     }
 
-    // Sign the message
-    const { signature } = await provider.signMessage(encodedMessage);
+    // Sign the message with type assertion
+    const { signature } = await (provider as any).signMessage(encodedMessage);
     
     return {
       signature: Buffer.from(signature).toString('hex'),
