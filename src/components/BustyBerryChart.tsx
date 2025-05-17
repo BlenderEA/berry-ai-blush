@@ -57,9 +57,10 @@ const BustyBerryChart = () => {
         chartElement.setAttribute('data-height', '560');
         chartContainerRef.current.appendChild(chartElement);
         
-        // Clean up any existing script to avoid duplicates
-        if (scriptRef.current && document.body.contains(scriptRef.current)) {
-          document.body.removeChild(scriptRef.current);
+        // Safely remove any previous script if it exists
+        if (scriptRef.current && scriptRef.current.parentNode) {
+          scriptRef.current.parentNode.removeChild(scriptRef.current);
+          scriptRef.current = null;
         }
         
         // Load DEXScreener embed script
@@ -105,8 +106,9 @@ const BustyBerryChart = () => {
     
     // Clean up function to remove script when component unmounts
     return () => {
-      if (scriptRef.current && document.body.contains(scriptRef.current)) {
-        document.body.removeChild(scriptRef.current);
+      // Safely remove script only if it exists in DOM
+      if (scriptRef.current && scriptRef.current.parentNode) {
+        scriptRef.current.parentNode.removeChild(scriptRef.current);
       }
     };
   }, [toast]);
