@@ -1,21 +1,46 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { Wallet } from 'lucide-react';
 import { handleWalletAuth, isWalletInstalled, disconnectWallet, WalletType } from '@/utils/wallet';
-import { useWalletAuth } from '@/hooks/use-wallet-auth';
+import { supabase } from '@/integrations/supabase/client';
+import { Session } from '@supabase/supabase-js';
 
 const WalletAuth: React.FC = () => {
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<WalletType | null>(null);
-  const { session, walletAddress, isAuthenticated } = useWalletAuth();
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
   
+  useEffect(() => {
+    // Check current auth state
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      
+      if (session?.user?.user_metadata?.wallet_address) {
+        setWalletAddress(session.user.user_metadata.wallet_address);
+      }
+    });
+
+    // Set up auth listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      
+      if (session?.user?.user_metadata?.wallet_address) {
+        setWalletAddress(session.user.user_metadata.wallet_address);
+      } else {
+        setWalletAddress(null);
+      }
+    });
+
+    // Cleanup
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleConnect = async (walletType: WalletType) => {
     if (!isWalletInstalled(walletType)) {
-      toast.error(`${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet is not installed`, {
-        description: "Please install the wallet extension and refresh the page"
-      });
+      toast.error(`${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet is not installed`);
       window.open(
         walletType === 'phantom' ? 'https://phantom.app/' : 'https://solflare.com/',
         '_blank'
@@ -26,20 +51,15 @@ const WalletAuth: React.FC = () => {
     setLoading(walletType);
     
     try {
-      console.log(`Starting wallet auth process for ${walletType}...`);
       const success = await handleWalletAuth(walletType);
       if (success) {
         toast.success(`Connected to ${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet`);
       } else {
-        toast.error('Failed to connect wallet', {
-          description: "Please make sure your wallet is unlocked and try again."
-        });
+        toast.error('Failed to connect wallet');
       }
     } catch (error) {
       console.error('Wallet connection error:', error);
-      toast.error('Error connecting wallet', {
-        description: error instanceof Error ? error.message : 'Unknown error occurred'
-      });
+      toast.error('Error connecting wallet');
     } finally {
       setLoading(null);
     }
@@ -59,7 +79,7 @@ const WalletAuth: React.FC = () => {
     return `${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
   };
 
-  if (isAuthenticated && walletAddress) {
+  if (session && walletAddress) {
     return (
       <Popover>
         <PopoverTrigger asChild>
