@@ -34,11 +34,13 @@ const ChartLoader: React.FC<ChartLoaderProps> = ({ chartUrl, dexScreenerUrl }) =
         chartElement.setAttribute('data-height', '560');
         chartContainerRef.current.appendChild(chartElement);
         
-        // Safely remove any previous script if it exists
-        if (scriptRef.current && scriptRef.current.parentNode) {
-          scriptRef.current.parentNode.removeChild(scriptRef.current);
-          scriptRef.current = null;
+        // Safely remove any previous script if it exists in the DOM
+        if (scriptRef.current && document.body.contains(scriptRef.current)) {
+          document.body.removeChild(scriptRef.current);
         }
+        
+        // Clean the reference regardless
+        scriptRef.current = null;
         
         // Load DEXScreener embed script
         const script = document.createElement('script');
@@ -83,12 +85,16 @@ const ChartLoader: React.FC<ChartLoaderProps> = ({ chartUrl, dexScreenerUrl }) =
     
     // Clean up function to remove script when component unmounts
     return () => {
-      // Safely remove script only if it exists in DOM
-      if (scriptRef.current && scriptRef.current.parentNode) {
-        scriptRef.current.parentNode.removeChild(scriptRef.current);
+      // Safely remove script only if it exists and is in DOM
+      if (scriptRef.current && document.body.contains(scriptRef.current)) {
+        try {
+          document.body.removeChild(scriptRef.current);
+        } catch (error) {
+          console.error('Error removing script:', error);
+        }
       }
     };
-  }, [toast]);
+  }, []);
 
   return (
     <div 
