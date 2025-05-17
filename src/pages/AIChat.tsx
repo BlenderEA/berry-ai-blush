@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Spinner } from '@/components/ui/spinner';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -43,10 +43,6 @@ const personalities = [
   },
 ];
 
-// Initialize Supabase client - these will be replaced with your actual values
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
 const AIChat = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('sweet-berry');
@@ -61,29 +57,26 @@ const AIChat = () => {
   const [hasSetApiKey, setHasSetApiKey] = useState(false);
   const [isLoadingKey, setIsLoadingKey] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   // Fetch API key from Supabase on component mount
   useEffect(() => {
     const fetchApiKey = async () => {
       try {
-        if (supabaseUrl && supabaseAnonKey) {
-          const { data, error } = await supabase
-            .from('api_keys')
-            .select('key_value')
-            .eq('key_name', 'huggingface')
-            .single();
+        const { data, error } = await supabase
+          .from('api_keys')
+          .select('key_value')
+          .eq('key_name', 'huggingface')
+          .single();
 
-          if (error) {
-            console.error('Error fetching API key:', error);
-            setIsLoadingKey(false);
-            return;
-          }
+        if (error) {
+          console.error('Error fetching API key:', error);
+          setIsLoadingKey(false);
+          return;
+        }
 
-          if (data?.key_value) {
-            setApiKey(data.key_value);
-            setHasSetApiKey(true);
-          }
+        if (data?.key_value) {
+          setApiKey(data.key_value);
+          setHasSetApiKey(true);
         }
       } catch (error) {
         console.error('Error accessing Supabase:', error);
@@ -204,36 +197,26 @@ const AIChat = () => {
       setIsLoading(true);
       
       try {
-        if (supabaseUrl && supabaseAnonKey) {
-          // Store the API key in Supabase
-          const { error } = await supabase
-            .from('api_keys')
-            .upsert({ key_name: 'huggingface', key_value: apiKey })
-            .select();
+        // Store the API key in Supabase
+        const { error } = await supabase
+          .from('api_keys')
+          .upsert({ key_name: 'huggingface', key_value: apiKey })
+          .select();
 
-          if (error) {
-            throw error;
-          }
-
-          setHasSetApiKey(true);
-          toast({
-            title: "API Key Set",
-            description: "Your Hugging Face API key has been stored in Supabase.",
-          });
-        } else {
-          // If Supabase is not configured, just set it locally
-          setHasSetApiKey(true);
-          toast({
-            title: "API Key Set",
-            description: "Your Hugging Face API key has been set. You can now start chatting!",
-            variant: "warning",
-          });
+        if (error) {
+          throw error;
         }
+
+        setHasSetApiKey(true);
+        toast({
+          title: "API Key Set",
+          description: "Your Hugging Face API key has been stored in Supabase.",
+        });
       } catch (error) {
         console.error('Error saving API key to Supabase:', error);
         toast({
           title: "Error Saving API Key",
-          description: "There was an error saving your API key to Supabase. Please connect your Supabase project first.",
+          description: "There was an error saving your API key to Supabase. Please check console for details.",
           variant: "destructive",
         });
       } finally {
@@ -263,14 +246,6 @@ const AIChat = () => {
               <p className="text-lg text-gray-300">
                 Each of our AI personalities offers a unique experience. Choose your favorite and start chatting!
               </p>
-              
-              {!supabaseUrl && !supabaseAnonKey && (
-                <div className="mt-4 p-3 bg-amber-800 bg-opacity-20 border border-amber-600 rounded-md">
-                  <p className="text-amber-300">
-                    For secure API key storage, please connect your project to Supabase using the green Supabase button in the top right.
-                  </p>
-                </div>
-              )}
             </div>
             
             {isLoadingKey ? (
@@ -301,9 +276,7 @@ const AIChat = () => {
                         {isLoading ? <Spinner className="mr-2" size="sm" /> : 'Set API Key'}
                       </Button>
                       <p className="text-xs text-gray-400 text-center">
-                        {supabaseUrl && supabaseAnonKey 
-                          ? "Your API key will be securely stored in Supabase." 
-                          : "Your API key is stored locally and never sent to our servers."}
+                        Your API key will be securely stored in Supabase.
                       </p>
                     </form>
                   </CardContent>
