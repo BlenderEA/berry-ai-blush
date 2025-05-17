@@ -140,7 +140,7 @@ const Token = () => {
               </Card>
             </div>
             
-            {/* Add chart section */}
+            {/* Add chart section with DEXScreener */}
             <div className="mb-12">
               <BustyBerryChart />
             </div>
