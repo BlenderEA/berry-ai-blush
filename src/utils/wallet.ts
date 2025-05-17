@@ -5,10 +5,12 @@ export type WalletType = 'phantom' | 'solflare';
 
 // Check if wallet is installed
 export const isWalletInstalled = (walletType: WalletType): boolean => {
+  if (typeof window === 'undefined') return false;
+  
   if (walletType === 'phantom') {
-    return window && 'solana' in window && 'phantom' in (window as any).solana;
+    return window && 'phantom' in window;
   } else if (walletType === 'solflare') {
-    return window && 'solana' in window && 'solflare' in (window as any).solana;
+    return window && 'solflare' in window;
   }
   return false;
 };
@@ -16,29 +18,44 @@ export const isWalletInstalled = (walletType: WalletType): boolean => {
 // Connect to wallet
 export const connectWallet = async (walletType: WalletType): Promise<string | null> => {
   try {
+    if (typeof window === 'undefined') return null;
+    
     let provider;
     
     if (walletType === 'phantom') {
-      provider = (window as any).solana?.phantom?.publicKey;
-      if (!provider) {
-        await (window as any).solana.connect();
-        provider = (window as any).solana?.phantom;
+      if (!('phantom' in window)) {
+        window.open('https://phantom.app/', '_blank');
+        return null;
       }
-    } else if (walletType === 'solflare') {
-      provider = (window as any).solana?.solflare?.publicKey;
-      if (!provider) {
-        await (window as any).solana.connect();
-        provider = (window as any).solana?.solflare;
+      
+      // @ts-ignore - Phantom is not typed
+      const phantomProvider = window.phantom?.solana;
+      
+      if (!phantomProvider?.isPhantom) {
+        throw new Error('Phantom wallet not found');
       }
+      
+      const { publicKey } = await phantomProvider.connect();
+      return publicKey.toString();
+    } 
+    else if (walletType === 'solflare') {
+      if (!('solflare' in window)) {
+        window.open('https://solflare.com/', '_blank');
+        return null;
+      }
+      
+      // @ts-ignore - Solflare is not typed
+      const solflareProvider = window.solflare;
+      
+      if (!solflareProvider?.isSolflare) {
+        throw new Error('Solflare wallet not found');
+      }
+      
+      const { publicKey } = await solflareProvider.connect();
+      return publicKey.toString();
     }
 
-    if (!provider) {
-      throw new Error(`${walletType} wallet not found`);
-    }
-
-    // Get public key
-    const publicKey = provider.publicKey.toString();
-    return publicKey;
+    return null;
   } catch (error) {
     console.error(`Error connecting to ${walletType}:`, error);
     return null;
@@ -52,10 +69,23 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     const encodedMessage = encoder.encode(message);
     
     let provider;
+    let publicKey;
+    
     if (walletType === 'phantom') {
-      provider = (window as any).solana?.phantom;
-    } else if (walletType === 'solflare') {
-      provider = (window as any).solana?.solflare;
+      // @ts-ignore - Phantom is not typed
+      provider = window.phantom?.solana;
+      if (!provider || !provider.isPhantom) {
+        throw new Error('Phantom wallet not found');
+      }
+      publicKey = provider.publicKey.toString();
+    } 
+    else if (walletType === 'solflare') {
+      // @ts-ignore - Solflare is not typed
+      provider = window.solflare;
+      if (!provider || !provider.isSolflare) {
+        throw new Error('Solflare wallet not found');
+      }
+      publicKey = provider.publicKey.toString();
     }
 
     if (!provider) {
@@ -67,7 +97,7 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
     
     return {
       signature: Buffer.from(signature).toString('hex'),
-      publicKey: provider.publicKey.toString()
+      publicKey: publicKey
     };
   } catch (error) {
     console.error(`Error signing with ${walletType}:`, error);
@@ -94,7 +124,7 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
       .from('wallet_auth')
       .select('user_id')
       .eq('wallet_address', walletAddress)
-      .single();
+      .maybeSingle();
 
     if (existingUser) {
       // User exists, sign in

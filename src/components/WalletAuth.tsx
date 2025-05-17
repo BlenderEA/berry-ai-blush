@@ -1,43 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { Wallet } from 'lucide-react';
 import { handleWalletAuth, isWalletInstalled, disconnectWallet, WalletType } from '@/utils/wallet';
-import { supabase } from '@/integrations/supabase/client';
-import { Session } from '@supabase/supabase-js';
+import { useWalletAuth } from '@/hooks/use-wallet-auth';
 
 const WalletAuth: React.FC = () => {
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<WalletType | null>(null);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const { session, walletAddress, isAuthenticated } = useWalletAuth();
   
-  useEffect(() => {
-    // Check current auth state
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      
-      if (session?.user?.user_metadata?.wallet_address) {
-        setWalletAddress(session.user.user_metadata.wallet_address);
-      }
-    });
-
-    // Set up auth listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      
-      if (session?.user?.user_metadata?.wallet_address) {
-        setWalletAddress(session.user.user_metadata.wallet_address);
-      } else {
-        setWalletAddress(null);
-      }
-    });
-
-    // Cleanup
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleConnect = async (walletType: WalletType) => {
     if (!isWalletInstalled(walletType)) {
       toast.error(`${walletType === 'phantom' ? 'Phantom' : 'Solflare'} wallet is not installed`);
@@ -79,7 +52,7 @@ const WalletAuth: React.FC = () => {
     return `${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
   };
 
-  if (session && walletAddress) {
+  if (isAuthenticated && walletAddress) {
     return (
       <Popover>
         <PopoverTrigger asChild>
