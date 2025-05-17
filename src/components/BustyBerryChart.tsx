@@ -35,15 +35,21 @@ const BustyBerryChart = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[600px] w-full mt-4 rounded-lg overflow-hidden border border-dark-border">
-          <iframe
-            src={dexScreenerUrl}
-            title="DEXScreener Chart for BUSTYBERRY"
-            width="100%"
-            height="100%"
-            style={{ border: "none" }}
-            className="bg-dark-lighter"
-          />
+        <div className="h-[600px] w-full mt-4 rounded-lg overflow-hidden border border-dark-border bg-dark-lighter p-4 flex flex-col items-center justify-center">
+          {/* Replace iframe with direct link */}
+          <p className="text-center mb-4">DEXScreener doesn't allow embedding in iframes.</p>
+          <p className="text-center mb-6">Click the button below to view the chart:</p>
+          <a 
+            href={dexScreenerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block"
+          >
+            <Button className="berry-button">
+              Open DEXScreener Chart
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </Button>
+          </a>
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-4 text-center">
