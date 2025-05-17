@@ -88,11 +88,21 @@ export const signMessage = async (walletType: WalletType, message: string): Prom
       publicKey = provider.publicKey.toString();
     }
 
+    console.log(`Signing message with ${walletType} wallet...`);
+    
     // Sign the message
     const { signature } = await provider.signMessage(encodedMessage);
+    console.log('Got signature:', signature);
+    
+    // Convert signature to hex string without using Buffer
+    const signatureHex = Array.from(signature)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    console.log('Converted signature to hex:', signatureHex);
     
     return {
-      signature: Buffer.from(signature).toString('hex'),
+      signature: signatureHex,
       publicKey: publicKey
     };
   } catch (error) {
@@ -115,6 +125,8 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
     const signedData = await signMessage(walletType, message);
     if (!signedData) return false;
     
+    console.log('Signed data:', signedData);
+    
     // Check if user exists with this wallet
     const { data: existingUser } = await supabase
       .from('wallet_auth')
@@ -124,14 +136,29 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
 
     if (existingUser) {
       // User exists, sign in
+      console.log('User exists, attempting to sign in with:', {
+        email: `${walletAddress}@wallet.bustyberry.com`,
+        password: signedData.signature.substring(0, 20)
+      });
+      
       const { error } = await supabase.auth.signInWithPassword({
         email: `${walletAddress}@wallet.bustyberry.com`,
         password: signedData.signature.substring(0, 20)
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Sign in error:', error);
+        throw error;
+      }
     } else {
       // Create new user account
+      console.log('Creating new user with:', {
+        email: `${walletAddress}@wallet.bustyberry.com`,
+        password: signedData.signature.substring(0, 20),
+        wallet_address: walletAddress,
+        wallet_type: walletType
+      });
+      
       const { error: signUpError, data } = await supabase.auth.signUp({
         email: `${walletAddress}@wallet.bustyberry.com`,
         password: signedData.signature.substring(0, 20),
@@ -143,7 +170,10 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        console.error('Sign up error:', signUpError);
+        throw signUpError;
+      }
 
       // Create entry in wallet_auth table
       if (data.user) {
@@ -155,7 +185,10 @@ export const handleWalletAuth = async (walletType: WalletType): Promise<boolean>
             wallet_type: walletType
           });
         
-        if (walletAuthError) throw walletAuthError;
+        if (walletAuthError) {
+          console.error('Wallet auth insert error:', walletAuthError);
+          throw walletAuthError;
+        }
       }
     }
     
