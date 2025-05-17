@@ -11,7 +11,7 @@ const BustyBerryChart = () => {
   const [priceData, setPriceData] = useState<{ price: string; change24h: number } | null>(null);
   
   const dexScreenerUrl = "https://dexscreener.com/solana/nxt6pyiaph5wisdmbfuc7zrqkj5btyqco6rypm5bmkw";
-  const chartUrl = "https://api.dexscreener.com/latest/dex/chart/solana/nxt6pyiaph5wisdmbfuc7zrqkj5btyqco6rypm5bmkw";
+  const chartUrl = "https://dexscreener.com/solana/nxt6pyiaph5wisdmbfuc7zrqkj5btyqco6rypm5bmkw?embed=1&theme=dark";
   const contractAddress = "6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump";
   
   // Fetch basic price data
@@ -40,7 +40,7 @@ const BustyBerryChart = () => {
       title: "Chart Refreshed",
       description: "Price chart data has been updated.",
     });
-    // Reference to the chart loader's loadDexScreenerChart method
+    // Just refresh price data
     fetchPriceData();
   };
 

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { ExternalLink, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -10,87 +10,28 @@ interface ChartLoaderProps {
 }
 
 const ChartLoader: React.FC<ChartLoaderProps> = ({ chartUrl, dexScreenerUrl }) => {
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const scriptRef = useRef<HTMLScriptElement | null>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [chartError, setChartError] = useState(false);
 
-  const loadDexScreenerChart = async () => {
-    try {
-      if (chartContainerRef.current) {
-        setIsLoading(true);
-        setChartError(false);
-        
-        // Clear any previous chart
-        chartContainerRef.current.innerHTML = '';
-        
-        // Add chart container with DEXScreener's expected format
-        const chartElement = document.createElement('div');
-        chartElement.className = 'dexscreener-embed-chart';
-        chartElement.setAttribute('data-pairAddress', 'nxt6pyiaph5wisdmbfuc7zrqkj5btyqco6rypm5bmkw');
-        chartElement.setAttribute('data-chain', 'solana');
-        chartElement.setAttribute('data-theme', 'dark');
-        chartElement.setAttribute('data-height', '560');
-        chartContainerRef.current.appendChild(chartElement);
-        
-        // Remove existing script reference if it exists
-        if (scriptRef.current) {
-          // Instead of trying to remove it, just clean the reference
-          scriptRef.current = null;
-        }
-        
-        // Create a new script element
-        const script = document.createElement('script');
-        script.src = 'https://widgets.dexscreener.com/latest/widget.js';
-        script.async = true;
-        
-        // Store script reference for cleanup
-        scriptRef.current = script;
-        
-        // Set loading state based on script load events
-        script.onload = () => {
-          setIsLoading(false);
-        };
-        
-        script.onerror = () => {
-          setIsLoading(false);
-          setChartError(true);
-          toast({
-            title: "Chart Loading Error",
-            description: "Unable to load the DEXScreener chart. Please try again later.",
-            variant: "destructive"
-          });
-        };
-        
-        // Append to document body
-        document.body.appendChild(script);
-      }
-    } catch (error) {
-      console.error('Error loading DEXScreener chart:', error);
-      setIsLoading(false);
-      setChartError(true);
-      toast({
-        title: "Chart Loading Error",
-        description: "Unable to load the DEXScreener chart. Please try again later.",
-        variant: "destructive"
-      });
-    }
+  // Using an iframe to load the DEXScreener chart avoids complex DOM manipulation
+  // and prevents the "removeChild" errors
+  const handleIframeLoad = () => {
+    setIsLoading(false);
   };
 
-  // Load chart when component mounts
-  useEffect(() => {
-    loadDexScreenerChart();
-    
-    // Clean up function - simplified to avoid DOM manipulation errors
-    return () => {
-      // Do nothing with the script on unmount - let the browser clean it up
-    };
-  }, []);
+  const handleIframeError = () => {
+    setIsLoading(false);
+    setChartError(true);
+    toast({
+      title: "Chart Loading Error",
+      description: "Unable to load the DEXScreener chart. Please try again later.",
+      variant: "destructive"
+    });
+  };
 
   return (
     <div 
-      ref={chartContainerRef} 
       className="h-[600px] w-full rounded-lg overflow-hidden border border-dark-border bg-dark-lighter relative"
     >
       {isLoading && (
@@ -126,11 +67,13 @@ const ChartLoader: React.FC<ChartLoaderProps> = ({ chartUrl, dexScreenerUrl }) =
         </div>
       )}
       
-      {!isLoading && !chartError && (
-        <div className="w-full h-full flex items-center justify-center">
-          {/* DEXScreener chart will be loaded here by the widget script */}
-        </div>
-      )}
+      <iframe 
+        src={`https://dexscreener.com/solana/nxt6pyiaph5wisdmbfuc7zrqkj5btyqco6rypm5bmkw?embed=1&theme=dark&trades=0&info=0`}
+        className="w-full h-full border-none"
+        onLoad={handleIframeLoad}
+        onError={handleIframeError}
+        title="DEXScreener Chart"
+      />
     </div>
   );
 };
