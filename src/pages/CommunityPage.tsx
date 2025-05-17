@@ -15,7 +15,7 @@ const CommunityPage = () => {
       icon: MessageSquare,
       link: "https://t.me/BustyBerry1",
       color: "bg-[#0088cc]",
-      members: "15K+",
+      members: "250+",
       description: "Join our Telegram community for real-time updates, direct communication with the team, and a vibrant community of $BUSTYBERRY enthusiasts.",
       groups: [
         { name: "Main Channel", link: "https://t.me/BustyBerry1" }
@@ -27,7 +27,7 @@ const CommunityPage = () => {
       icon: Twitter,
       link: "https://x.com/BustyBerryAI",
       color: "bg-[#1DA1F2]", 
-      members: "22K+",
+      members: "100+",
       description: "Follow us on X (formerly Twitter) for the latest announcements, memes, and to participate in our campaigns and giveaways.",
       latestTweets: [
         "Exciting news coming soon! The juiciest memecoin is about to get even juicier! #BUSTYBERRY",
@@ -41,7 +41,7 @@ const CommunityPage = () => {
       icon: ExternalLink,
       link: "https://x.com/i/communities/1922803262262215153",
       color: "bg-[#1DA1F2]",
-      members: "8K+",
+      members: "50+",
       description: "Our X Community is the place for deeper discussions on development, feature requests, and connecting with fellow community members.",
       channels: [
         "🍓 general-chat",

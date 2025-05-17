@@ -11,21 +11,21 @@ const Community = () => {
       icon: MessageSquare,
       link: "https://t.me/BustyBerry1",
       color: "bg-[#0088cc]",
-      members: "15K+"
+      members: "250+"
     },
     {
       name: "X (Twitter)",
       icon: Twitter,
       link: "https://x.com/BustyBerryAI",
       color: "bg-[#1DA1F2]", 
-      members: "22K+"
+      members: "100+"
     },
     {
       name: "X Community",
       icon: ExternalLink,
       link: "https://x.com/i/communities/1922803262262215153",
       color: "bg-[#1DA1F2]",
-      members: "8K+"
+      members: "50+"
     }
   ];
 
