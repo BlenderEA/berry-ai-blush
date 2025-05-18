@@ -16,6 +16,7 @@ import ContentGuidelines from "./pages/ContentGuidelines";
 import Whitepaper from "./pages/Whitepaper";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RiskDisclaimer from "./pages/RiskDisclaimer";
+import NFTMint from "./pages/NFTMint";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/content-guidelines" element={<ContentGuidelines />} />
           <Route path="/disclaimer" element={<RiskDisclaimer />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
+          <Route path="/nft" element={<NFTMint />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
