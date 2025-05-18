@@ -7,10 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useSearchParams } from 'react-router-dom';
 import ChatWindow from '@/components/chat/ChatWindow';
-import { useWalletAuth } from '@/hooks/use-wallet-auth';
-import { Button } from '@/components/ui/button';
-import { Wallet } from 'lucide-react';
-import WalletAuth from '@/components/WalletAuth';
 
 const personalities = [
   {
@@ -73,7 +69,6 @@ const AIChat = () => {
   const [searchParams] = useSearchParams();
   const personalityParam = searchParams.get('personality');
   const [activeTab, setActiveTab] = useState(personalityParam || 'blueberry-babe');
-  const { walletAddress } = useWalletAuth();
   
   useEffect(() => {
     if (personalityParam && personalities.some(p => p.id === personalityParam)) {
@@ -92,13 +87,6 @@ const AIChat = () => {
               <p className="text-lg text-gray-300 mb-6">
                 Each of our AI personalities offers a unique experience. Choose your favorite and start chatting!
               </p>
-              
-              {!walletAddress && (
-                <div className="bg-dark-lighter p-4 rounded-lg border border-berry/30 mb-8">
-                  <p className="text-sm mb-3">Connect your wallet to access AI chat features</p>
-                  <WalletAuth />
-                </div>
-              )}
             </div>
             
             <div className="max-w-5xl mx-auto">

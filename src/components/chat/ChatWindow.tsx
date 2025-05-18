@@ -6,7 +6,6 @@ import { Send } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 import { useTTS } from '@/hooks/use-tts';
 import { toast } from 'sonner';
-import { useWalletAuth } from '@/hooks/use-wallet-auth';
 
 interface ChatWindowProps {
   personalityId: string;
@@ -44,9 +43,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  const { walletAddress } = useWalletAuth();
-  const hasWalletAccess = !!walletAddress;
 
   const { speak, stop, isLoading: isTTSLoading, isPlaying } = useTTS({
     onEnd: () => setSpeakingMessageId(null),
@@ -78,13 +74,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     
     if (!inputMessage.trim()) return;
     
-    if (!hasWalletAccess) {
-      toast.error('Connect your wallet to chat with AI Berries', {
-        description: 'You need to hold $BUSTYBERRY tokens to access this feature.'
-      });
-      return;
-    }
-    
     // Add user message
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -110,12 +99,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       
       setMessages(prev => [...prev, assistantMessage]);
       
-      // Auto-speak the first assistant message if the user has wallet access
-      if (hasWalletAccess) {
-        setTimeout(() => {
-          handleSpeakMessage(assistantMessage.id, responseText);
-        }, 300);
-      }
+      // Auto-speak the assistant message
+      setTimeout(() => {
+        handleSpeakMessage(assistantMessage.id, responseText);
+      }, 300);
       
     } catch (error) {
       console.error('Error generating response:', error);
@@ -180,26 +167,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       <div className="border-t border-dark-border p-3">
         <form onSubmit={handleSendMessage} className="flex gap-2">
           <Input
-            placeholder={hasWalletAccess ? "Type your message..." : "Connect wallet to chat..."}
+            placeholder="Type your message..."
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            disabled={isLoading || !hasWalletAccess}
+            disabled={isLoading}
             className="bg-dark border-dark-border"
           />
           <Button 
             type="submit" 
-            disabled={isLoading || !inputMessage.trim() || !hasWalletAccess}
+            disabled={isLoading || !inputMessage.trim()}
             className="bg-berry hover:bg-berry-light"
           >
             <Send size={18} />
           </Button>
         </form>
-        
-        {!hasWalletAccess && (
-          <p className="text-xs text-gray-400 mt-2 text-center">
-            You need to connect your wallet and hold $BUSTYBERRY tokens to chat
-          </p>
-        )}
       </div>
     </div>
   );

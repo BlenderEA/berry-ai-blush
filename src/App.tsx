@@ -16,7 +16,6 @@ import ContentGuidelines from "./pages/ContentGuidelines";
 import Whitepaper from "./pages/Whitepaper";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RiskDisclaimer from "./pages/RiskDisclaimer";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -31,14 +30,7 @@ const App = () => (
           <Route path="/ai-chat" element={<AIChat />} />
           <Route path="/token" element={<Token />} />
           <Route path="/creators" element={<Creators />} />
-          <Route 
-            path="/apply-as-creator" 
-            element={
-              <ProtectedRoute redirectTo="/">
-                <CreatorApplication />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/creator-application" element={<CreatorApplication />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

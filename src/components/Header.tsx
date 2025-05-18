@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
-import WalletAuth from '@/components/WalletAuth';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -68,11 +67,6 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* Wallet Auth Button - Desktop */}
-        <div className="hidden md:block">
-          <WalletAuth />
-        </div>
-
         {/* Mobile Menu Button */}
         <div className="md:hidden">
           <Button 
@@ -105,9 +99,6 @@ const Header = () => {
                 {link.name}
               </Link>
             ))}
-            <div className="pt-2">
-              <WalletAuth />
-            </div>
           </div>
         </div>
       )}
