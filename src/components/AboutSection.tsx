@@ -1,6 +1,10 @@
+
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { DollarSign, MessageCircle } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { DollarSign, MessageCircle, UserPlus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+
 const AboutSection = () => {
   return <section className="section-padding relative" id="about">
       <div className="container mx-auto">
@@ -21,8 +25,16 @@ const AboutSection = () => {
               <CardTitle className="text-2xl">Memecoin With Potential</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-300">$BUSTYBERRY isn't just another memecoin. Built on the Solana blockchain for lightning-fast transactions and minimal fees, our token combines virality with realUtility through ai chat bot and exclusive access to VIP Busty Berry Girls rooms and opportunities to provide content. </p>
+              <p className="text-gray-300">$BUSTYBERRY isn't just another memecoin. Built on the Solana blockchain for lightning-fast transactions and minimal fees, our token combines virality with realUtility through ai chat bot and exclusive access to VIP Busty Berry Girls rooms and opportunities to provide content.</p>
             </CardContent>
+            <CardFooter>
+              <Link to="/creator-application">
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Apply as Creator
+                </Button>
+              </Link>
+            </CardFooter>
           </Card>
           
           <Card className="glass-card hover:border-berry/30 transition-all hover:-translate-y-1 duration-300">
@@ -45,4 +57,5 @@ const AboutSection = () => {
       </div>
     </section>;
 };
+
 export default AboutSection;
