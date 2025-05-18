@@ -6,6 +6,7 @@ import { Send } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 import { useTTS } from '@/hooks/use-tts';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChatWindowProps {
   personalityId: string;
@@ -52,20 +53,32 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   });
 
-  // Mock response generation - In a real app, this would call an AI API
+  // Generate AI response using Hugging Face models via Supabase Edge Function
   const generateResponse = async (userMessage: string): Promise<string> => {
-    // Simple mock response based on message content
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
-    
-    const keywords = ['hello', 'hi', 'hey', 'what', 'who', 'how', 'why', 'where', 'when'];
-    const hasCommonKeyword = keywords.some(keyword => 
-      userMessage.toLowerCase().includes(keyword)
-    );
-    
-    if (hasCommonKeyword) {
-      return `Thanks for your message! I'm ${personalityName} and I'm still learning. In the future, I'll have proper AI responses, but for now this is a demonstration of our chat interface.`;
-    } else {
-      return `That's interesting! I'm ${personalityName} and I'd love to chat more about this when my AI capabilities are fully implemented. Stay tuned!`;
+    try {
+      // Format message history for the AI (limited to last 10 messages for context)
+      const messageHistory = messages
+        .slice(-10)
+        .map(msg => ({ role: msg.role, content: msg.content }));
+
+      // Call Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('ai-chat', {
+        body: { 
+          text: userMessage, 
+          personalityId, 
+          messageHistory 
+        }
+      });
+
+      if (error) {
+        console.error('AI chat function error:', error);
+        throw new Error(error.message || 'Failed to generate response');
+      }
+
+      return data?.response || `I'm ${personalityName} and I seem to be having trouble thinking right now. Can you try again?`;
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      return `Sorry, I'm having trouble connecting to my thoughts right now. Could you try again in a moment?`;
     }
   };
 
