@@ -43,6 +43,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { speak, stop, isLoading: isTTSLoading, isPlaying } = useTTS({
@@ -57,6 +58,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   // Generate AI response using Hugging Face models via Supabase Edge Function
   const generateResponse = async (userMessage: string): Promise<string> => {
     try {
+      setErrorMessage(null);
+      
       // Format message history for the AI (limited to last 10 messages for context)
       const messageHistory = messages
         .slice(-10)
@@ -82,8 +85,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         throw new Error(error.message || 'Failed to generate response');
       }
 
-      if (!data || !data.response) {
+      if (!data) {
         console.error('Invalid response from AI chat function:', data);
+        throw new Error('Received empty response from AI');
+      }
+
+      if (data.error) {
+        console.error('Error from AI chat function:', data.error);
+        throw new Error(data.error || 'AI generated an error');
+      }
+
+      if (!data.response) {
+        console.error('Invalid response format:', data);
         throw new Error('Received invalid response format from AI');
       }
 
@@ -91,6 +104,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       return data.response;
     } catch (error) {
       console.error('Error generating AI response:', error);
+      
+      // Store the specific error message for display
+      setErrorMessage(error instanceof Error ? error.message : 'Unknown error occurred');
+      
       toast.error('Failed to generate AI response. Please try again later.');
       return `I'm ${personalityName} and I seem to be having trouble thinking right now. Can you try again?`;
     }
@@ -190,6 +207,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
               <div className="w-2 h-2 bg-berry/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
             </div>
             <span className="text-sm text-gray-400">Thinking...</span>
+          </div>
+        )}
+        
+        {/* Error message */}
+        {errorMessage && (
+          <div className="p-3 bg-red-900/30 border border-red-800 rounded-lg text-sm text-white">
+            <p className="font-semibold">Error with AI service:</p>
+            <p>{errorMessage}</p>
+            <p className="mt-2 text-xs text-gray-300">Please try again or reload the page.</p>
           </div>
         )}
       </div>

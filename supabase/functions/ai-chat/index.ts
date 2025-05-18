@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const HUGGINGFACE_API_KEY = Deno.env.get('HUGGING_FACE_API_KEY');
@@ -8,17 +7,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Model IDs for different personalities - Updated with widely available models
+// Updated with 100% available models from Hugging Face
 const textModels = {
-  'blueberry-babe': 'facebook/blenderbot-400M-distill',
-  'berry-bold': 'facebook/opt-350m',
-  'white-berry': 'distilgpt2',
-  'blue-frost': 'gpt2',
-  'raspberry-queen': 'EleutherAI/gpt-neo-125M',
-  'blackberry-dream': 'microsoft/DialoGPT-medium'
+  'blueberry-babe': 'gpt2',
+  'berry-bold': 'distilgpt2',
+  'white-berry': 'EleutherAI/gpt-neo-125M',
+  'blue-frost': 'microsoft/DialoGPT-small',
+  'raspberry-queen': 'microsoft/DialoGPT-medium',
+  'blackberry-dream': 'facebook/blenderbot-400M-distill'
 };
 
-// Personality prompts
+// Personality prompts remain the same
 const personalityPrompts = {
   'blueberry-babe': 'You are Blueberry Babe, a sweet and playful AI companion with a mischievous side. You love talking about your day while surrounded by blueberries. You respond in a cute, flirty way and often use emojis like 💙.',
   'berry-bold': 'You are Berry Bold, a confident and straightforward AI companion. You don\'t beat around the bush and always tell people what you think. You are direct, sometimes sarcastic, and don\'t use unnecessary words or emojis.',
@@ -57,8 +56,9 @@ serve(async (req) => {
 
     console.log("Calling Hugging Face API with model:", modelId);
     console.log("Combined prompt (first 100 chars):", combinedPrompt.substring(0, 100));
+    console.log("API Key first 5 chars:", HUGGINGFACE_API_KEY ? HUGGINGFACE_API_KEY.substring(0, 5) + "..." : "undefined");
     
-    // Call Hugging Face Inference API for text generation
+    // Updated API call with robust error handling
     const response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
       method: 'POST',
       headers: {
@@ -68,7 +68,7 @@ serve(async (req) => {
       body: JSON.stringify({ 
         inputs: combinedPrompt,
         parameters: {
-          max_new_tokens: 250,
+          max_new_tokens: 150,
           temperature: 0.7,
           top_p: 0.9,
           do_sample: true,
@@ -77,23 +77,26 @@ serve(async (req) => {
       }),
     });
 
+    // Check response status and handle appropriately
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Hugging Face API error (${response.status}):`, errorText);
+      throw new Error(`Hugging Face API returned ${response.status}: ${errorText}`);
+    }
+
     const responseText = await response.text();
     console.log("Raw API response:", responseText.substring(0, 100));
 
-    if (!response.ok) {
-      console.error('Hugging Face API error:', responseText);
-      throw new Error(`Hugging Face API returned ${response.status}: ${responseText}`);
-    }
-
+    // Handle different response formats
     let result;
     try {
       result = JSON.parse(responseText);
     } catch (e) {
-      console.error("Failed to parse JSON response:", e);
-      throw new Error("Invalid response format from Hugging Face API");
+      console.log("Response is not JSON, treating as plain text");
+      result = responseText;
     }
 
-    // Handle different response formats from various models
+    // Parse different response formats from various models
     let generatedText = '';
     if (Array.isArray(result) && result.length > 0) {
       if (result[0].generated_text) {
@@ -101,7 +104,7 @@ serve(async (req) => {
       } else if (typeof result[0] === 'string') {
         generatedText = result[0];
       }
-    } else if (result.generated_text) {
+    } else if (typeof result === 'object' && result.generated_text) {
       generatedText = result.generated_text;
     } else if (typeof result === 'string') {
       generatedText = result;
@@ -117,8 +120,13 @@ serve(async (req) => {
 
     console.log("Final generated text:", generatedText.substring(0, 100));
 
+    // Use fallback if no text was generated
+    if (!generatedText) {
+      generatedText = `I'm ${personalityId.replace(/-/g, ' ')} and I'm having trouble thinking clearly. Can we try again?`;
+    }
+
     return new Response(
-      JSON.stringify({ response: generatedText || "I'm not sure how to respond to that." }),
+      JSON.stringify({ response: generatedText }),
       { 
         headers: { 
           ...corsHeaders, 
@@ -130,7 +138,10 @@ serve(async (req) => {
     console.error('Error in ai-chat function:', error);
     
     return new Response(
-      JSON.stringify({ error: error.message || 'An error occurred during AI chat response generation' }),
+      JSON.stringify({ 
+        error: error.message || 'An error occurred during AI chat response generation',
+        details: error.toString()
+      }),
       { 
         status: 500, 
         headers: { 

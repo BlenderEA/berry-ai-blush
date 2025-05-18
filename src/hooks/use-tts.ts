@@ -13,11 +13,13 @@ export const useTTS = (options: UseTTSOptions = {}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const speak = async (text: string, personalityId: string) => {
     if (!text || !personalityId) return;
 
     try {
+      setErrorMessage(null);
       setIsLoading(true);
       options.onStart?.();
 
@@ -36,7 +38,17 @@ export const useTTS = (options: UseTTSOptions = {}) => {
         throw new Error(error.message || 'Failed to generate speech');
       }
 
-      if (!data || !data.audio) {
+      if (!data) {
+        console.error('Invalid TTS response:', data);
+        throw new Error('No response received from speech service');
+      }
+
+      if (data.error) {
+        console.error('Error from TTS function:', data.error);
+        throw new Error(data.error || 'Speech service error');
+      }
+
+      if (!data.audio) {
         console.error('Invalid TTS response:', data);
         throw new Error('No audio data received');
       }
@@ -63,7 +75,9 @@ export const useTTS = (options: UseTTSOptions = {}) => {
       newAudio.onerror = (e) => {
         console.error('Audio playback error:', e);
         setIsPlaying(false);
-        options.onError?.('Error playing audio');
+        const errorMsg = 'Error playing audio';
+        setErrorMessage(errorMsg);
+        options.onError?.(errorMsg);
         toast.error('Failed to play audio');
         URL.revokeObjectURL(audioUrl); // Clean up
       };
@@ -78,7 +92,9 @@ export const useTTS = (options: UseTTSOptions = {}) => {
       }
     } catch (error) {
       console.error('TTS error:', error);
-      options.onError?.(error instanceof Error ? error.message : 'Unknown error');
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      setErrorMessage(errorMsg);
+      options.onError?.(errorMsg);
       toast.error('Speech generation failed');
       throw error; // Re-throw to allow the caller to handle the error
     } finally {
@@ -116,6 +132,7 @@ export const useTTS = (options: UseTTSOptions = {}) => {
     speak,
     stop,
     isLoading,
-    isPlaying
+    isPlaying,
+    errorMessage
   };
 };
