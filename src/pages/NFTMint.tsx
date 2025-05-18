@@ -1,41 +1,34 @@
 
-import React, { useState } from 'react';
-import { Wallet, Plus, Check } from 'lucide-react';
+import React from 'react';
+import { CalendarDays, Bell } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 
 const NFTMint = () => {
-  const [mintAmount, setMintAmount] = useState(1);
-  const [isMinting, setIsMinting] = useState(false);
-  const [mintComplete, setMintComplete] = useState(false);
   const { toast } = useToast();
+  const [email, setEmail] = React.useState('');
 
-  const handleDecrease = () => {
-    if (mintAmount > 1) setMintAmount(mintAmount - 1);
-  };
-
-  const handleIncrease = () => {
-    if (mintAmount < 10) setMintAmount(mintAmount + 1);
-  };
-
-  const handleMint = () => {
-    setIsMinting(true);
-    
-    // Simulate minting process
-    setTimeout(() => {
-      setIsMinting(false);
-      setMintComplete(true);
-      
+  const handleNotify = () => {
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       toast({
-        title: "NFTs Minted Successfully!",
-        description: `You have minted ${mintAmount} Busty Berry NFTITTYS.`,
-        variant: "default",
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
       });
-    }, 2000);
+      return;
+    }
+    
+    toast({
+      title: "Notification Set!",
+      description: "We'll notify you when Busty Berry NFTITTYS are available for minting.",
+      variant: "default",
+    });
+    
+    setEmail('');
   };
 
   return (
@@ -45,10 +38,13 @@ const NFTMint = () => {
       <main className="container mx-auto px-4 py-16">
         <div className="flex flex-col items-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center gradient-text">
-            Mint Your Busty Berry NFTITTYS
+            Busty Berry NFTITTYS
           </h1>
+          <div className="bg-berry px-4 py-2 rounded-full text-white font-bold text-lg mb-8 animate-pulse">
+            Coming Soon!
+          </div>
           <p className="text-xl mb-8 text-center max-w-2xl">
-            Exclusive NFT collection with unique digital assets. Mint yours now before they're gone!
+            Our exclusive NFT collection will be available for minting soon. Be among the first to get your hands on these unique digital assets!
           </p>
         </div>
 
@@ -56,12 +52,12 @@ const NFTMint = () => {
           {/* NFT Preview */}
           <div className="flex flex-col items-center">
             <div className="w-full max-w-md aspect-square bg-dark-card rounded-2xl overflow-hidden border-2 border-berry p-1 mb-4">
-              <div className="w-full h-full rounded-xl overflow-hidden bg-gradient-to-br from-berry-purple to-berry-magenta flex items-center justify-center animate-pulse-slow">
-                <img 
-                  src="/placeholder.svg" 
-                  alt="Busty Berry NFT Preview" 
-                  className="w-4/5 h-4/5 object-cover animate-float"
-                />
+              <div className="w-full h-full rounded-xl overflow-hidden bg-gradient-to-br from-berry-purple to-berry-magenta flex items-center justify-center">
+                <div className="text-center p-6">
+                  <CalendarDays size={80} className="mx-auto mb-4 text-white/50" />
+                  <h3 className="text-2xl font-bold mb-2">Launch Date</h3>
+                  <p className="text-lg text-white/80">Coming Q3 2023</p>
+                </div>
               </div>
             </div>
             <div className="bg-dark-lighter p-4 rounded-xl w-full max-w-md">
@@ -81,93 +77,47 @@ const NFTMint = () => {
                 </li>
                 <li className="flex justify-between">
                   <span className="text-gray-400">Price:</span>
-                  <span className="font-medium">0.69 SOL</span>
+                  <span className="font-medium">TBA</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Mint Controls */}
+          {/* Notification Sign-up */}
           <Card className="bg-dark-card border-dark-border">
-            <CardHeader>
-              <CardTitle className="text-2xl">Mint Your NFTs</CardTitle>
-              <CardDescription>Select how many NFTs to mint</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span>Quantity:</span>
-                  <span className="text-berry font-bold">{mintAmount} NFT{mintAmount > 1 ? 's' : ''}</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handleDecrease}
-                    disabled={mintAmount <= 1 || isMinting}
-                    className="border-berry text-berry hover:bg-berry/10"
-                  >
-                    -
-                  </Button>
-                  <div className="flex-grow">
-                    <Input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={mintAmount}
-                      onChange={(e) => setMintAmount(parseInt(e.target.value) || 1)}
-                      disabled={isMinting}
-                      className="bg-dark-lighter border-dark-border text-center"
-                    />
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handleIncrease}
-                    disabled={mintAmount >= 10 || isMinting}
-                    className="border-berry text-berry hover:bg-berry/10"
-                  >
-                    +
-                  </Button>
-                </div>
+            <CardContent className="pt-6">
+              <div className="text-center mb-6">
+                <Bell className="h-12 w-12 mx-auto mb-4 text-berry" />
+                <h2 className="text-2xl font-bold mb-2">Get Notified</h2>
+                <p className="text-gray-400">Be the first to know when minting goes live</p>
               </div>
-
+              
               <div className="space-y-4">
-                <div className="flex justify-between items-center border-t border-dark-border pt-4">
-                  <span>Price per NFT:</span>
-                  <span className="font-bold">0.69 SOL</span>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    className="bg-dark-lighter border-dark-border"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span>Total:</span>
-                  <span className="font-bold text-lg">{(0.69 * mintAmount).toFixed(2)} SOL</span>
-                </div>
+                
+                <Button 
+                  className="w-full bg-berry hover:bg-berry-light text-white font-bold py-3 h-auto"
+                  onClick={handleNotify}
+                >
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notify Me When Live
+                </Button>
+                
+                <p className="text-xs text-center text-gray-500 mt-4">
+                  We respect your privacy. No spam, just important updates.
+                </p>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full bg-berry hover:bg-berry-light text-white font-bold py-3 h-auto"
-                disabled={isMinting || mintComplete}
-                onClick={handleMint}
-              >
-                {isMinting ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Minting...
-                  </span>
-                ) : mintComplete ? (
-                  <span className="flex items-center">
-                    <Check className="mr-2" /> Minted Successfully
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <Wallet className="mr-2" /> Mint Now
-                  </span>
-                )}
-              </Button>
-            </CardFooter>
           </Card>
         </div>
 
@@ -176,10 +126,10 @@ const NFTMint = () => {
           <h2 className="text-3xl font-bold mb-6 text-center">About Busty Berry NFTITTYS</h2>
           <div className="bg-dark-lighter rounded-xl p-6 mb-8">
             <p className="mb-4">
-              Busty Berry NFTITTYS is a limited collection of 10,000 unique NFTs on the Solana blockchain. Each NFT features unique attributes and varying rarities, making them valuable digital collectibles.
+              Busty Berry NFTITTYS is a limited collection of 10,000 unique NFTs on the Solana blockchain. Each NFT will feature unique attributes and varying rarities, making them valuable digital collectibles.
             </p>
             <p>
-              Holding Busty Berry NFTITTYS grants you exclusive access to community events, airdrops, and upcoming releases in the Busty Berry ecosystem.
+              Holding Busty Berry NFTITTYS will grant you exclusive access to community events, airdrops, and upcoming releases in the Busty Berry ecosystem.
             </p>
           </div>
 
