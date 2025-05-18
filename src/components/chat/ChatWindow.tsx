@@ -2,11 +2,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Play, Pause } from 'lucide-react';
+import { Send } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useTTS } from '@/hooks/use-tts';
 
 interface ChatWindowProps {
   personalityId: string;
@@ -23,7 +22,6 @@ interface Message {
   role: 'user' | 'assistant';
   timestamp: Date;
   modelUsed?: string;
-  isPlaying?: boolean;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -45,27 +43,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Add text-to-speech functionality
-  const { speak, stop, isLoading: ttsLoading, isPlaying } = useTTS({
-    onStart: () => {
-      // Update UI to show which message is being spoken
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage && lastMessage.role === 'assistant') {
-        setMessages(prev => prev.map(msg => 
-          msg.id === lastMessage.id ? { ...msg, isPlaying: true } : { ...msg, isPlaying: false }
-        ));
-      }
-    },
-    onEnd: () => {
-      // Clear playing status when audio ends
-      setMessages(prev => prev.map(msg => ({ ...msg, isPlaying: false })));
-    },
-    onError: (error) => {
-      toast.error(`Audio error: ${error}`);
-      setMessages(prev => prev.map(msg => ({ ...msg, isPlaying: false })));
-    }
-  });
   
   // Generate a response
   const generateResponse = async (userMessage: string): Promise<string> => {
@@ -150,34 +127,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       };
       
       setMessages(prev => [...prev, assistantMessage]);
-      
-      // Auto-speak the assistant's message
-      speak(responseText, personalityId);
-      
     } catch (error) {
       console.error('Error generating response:', error);
       toast.error('Failed to generate response');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // Toggle speech for a specific message
-  const handleToggleSpeech = (message: Message) => {
-    if (message.role === 'assistant') {
-      if (message.isPlaying) {
-        stop();
-        setMessages(prev => prev.map(msg => ({ ...msg, isPlaying: false })));
-      } else {
-        // Stop any currently playing audio
-        stop();
-        // Play the selected message
-        speak(message.content, personalityId);
-        // Update UI
-        setMessages(prev => prev.map(msg => 
-          msg.id === message.id ? { ...msg, isPlaying: true } : { ...msg, isPlaying: false }
-        ));
-      }
     }
   };
 
@@ -191,34 +145,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       {/* Chat messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map(message => (
-          <div key={message.id} className="relative">
-            <ChatMessage
-              key={message.id}
-              content={message.content}
-              role={message.role}
-              timestamp={message.timestamp}
-              avatarSrc={message.role === 'assistant' ? avatarSrc : undefined}
-              avatarFallback={message.role === 'assistant' ? avatarFallback : undefined}
-              avatarColor={message.role === 'assistant' ? avatarColor : undefined}
-            />
-            
-            {/* Audio control button for assistant messages */}
-            {message.role === 'assistant' && (
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => handleToggleSpeech(message)}
-                disabled={ttsLoading && !message.isPlaying}
-                className="absolute top-0 right-0 rounded-full w-8 h-8 bg-transparent hover:bg-dark-lighter"
-              >
-                {message.isPlaying ? (
-                  <Pause size={16} className="text-berry" />
-                ) : (
-                  <Play size={16} className="text-berry" />
-                )}
-              </Button>
-            )}
-          </div>
+          <ChatMessage
+            key={message.id}
+            content={message.content}
+            role={message.role}
+            timestamp={message.timestamp}
+            avatarSrc={message.role === 'assistant' ? avatarSrc : undefined}
+            avatarFallback={message.role === 'assistant' ? avatarFallback : undefined}
+            avatarColor={message.role === 'assistant' ? avatarColor : undefined}
+          />
         ))}
         <div ref={messagesEndRef} />
         
