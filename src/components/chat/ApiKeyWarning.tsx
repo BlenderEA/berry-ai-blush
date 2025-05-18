@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { AlertTriangle } from 'lucide-react';
 
 interface ApiKeyWarningProps {
   message: string;
@@ -11,7 +11,7 @@ interface ApiKeyWarningProps {
 const ApiKeyWarning = ({ message, details }: ApiKeyWarningProps) => {
   return (
     <Alert variant="destructive" className="mb-4">
-      <ExclamationTriangleIcon className="h-4 w-4" />
+      <AlertTriangle className="h-4 w-4" />
       <AlertTitle>API Key Issue</AlertTitle>
       <AlertDescription>
         <p className="mb-2">{message}</p>

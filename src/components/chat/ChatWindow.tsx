@@ -7,6 +7,8 @@ import ChatMessage from './ChatMessage';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import ApiKeyWarning from './ApiKeyWarning';
+import { useTTS } from '@/hooks/use-tts';
 
 interface ChatWindowProps {
   personalityId: string;
@@ -46,6 +48,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Use the TTS hook to access apiKeyError
+  const { speak, isLoading: ttsLoading, isPlaying, apiKeyError } = useTTS();
 
   // Generate AI response using Hugging Face models via Supabase Edge Function
   const generateResponse = async (userMessage: string): Promise<string> => {
@@ -181,8 +186,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   return (
     <div className="flex flex-col h-[400px] bg-dark border border-dark-border rounded-lg">
+      {/* Show API Key Warning if there's an apiKeyError from the TTS hook */}
+      {apiKeyError && (
+        <div className="p-4">
+          <ApiKeyWarning message={apiKeyError.message} details={apiKeyError.details} />
+        </div>
+      )}
+      
       {/* Chat messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${apiKeyError ? 'max-h-[300px]' : ''}`}>
         {messages.map(message => (
           <ChatMessage
             key={message.id}
