@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CalendarDays, Bell } from 'lucide-react';
 import Header from '@/components/Header';
@@ -7,32 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-
 const NFTMint = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [email, setEmail] = React.useState('');
-
   const handleNotify = () => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       toast({
         title: "Invalid Email",
         description: "Please enter a valid email address.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-    
     toast({
       title: "Notification Set!",
       description: "We'll notify you when Busty Berry NFTITTYS are available for minting.",
-      variant: "default",
+      variant: "default"
     });
-    
     setEmail('');
   };
-
-  return (
-    <div className="min-h-screen bg-dark text-white">
+  return <div className="min-h-screen bg-dark text-white">
       <Header />
       
       <main className="container mx-auto px-4 py-16">
@@ -56,7 +51,7 @@ const NFTMint = () => {
                 <div className="text-center p-6">
                   <CalendarDays size={80} className="mx-auto mb-4 text-white/50" />
                   <h3 className="text-2xl font-bold mb-2">Launch Date</h3>
-                  <p className="text-lg text-white/80">Coming Q3 2023</p>
+                  <p className="text-lg text-white/80">Coming Q3 2025</p>
                 </div>
               </div>
             </div>
@@ -95,20 +90,10 @@ const NFTMint = () => {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                    className="bg-dark-lighter border-dark-border"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+                  <Input id="email" type="email" placeholder="your@email.com" className="bg-dark-lighter border-dark-border" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
                 
-                <Button 
-                  className="w-full bg-berry hover:bg-berry-light text-white font-bold py-3 h-auto"
-                  onClick={handleNotify}
-                >
+                <Button className="w-full bg-berry hover:bg-berry-light text-white font-bold py-3 h-auto" onClick={handleNotify}>
                   <Bell className="h-4 w-4 mr-2" />
                   Notify Me When Live
                 </Button>
@@ -151,8 +136,6 @@ const NFTMint = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default NFTMint;
