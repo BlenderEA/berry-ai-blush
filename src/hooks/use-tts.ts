@@ -14,12 +14,14 @@ export const useTTS = (options: UseTTSOptions = {}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [apiKeyError, setApiKeyError] = useState<{message: string, details?: string} | null>(null);
 
   const speak = async (text: string, personalityId: string) => {
     if (!text || !personalityId) return;
 
     try {
       setErrorMessage(null);
+      setApiKeyError(null);
       setIsLoading(true);
       options.onStart?.();
 
@@ -41,6 +43,16 @@ export const useTTS = (options: UseTTSOptions = {}) => {
       if (!data) {
         console.error('Invalid TTS response:', data);
         throw new Error('No response received from speech service');
+      }
+
+      // Check for API key related errors
+      if (data.error && (data.error === 'Missing API key' || data.error === 'Invalid API Key')) {
+        console.error('API key error:', data);
+        setApiKeyError({
+          message: data.error,
+          details: data.details || 'Please check the Hugging Face API key configuration.'
+        });
+        return;
       }
 
       if (data.error) {
@@ -133,6 +145,7 @@ export const useTTS = (options: UseTTSOptions = {}) => {
     stop,
     isLoading,
     isPlaying,
-    errorMessage
+    errorMessage,
+    apiKeyError
   };
 };

@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const HUGGINGFACE_API_KEY = Deno.env.get('HUGGING_FACE_API_KEY');
+const HUGGING_FACE_API_KEY = Deno.env.get('HUGGING_FACE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -35,17 +35,30 @@ serve(async (req) => {
       throw new Error('Valid personality ID is required');
     }
 
-    // Check if API key is available
-    if (!HUGGINGFACE_API_KEY) {
-      console.error('HUGGING_FACE_API_KEY is not set');
-      throw new Error('Hugging Face API key is not configured');
+    // Enhanced API key validation with more descriptive error
+    if (!HUGGING_FACE_API_KEY) {
+      console.error('HUGGING_FACE_API_KEY is not set in the environment variables');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Missing API key',
+          details: 'Hugging Face API key is not configured in Supabase secrets. Please add a valid API key.',
+          help: "You need to add a HUGGING_FACE_API_KEY secret in Supabase Edge Function secrets."
+        }),
+        { 
+          status: 500, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
     }
 
     const modelId = voiceModels[personalityId];
     
     console.log("Calling Hugging Face TTS API with model:", modelId);
     console.log("Text prompt (first 50 chars):", text.substring(0, 50));
-    console.log("API Key first 5 chars:", HUGGINGFACE_API_KEY ? HUGGINGFACE_API_KEY.substring(0, 5) + "..." : "undefined");
+    console.log("API Key first 5 chars:", HUGGING_FACE_API_KEY ? HUGGING_FACE_API_KEY.substring(0, 5) + "..." : "undefined");
     
     // Updated error handling for API call
     let response;
@@ -53,7 +66,7 @@ serve(async (req) => {
       response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${HUGGINGFACE_API_KEY}`,
+          'Authorization': `Bearer ${HUGGING_FACE_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ inputs: text }),
@@ -63,19 +76,39 @@ serve(async (req) => {
       throw new Error(`Network error: ${fetchError.message}`);
     }
 
-    // Enhanced error handling
+    // Enhanced error handling with clear messages for common API key issues
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Hugging Face API error (${response.status}):`, errorText);
+      const statusCode = response.status;
+      let errorText;
+      try {
+        errorText = await response.text();
+      } catch (e) {
+        errorText = "Could not read error response";
+      }
       
-      if (response.status === 401) {
-        throw new Error("Authentication failed. Please check your Hugging Face API key.");
-      } else if (response.status === 404) {
+      console.error(`Hugging Face API error (${statusCode}):`, errorText);
+      
+      if (statusCode === 401) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Invalid API Key",
+            details: "The Hugging Face API key is invalid or revoked. Please update your API key.",
+            help: "You need to replace your HUGGING_FACE_API_KEY with a valid key in Supabase Edge Function secrets."
+          }),
+          { 
+            status: 401, 
+            headers: { 
+              ...corsHeaders, 
+              'Content-Type': 'application/json' 
+            } 
+          }
+        );
+      } else if (statusCode === 404) {
         throw new Error(`Model not found: ${modelId}. Please try a different personality.`);
-      } else if (response.status === 503) {
+      } else if (statusCode === 503) {
         throw new Error("Hugging Face service is currently unavailable. Please try again later.");
       } else {
-        throw new Error(`Hugging Face API returned ${response.status}: ${errorText}`);
+        throw new Error(`Hugging Face API returned ${statusCode}: ${errorText}`);
       }
     }
 
@@ -120,7 +153,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message || 'An error occurred during speech generation',
-        details: error.toString()
+        details: error.toString(),
+        help: "Try refreshing the page or checking your Hugging Face API key configuration."
       }),
       { 
         status: 500, 
