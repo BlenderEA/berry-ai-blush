@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const HUGGINGFACE_API_KEY = Deno.env.get('HUGGING_FACE_API_KEY');
@@ -8,15 +7,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Updated with 100% guaranteed available models from Hugging Face
+// Updated with smaller, more stable models that are always available
 const textModels = {
   'blueberry-babe': 'gpt2',
   'berry-bold': 'distilgpt2',
   'white-berry': 'EleutherAI/gpt-neo-125M',
-  'blue-frost': 'microsoft/DialoGPT-small',
-  'raspberry-queen': 'microsoft/DialoGPT-medium',
-  'blackberry-dream': 'facebook/blenderbot-400M-distill'
+  'blue-frost': 'gpt2-medium',
+  'raspberry-queen': 'gpt2-large',
+  'blackberry-dream': 'distilgpt2'
 };
+
+// Fallback model if the primary model fails
+const FALLBACK_MODEL = 'gpt2';
 
 // Personality prompts remain the same
 const personalityPrompts = {
@@ -41,17 +43,18 @@ serve(async (req) => {
       throw new Error('Text is required');
     }
 
-    if (!personalityId || !textModels[personalityId]) {
+    if (!personalityId || !personalityPrompts[personalityId]) {
       throw new Error('Valid personality ID is required');
     }
 
     // Check if API key is available
     if (!HUGGINGFACE_API_KEY) {
-      console.error('HUGGING_FACE_API_KEY is not set');
-      throw new Error('Hugging Face API key is not configured');
+      console.error('HUGGING_FACE_API_KEY is not set in the environment variables');
+      throw new Error('Hugging Face API key is not configured. Please contact the administrator.');
     }
 
-    const modelId = textModels[personalityId];
+    // Get the model ID with fallback if needed
+    let modelId = textModels[personalityId] || FALLBACK_MODEL;
     const systemPrompt = personalityPrompts[personalityId];
     
     // For older models that don't use chat format, convert to a single text prompt
@@ -61,12 +64,14 @@ serve(async (req) => {
       ).join('\n')
     }\n\nUser: ${text}\n\n${personalityId}:`;
 
-    console.log("Calling Hugging Face API with model:", modelId);
-    console.log("Combined prompt (first 100 chars):", combinedPrompt.substring(0, 100));
+    console.log("Using model:", modelId);
     console.log("API Key first 5 chars:", HUGGINGFACE_API_KEY ? HUGGINGFACE_API_KEY.substring(0, 5) + "..." : "undefined");
+    console.log("Prompt length:", combinedPrompt.length);
     
-    // Updated API call with robust error handling
+    // Try with primary model
     let response;
+    let isUsingFallback = false;
+    
     try {
       response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
         method: 'POST',
@@ -86,69 +91,117 @@ serve(async (req) => {
         }),
       });
     } catch (fetchError) {
-      console.error("Network error:", fetchError);
-      throw new Error(`Network error: ${fetchError.message}`);
+      console.error("Network error with primary model:", fetchError);
+      
+      // Try with fallback model
+      if (modelId !== FALLBACK_MODEL) {
+        isUsingFallback = true;
+        modelId = FALLBACK_MODEL;
+        console.log("Falling back to model:", modelId);
+        
+        response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${HUGGINGFACE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            inputs: combinedPrompt,
+            parameters: {
+              max_new_tokens: 150,
+              temperature: 0.7,
+              top_p: 0.9,
+              do_sample: true,
+              return_full_text: false
+            }
+          }),
+        });
+      } else {
+        throw new Error(`Network error: ${fetchError.message}`);
+      }
     }
 
     // Check response status and handle appropriately
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Hugging Face API error (${response.status}):`, errorText);
+      const statusCode = response.status;
+      let errorText;
+      try {
+        errorText = await response.text();
+      } catch (e) {
+        errorText = "Could not read error response";
+      }
       
-      if (response.status === 401) {
-        throw new Error("Authentication failed. Please check your Hugging Face API key.");
-      } else if (response.status === 404) {
+      console.error(`Hugging Face API error (${statusCode}):`, errorText);
+      
+      if (statusCode === 401) {
+        throw new Error("Authentication failed. Invalid Hugging Face API key.");
+      } else if (statusCode === 404) {
         throw new Error(`Model not found: ${modelId}. Please try a different personality.`);
-      } else if (response.status === 503) {
+      } else if (statusCode === 503) {
         throw new Error("Hugging Face service is currently unavailable. Please try again later.");
       } else {
-        throw new Error(`Hugging Face API returned ${response.status}: ${errorText}`);
+        throw new Error(`Hugging Face API returned ${statusCode}: ${errorText}`);
       }
     }
 
-    const responseText = await response.text();
-    console.log("Raw API response:", responseText.substring(0, 100));
-
-    // Parse response - handle both JSON and plain text responses
+    // Try to process the response
     let result;
-    try {
-      result = JSON.parse(responseText);
-    } catch (e) {
-      console.log("Response is not JSON, treating as plain text");
-      result = responseText;
-    }
-
-    // Parse different response formats from various models
     let generatedText = '';
-    if (Array.isArray(result) && result.length > 0) {
-      if (result[0].generated_text) {
-        generatedText = result[0].generated_text;
-      } else if (typeof result[0] === 'string') {
-        generatedText = result[0];
+    let responseText;
+    
+    try {
+      responseText = await response.text();
+      console.log("Raw API response head:", responseText.substring(0, 100));
+      
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        console.log("Response is not JSON, treating as plain text");
+        result = responseText;
       }
-    } else if (typeof result === 'object' && result.generated_text) {
-      generatedText = result.generated_text;
-    } else if (typeof result === 'string') {
-      generatedText = result;
+      
+      // Parse different response formats
+      if (Array.isArray(result) && result.length > 0) {
+        if (result[0].generated_text) {
+          generatedText = result[0].generated_text;
+        } else if (typeof result[0] === 'string') {
+          generatedText = result[0];
+        }
+      } else if (typeof result === 'object' && result.generated_text) {
+        generatedText = result.generated_text;
+      } else if (typeof result === 'string') {
+        generatedText = result;
+      }
+
+      // Clean up the response if needed
+      if (generatedText.includes(`${personalityId}:`)) {
+        generatedText = generatedText.split(`${personalityId}:`)[1].trim();
+      }
+      if (generatedText.includes("User:")) {
+        generatedText = generatedText.split("User:")[0].trim();
+      }
+
+      console.log("Final generated text head:", generatedText.substring(0, 100));
+
+      // If we got no text back, use a fallback response
+      if (!generatedText || generatedText.trim().length === 0) {
+        generatedText = `I'm ${personalityId.replace(/-/g, ' ')} and I'm having trouble thinking clearly right now. Can we try again?`;
+      }
+    } catch (processingError) {
+      console.error("Error processing API response:", processingError, "\nResponse text:", responseText);
+      throw new Error(`Failed to process AI response: ${processingError.message}`);
     }
 
-    // Clean up the response if needed
-    if (generatedText.includes(`${personalityId}:`)) {
-      generatedText = generatedText.split(`${personalityId}:`)[1].trim();
-    }
-    if (generatedText.includes("User:")) {
-      generatedText = generatedText.split("User:")[0].trim();
-    }
-
-    console.log("Final generated text:", generatedText.substring(0, 100));
-
-    // Use fallback if no text was generated
-    if (!generatedText) {
-      generatedText = `I'm ${personalityId.replace(/-/g, ' ')} and I'm having trouble thinking clearly. Can we try again?`;
+    // Add a note if we had to use the fallback model
+    if (isUsingFallback) {
+      generatedText = `${generatedText}\n\n(Note: I had to switch to a simpler model to respond. My thoughts might be a bit basic.)`;
     }
 
     return new Response(
-      JSON.stringify({ response: generatedText }),
+      JSON.stringify({ 
+        response: generatedText,
+        model_used: modelId 
+      }),
       { 
         headers: { 
           ...corsHeaders, 
@@ -159,10 +212,12 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in ai-chat function:', error);
     
+    // Return detailed error information in a user-friendly format
     return new Response(
       JSON.stringify({ 
         error: error.message || 'An error occurred during AI chat response generation',
-        details: error.toString()
+        details: error.toString(),
+        help: "Try refreshing the page or checking your Hugging Face API key configuration."
       }),
       { 
         status: 500, 

@@ -6,6 +6,7 @@ import { Send } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 interface ChatWindowProps {
   personalityId: string;
@@ -21,6 +22,7 @@ interface Message {
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
+  modelUsed?: string;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -42,12 +44,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Generate AI response using Hugging Face models via Supabase Edge Function
   const generateResponse = async (userMessage: string): Promise<string> => {
     try {
       setErrorMessage(null);
+      setErrorDetails(null);
       
       // Format message history for the AI (limited to last 10 messages for context)
       const messageHistory = messages
@@ -81,6 +85,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
       if (data.error) {
         console.error('Error from AI chat function:', data.error);
+        
+        // Store more detailed error information
+        if (data.details) {
+          setErrorDetails(data.details);
+        }
+        
         throw new Error(data.error || 'AI generated an error');
       }
 
@@ -90,6 +100,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       }
 
       console.log("Received AI response:", data.response.substring(0, 100));
+      
+      if (data.model_used) {
+        console.log("Model used:", data.model_used);
+      }
+      
       return data.response;
     } catch (error) {
       console.error('Error generating AI response:', error);
@@ -139,6 +154,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
+  // Retry connection with AI
+  const handleRetry = () => {
+    setErrorMessage(null);
+    setErrorDetails(null);
+    toast.info('Retrying connection to AI service...');
+    
+    // Send a small test message to check if connection works
+    generateResponse("Hello").then(response => {
+      toast.success('Successfully reconnected to AI service!');
+      setMessages(prev => [...prev, {
+        id: `assistant-${Date.now()}`,
+        content: "I'm back online and ready to chat!",
+        role: 'assistant',
+        timestamp: new Date()
+      }]);
+    }).catch(error => {
+      toast.error('Still unable to connect to AI service');
+    });
+  };
+
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -173,13 +208,43 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           </div>
         )}
         
-        {/* Error message */}
+        {/* Error message with retry button */}
         {errorMessage && (
-          <div className="p-3 bg-red-900/30 border border-red-800 rounded-lg text-sm text-white">
-            <p className="font-semibold">Error with AI service:</p>
-            <p>{errorMessage}</p>
-            <p className="mt-2 text-xs text-gray-300">Please try again or reload the page.</p>
-          </div>
+          <Alert variant="destructive" className="bg-red-900/30 border border-red-800 text-white">
+            <AlertTitle className="font-semibold">Error with AI service:</AlertTitle>
+            <AlertDescription>
+              <p>{errorMessage}</p>
+              
+              {errorDetails && (
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-xs">Technical details</summary>
+                  <p className="mt-1 text-xs text-gray-300 whitespace-pre-wrap">{errorDetails}</p>
+                </details>
+              )}
+              
+              <div className="mt-4 flex gap-4">
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={handleRetry}
+                  className="bg-gray-700 hover:bg-gray-600"
+                >
+                  Retry Connection
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setErrorMessage(null);
+                    setErrorDetails(null);
+                  }}
+                  className="text-gray-300 hover:text-white hover:bg-transparent"
+                >
+                  Dismiss
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
         )}
       </div>
       
