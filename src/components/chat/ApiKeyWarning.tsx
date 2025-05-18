@@ -24,23 +24,21 @@ const ApiKeyWarning = ({ message, details }: ApiKeyWarningProps) => {
         {details && <p className="text-sm opacity-90 mb-2">{details}</p>}
         <div className="text-sm mt-3">
           <p className="mb-2">
-            To fix this issue, a valid OpenAI API key needs to be set in the Supabase Edge Function secrets.
-            You can get an API key by signing up at{' '}
-            <a 
-              href="https://platform.openai.com/api-keys" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="underline font-medium hover:text-primary"
-            >
-              platform.openai.com
-            </a>.
+            To fix this issue, you need to verify that:
           </p>
+          <ol className="list-decimal pl-5 space-y-1 mb-3">
+            <li>You have a valid OpenAI API key (should start with <code className="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded">sk-</code>)</li>
+            <li>The API key is correctly added as <code className="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded">OPENAI_API_KEY</code> in Supabase secrets</li>
+            <li>There are no extra spaces before or after the API key</li>
+          </ol>
           <div className="mt-4">
             <h4 className="font-medium mb-1">Steps to fix:</h4>
             <ol className="list-decimal pl-5 space-y-1">
               <li>Get a valid API key from OpenAI</li>
               <li>Go to your Supabase project's Edge Function secrets</li>
-              <li>Add or update the <code className="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded">OPENAI_API_KEY</code> secret with your valid key</li>
+              <li>Delete the current <code className="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded">OPENAI_API_KEY</code> value if it exists</li>
+              <li>Add a new <code className="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded">OPENAI_API_KEY</code> secret with your valid key</li>
+              <li>Make sure there are no spaces or extra characters</li>
               <li>Refresh this page and try chatting again</li>
             </ol>
           </div>

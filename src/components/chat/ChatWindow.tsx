@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,22 +78,29 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         }
       });
 
+      // Handle Supabase invoke error
       if (error) {
         console.error('AI chat function error:', error);
         
         // Check if it's likely an API key issue
-        if (error.message && error.message.includes('non-2xx status code')) {
+        if (error.message && (
+            error.message.includes('non-2xx status code') || 
+            error.message.includes('401') ||
+            error.message.includes('unauthorized')
+        )) {
           throw new Error('API key may be invalid or missing. Please check your OpenAI API key configuration.');
         }
         
         throw new Error(error.message || 'Failed to generate response');
       }
 
+      // Validate response data exists
       if (!data) {
         console.error('Invalid response from AI chat function:', data);
         throw new Error('Received empty response from AI');
       }
 
+      // Handle specific API errors from the function
       if (data.error) {
         console.error('Error from AI chat function:', data.error);
         
@@ -101,9 +109,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           setErrorDetails(data.details);
         }
         
+        // Special handling for API key errors
+        if (data.error === 'Invalid API Key' || data.error === 'Missing API key') {
+          throw new Error('API key may be invalid or missing. Please check your OpenAI API key configuration.');
+        }
+        
         throw new Error(data.error || 'AI generated an error');
       }
 
+      // Validate response format
       if (!data.response) {
         console.error('Invalid response format:', data);
         throw new Error('Received invalid response format from AI');
@@ -189,20 +203,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Check if we have an API key issue
+  const hasApiKeyIssue = 
+    apiKeyError || 
+    errorMessage?.includes('API key may be invalid or missing') || 
+    errorMessage?.includes('Invalid API Key');
+
   return (
     <div className="flex flex-col h-[400px] bg-dark border border-dark-border rounded-lg">
       {/* Show API Key Warning if there's an apiKeyError from the TTS hook */}
-      {(apiKeyError || errorMessage === 'API key may be invalid or missing. Please check your OpenAI API key configuration.') && (
+      {hasApiKeyIssue && (
         <div className="p-4">
           <ApiKeyWarning 
             message={apiKeyError?.message || "Your OpenAI API key appears to be missing or invalid."} 
-            details={apiKeyError?.details || "Please make sure you've added a valid OpenAI API key to your Supabase Edge Function secrets."} 
+            details={apiKeyError?.details || errorDetails || "Please make sure you've added a valid OpenAI API key to your Supabase Edge Function secrets."} 
           />
         </div>
       )}
       
       {/* Chat messages */}
-      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${apiKeyError ? 'max-h-[300px]' : ''}`}>
+      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${hasApiKeyIssue ? 'max-h-[300px]' : ''}`}>
         {messages.map(message => (
           <ChatMessage
             key={message.id}
@@ -229,7 +249,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         )}
         
         {/* Error message with retry button */}
-        {errorMessage && !apiKeyError && errorMessage !== 'API key may be invalid or missing. Please check your OpenAI API key configuration.' && (
+        {errorMessage && !hasApiKeyIssue && (
           <Alert variant="destructive" className="bg-red-900/30 border border-red-800 text-white">
             <AlertTitle className="font-semibold">Error with AI service:</AlertTitle>
             <AlertDescription>

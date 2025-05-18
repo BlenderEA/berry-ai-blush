@@ -38,7 +38,14 @@ serve(async (req) => {
       throw new Error('Valid personality ID is required');
     }
 
-    // Validate API key more thoroughly
+    // Debug logs for API key
+    console.log("API Key exists:", !!OPENAI_API_KEY);
+    if (OPENAI_API_KEY) {
+      console.log("API Key first 5 chars:", OPENAI_API_KEY.substring(0, 5) + "...");
+      console.log("API Key length:", OPENAI_API_KEY.length);
+    }
+
+    // Validate API key exists
     if (!OPENAI_API_KEY) {
       console.error('OPENAI_API_KEY is not set in the environment variables');
       return new Response(
@@ -49,25 +56,6 @@ serve(async (req) => {
         }),
         { 
           status: 500, 
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'application/json' 
-          } 
-        }
-      );
-    }
-
-    // Check if the API key starts with "sk-" (OpenAI API keys format)
-    if (!OPENAI_API_KEY.startsWith('sk-')) {
-      console.error('Invalid OPENAI_API_KEY format');
-      return new Response(
-        JSON.stringify({ 
-          error: 'Invalid API Key Format',
-          details: 'The provided OpenAI API key does not appear to be in the correct format. API keys should start with "sk-".',
-          help: "Please verify your OpenAI API key is correct in Supabase Edge Function secrets."
-        }),
-        { 
-          status: 400, 
           headers: { 
             ...corsHeaders, 
             'Content-Type': 'application/json' 
@@ -101,7 +89,6 @@ serve(async (req) => {
     });
 
     console.log("Using OpenAI model:", CHAT_MODEL);
-    console.log("API Key first 5 chars:", OPENAI_API_KEY ? OPENAI_API_KEY.substring(0, 5) + "..." : "undefined");
     console.log("Sending messages length:", messages.length);
     
     try {
