@@ -32,9 +32,7 @@ const NFTMint = () => {
       
       <main className="container mx-auto px-4 py-16">
         <div className="flex flex-col items-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center gradient-text">
-            Busty Berry NFTITTYS
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center gradient-text">Busty Berry NFTitties</h1>
           <div className="bg-berry px-4 py-2 rounded-full text-white font-bold text-lg mb-8 animate-pulse">
             Coming Soon!
           </div>
@@ -60,7 +58,7 @@ const NFTMint = () => {
               <ul className="space-y-2 text-sm">
                 <li className="flex justify-between">
                   <span className="text-gray-400">Collection:</span>
-                  <span className="font-medium">Busty Berry NFTITTYS</span>
+                  <span className="font-medium">Busty Berry NFTitties</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text-gray-400">Total Supply:</span>
@@ -108,14 +106,10 @@ const NFTMint = () => {
 
         {/* Collection Info */}
         <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center">About Busty Berry NFTITTYS</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center">About Busty Berry NFTitties</h2>
           <div className="bg-dark-lighter rounded-xl p-6 mb-8">
-            <p className="mb-4">
-              Busty Berry NFTITTYS is a limited collection of 10,000 unique NFTs on the Solana blockchain. Each NFT will feature unique attributes and varying rarities, making them valuable digital collectibles.
-            </p>
-            <p>
-              Holding Busty Berry NFTITTYS will grant you exclusive access to community events, airdrops, and upcoming releases in the Busty Berry ecosystem.
-            </p>
+            <p className="mb-4">Busty Berry NFTitties is a limited collection of 10,000 unique NFTs on the Solana blockchain. Each NFT will feature unique attributes and varying rarities, making them valuable digital collectibles.</p>
+            <p>Holding Busty Berry NFTitties will grant you exclusive access to community events, airdrops, and upcoming releases in the Busty Berry ecosystem.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
