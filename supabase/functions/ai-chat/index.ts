@@ -1,27 +1,17 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const HUGGING_FACE_API_KEY = Deno.env.get('HUGGING_FACE_API_KEY');
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Updated with smaller, more stable models that are always available
-const textModels = {
-  'blueberry-babe': 'gpt2',
-  'berry-bold': 'distilgpt2',
-  'white-berry': 'EleutherAI/gpt-neo-125M',
-  'blue-frost': 'gpt2-medium',
-  'raspberry-queen': 'gpt2-large',
-  'blackberry-dream': 'distilgpt2'
-};
+// OpenAI model selection
+const CHAT_MODEL = "gpt-4o-mini";
 
-// Fallback model if the primary model fails
-const FALLBACK_MODEL = 'gpt2';
-
-// Personality prompts remain the same
+// Personality prompts
 const personalityPrompts = {
   'blueberry-babe': 'You are Blueberry Babe, a sweet and playful AI companion with a mischievous side. You love talking about your day while surrounded by blueberries. You respond in a cute, flirty way and often use emojis like 💙.',
   'berry-bold': 'You are Berry Bold, a confident and straightforward AI companion. You don\'t beat around the bush and always tell people what you think. You are direct, sometimes sarcastic, and don\'t use unnecessary words or emojis.',
@@ -49,13 +39,13 @@ serve(async (req) => {
     }
 
     // Enhanced API key validation with more descriptive error
-    if (!HUGGING_FACE_API_KEY) {
-      console.error('HUGGING_FACE_API_KEY is not set in the environment variables');
+    if (!OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY is not set in the environment variables');
       return new Response(
         JSON.stringify({ 
           error: 'Missing API key',
-          details: 'Hugging Face API key is not configured in Supabase secrets. Please add a valid API key.',
-          help: "You need to add a HUGGING_FACE_API_KEY secret in Supabase Edge Function secrets."
+          details: 'OpenAI API key is not configured in Supabase secrets. Please add a valid API key.',
+          help: "You need to add an OPENAI_API_KEY secret in Supabase Edge Function secrets."
         }),
         { 
           status: 500, 
@@ -67,92 +57,68 @@ serve(async (req) => {
       );
     }
 
-    // Get the model ID with fallback if needed
-    let modelId = textModels[personalityId] || FALLBACK_MODEL;
     const systemPrompt = personalityPrompts[personalityId];
     
-    // For older models that don't use chat format, convert to a single text prompt
-    const combinedPrompt = `${systemPrompt}\n\nConversation history:\n${
-      messageHistory.map((msg: { role: string; content: string }) => 
-        `${msg.role === 'assistant' ? personalityId : 'User'}: ${msg.content}`
-      ).join('\n')
-    }\n\nUser: ${text}\n\n${personalityId}:`;
-
-    console.log("Using model:", modelId);
-    console.log("API Key first 5 chars:", HUGGING_FACE_API_KEY ? HUGGING_FACE_API_KEY.substring(0, 5) + "..." : "undefined");
-    console.log("Prompt length:", combinedPrompt.length);
+    // Prepare conversation history for OpenAI format
+    const messages = [
+      { role: "system", content: systemPrompt }
+    ];
     
-    // Try with primary model
-    let response;
-    let isUsingFallback = false;
-    
-    try {
-      response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${HUGGING_FACE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          inputs: combinedPrompt,
-          parameters: {
-            max_new_tokens: 150,
-            temperature: 0.7,
-            top_p: 0.9,
-            do_sample: true,
-            return_full_text: false
-          }
-        }),
-      });
-    } catch (fetchError) {
-      console.error("Network error with primary model:", fetchError);
-      
-      // Try with fallback model
-      if (modelId !== FALLBACK_MODEL) {
-        isUsingFallback = true;
-        modelId = FALLBACK_MODEL;
-        console.log("Falling back to model:", modelId);
-        
-        response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${HUGGING_FACE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            inputs: combinedPrompt,
-            parameters: {
-              max_new_tokens: 150,
-              temperature: 0.7,
-              top_p: 0.9,
-              do_sample: true,
-              return_full_text: false
-            }
-          }),
+    // Add message history if available (limited to last 10 messages)
+    if (messageHistory && Array.isArray(messageHistory)) {
+      const limitedHistory = messageHistory.slice(-10);
+      limitedHistory.forEach(msg => {
+        messages.push({
+          role: msg.role,
+          content: msg.content
         });
-      } else {
-        throw new Error(`Network error: ${fetchError.message}`);
-      }
+      });
     }
+    
+    // Add current user message
+    messages.push({
+      role: "user",
+      content: text
+    });
 
-    // Enhanced error handling with clear messages for common API key issues
+    console.log("Using OpenAI model:", CHAT_MODEL);
+    console.log("API Key first 5 chars:", OPENAI_API_KEY ? OPENAI_API_KEY.substring(0, 5) + "..." : "undefined");
+    console.log("Sending messages length:", messages.length);
+    
+    // Call OpenAI API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: CHAT_MODEL,
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 300
+      }),
+    });
+
     if (!response.ok) {
       const statusCode = response.status;
       let errorText;
+      
       try {
-        errorText = await response.text();
+        const errorData = await response.json();
+        errorText = errorData.error?.message || JSON.stringify(errorData);
       } catch (e) {
-        errorText = "Could not read error response";
+        errorText = await response.text() || `Status code: ${statusCode}`;
       }
       
-      console.error(`Hugging Face API error (${statusCode}):`, errorText);
+      console.error(`OpenAI API error (${statusCode}):`, errorText);
       
       if (statusCode === 401) {
         return new Response(
           JSON.stringify({ 
             error: "Invalid API Key",
-            details: "The Hugging Face API key is invalid or revoked. Please update your API key.",
-            help: "You need to replace your HUGGING_FACE_API_KEY with a valid key in Supabase Edge Function secrets."
+            details: "The OpenAI API key is invalid or revoked. Please update your API key.",
+            help: "You need to replace your OPENAI_API_KEY with a valid key in Supabase Edge Function secrets."
           }),
           { 
             status: 401, 
@@ -162,72 +128,26 @@ serve(async (req) => {
             } 
           }
         );
-      } else if (statusCode === 404) {
-        throw new Error(`Model not found: ${modelId}. Please try a different personality.`);
-      } else if (statusCode === 503) {
-        throw new Error("Hugging Face service is currently unavailable. Please try again later.");
       } else {
-        throw new Error(`Hugging Face API returned ${statusCode}: ${errorText}`);
+        throw new Error(`OpenAI API returned ${statusCode}: ${errorText}`);
       }
     }
 
-    // Try to process the response
-    let result;
-    let generatedText = '';
-    let responseText;
+    // Process the response
+    const responseData = await response.json();
     
-    try {
-      responseText = await response.text();
-      console.log("Raw API response head:", responseText.substring(0, 100));
-      
-      try {
-        result = JSON.parse(responseText);
-      } catch (e) {
-        console.log("Response is not JSON, treating as plain text");
-        result = responseText;
-      }
-      
-      // Parse different response formats
-      if (Array.isArray(result) && result.length > 0) {
-        if (result[0].generated_text) {
-          generatedText = result[0].generated_text;
-        } else if (typeof result[0] === 'string') {
-          generatedText = result[0];
-        }
-      } else if (typeof result === 'object' && result.generated_text) {
-        generatedText = result.generated_text;
-      } else if (typeof result === 'string') {
-        generatedText = result;
-      }
-
-      // Clean up the response if needed
-      if (generatedText.includes(`${personalityId}:`)) {
-        generatedText = generatedText.split(`${personalityId}:`)[1].trim();
-      }
-      if (generatedText.includes("User:")) {
-        generatedText = generatedText.split("User:")[0].trim();
-      }
-
-      console.log("Final generated text head:", generatedText.substring(0, 100));
-
-      // If we got no text back, use a fallback response
-      if (!generatedText || generatedText.trim().length === 0) {
-        generatedText = `I'm ${personalityId.replace(/-/g, ' ')} and I'm having trouble thinking clearly right now. Can we try again?`;
-      }
-    } catch (processingError) {
-      console.error("Error processing API response:", processingError, "\nResponse text:", responseText);
-      throw new Error(`Failed to process AI response: ${processingError.message}`);
+    if (!responseData.choices || !responseData.choices[0] || !responseData.choices[0].message) {
+      console.error("Invalid response format from OpenAI:", responseData);
+      throw new Error("Received invalid response format from OpenAI");
     }
-
-    // Add a note if we had to use the fallback model
-    if (isUsingFallback) {
-      generatedText = `${generatedText}\n\n(Note: I had to switch to a simpler model to respond. My thoughts might be a bit basic.)`;
-    }
+    
+    const generatedText = responseData.choices[0].message.content;
+    console.log("Generated text length:", generatedText.length);
 
     return new Response(
       JSON.stringify({ 
         response: generatedText,
-        model_used: modelId 
+        model_used: CHAT_MODEL
       }),
       { 
         headers: { 
@@ -239,12 +159,11 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in ai-chat function:', error);
     
-    // Return detailed error information in a user-friendly format
     return new Response(
       JSON.stringify({ 
         error: error.message || 'An error occurred during AI chat response generation',
         details: error.toString(),
-        help: "Try refreshing the page or checking your Hugging Face API key configuration."
+        help: "Try refreshing the page or checking your OpenAI API key configuration."
       }),
       { 
         status: 500, 

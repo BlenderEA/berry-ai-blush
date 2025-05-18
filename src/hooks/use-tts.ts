@@ -50,7 +50,7 @@ export const useTTS = (options: UseTTSOptions = {}) => {
         console.error('API key error:', data);
         setApiKeyError({
           message: data.error,
-          details: data.details || 'Please check the Hugging Face API key configuration.'
+          details: data.details || 'Please check the OpenAI API key configuration.'
         });
         return;
       }
@@ -74,7 +74,7 @@ export const useTTS = (options: UseTTSOptions = {}) => {
       }
 
       // Create and play audio
-      const audioBlob = base64ToBlob(data.audio, data.format || 'audio/wav');
+      const audioBlob = base64ToBlob(data.audio, data.format || 'audio/mp3');
       const audioUrl = URL.createObjectURL(audioBlob);
       const newAudio = new Audio(audioUrl);
 

@@ -1,21 +1,21 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const HUGGING_FACE_API_KEY = Deno.env.get('HUGGING_FACE_API_KEY');
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Updated with more reliable open source TTS models
+// OpenAI voice mappings for our personalities
 const voiceModels = {
-  'blueberry-babe': 'facebook/mms-tts-eng',
-  'berry-bold': 'microsoft/speecht5_tts',
-  'white-berry': 'speechbrain/tts-tacotron2-ljspeech',
-  'blue-frost': 'facebook/fastspeech2-en-ljspeech',
-  'raspberry-queen': 'microsoft/speecht5_hifigan',
-  'blackberry-dream': 'microsoft/speecht5_tts'
+  'blueberry-babe': 'nova',
+  'berry-bold': 'onyx',
+  'white-berry': 'shimmer',
+  'blue-frost': 'fable',
+  'raspberry-queen': 'alloy',
+  'blackberry-dream': 'echo'
 };
 
 serve(async (req) => {
@@ -36,13 +36,13 @@ serve(async (req) => {
     }
 
     // Enhanced API key validation with more descriptive error
-    if (!HUGGING_FACE_API_KEY) {
-      console.error('HUGGING_FACE_API_KEY is not set in the environment variables');
+    if (!OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY is not set in the environment variables');
       return new Response(
         JSON.stringify({ 
           error: 'Missing API key',
-          details: 'Hugging Face API key is not configured in Supabase secrets. Please add a valid API key.',
-          help: "You need to add a HUGGING_FACE_API_KEY secret in Supabase Edge Function secrets."
+          details: 'OpenAI API key is not configured in Supabase secrets. Please add a valid API key.',
+          help: "You need to add an OPENAI_API_KEY secret in Supabase Edge Function secrets."
         }),
         { 
           status: 500, 
@@ -54,46 +54,45 @@ serve(async (req) => {
       );
     }
 
-    const modelId = voiceModels[personalityId];
+    const voice = voiceModels[personalityId];
     
-    console.log("Calling Hugging Face TTS API with model:", modelId);
+    console.log("Calling OpenAI TTS API with voice:", voice);
     console.log("Text prompt (first 50 chars):", text.substring(0, 50));
-    console.log("API Key first 5 chars:", HUGGING_FACE_API_KEY ? HUGGING_FACE_API_KEY.substring(0, 5) + "..." : "undefined");
     
-    // Updated error handling for API call
-    let response;
-    try {
-      response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${HUGGING_FACE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ inputs: text }),
-      });
-    } catch (fetchError) {
-      console.error("Network error:", fetchError);
-      throw new Error(`Network error: ${fetchError.message}`);
-    }
+    // Call OpenAI's TTS API
+    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'tts-1',
+        input: text,
+        voice: voice,
+        response_format: 'mp3',
+      }),
+    });
 
-    // Enhanced error handling with clear messages for common API key issues
     if (!response.ok) {
       const statusCode = response.status;
       let errorText;
+      
       try {
-        errorText = await response.text();
+        const errorData = await response.json();
+        errorText = errorData.error?.message || JSON.stringify(errorData);
       } catch (e) {
-        errorText = "Could not read error response";
+        errorText = await response.text() || `Status code: ${statusCode}`;
       }
       
-      console.error(`Hugging Face API error (${statusCode}):`, errorText);
+      console.error(`OpenAI API error (${statusCode}):`, errorText);
       
       if (statusCode === 401) {
         return new Response(
           JSON.stringify({ 
             error: "Invalid API Key",
-            details: "The Hugging Face API key is invalid or revoked. Please update your API key.",
-            help: "You need to replace your HUGGING_FACE_API_KEY with a valid key in Supabase Edge Function secrets."
+            details: "The OpenAI API key is invalid or revoked. Please update your API key.",
+            help: "You need to replace your OPENAI_API_KEY with a valid key in Supabase Edge Function secrets."
           }),
           { 
             status: 401, 
@@ -103,29 +102,16 @@ serve(async (req) => {
             } 
           }
         );
-      } else if (statusCode === 404) {
-        throw new Error(`Model not found: ${modelId}. Please try a different personality.`);
-      } else if (statusCode === 503) {
-        throw new Error("Hugging Face service is currently unavailable. Please try again later.");
       } else {
-        throw new Error(`Hugging Face API returned ${statusCode}: ${errorText}`);
+        throw new Error(`OpenAI API returned ${statusCode}: ${errorText}`);
       }
-    }
-
-    // Check content type to ensure we received audio
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('audio')) {
-      console.warn("Unexpected content type:", contentType);
-      const responseText = await response.text();
-      console.error("Unexpected response:", responseText);
-      throw new Error("Received non-audio response from Hugging Face API");
     }
 
     // Get the audio data as ArrayBuffer
     const audioArrayBuffer = await response.arrayBuffer();
     
     if (!audioArrayBuffer || audioArrayBuffer.byteLength === 0) {
-      throw new Error('Received empty audio response from Hugging Face API');
+      throw new Error('Received empty audio response from OpenAI API');
     }
     
     console.log("Received audio data of size:", audioArrayBuffer.byteLength, "bytes");
@@ -138,7 +124,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         audio: audioBase64,
-        format: 'audio/wav' // Most Hugging Face TTS models return WAV
+        format: 'audio/mp3'
       }),
       { 
         headers: { 
@@ -154,7 +140,7 @@ serve(async (req) => {
       JSON.stringify({ 
         error: error.message || 'An error occurred during speech generation',
         details: error.toString(),
-        help: "Try refreshing the page or checking your Hugging Face API key configuration."
+        help: "Try refreshing the page or checking your OpenAI API key configuration."
       }),
       { 
         status: 500, 
