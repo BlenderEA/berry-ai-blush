@@ -1,8 +1,1 @@
-
 project_id = "vrjjfsmaluulohnvfpuv"
-
-[functions.ai-speech]
-verify_jwt = false
-
-[functions.ai-chat]
-verify_jwt = false
