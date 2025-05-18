@@ -1,11 +1,8 @@
-
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { DollarSign, MessageCircle } from 'lucide-react';
-
 const AboutSection = () => {
-  return (
-    <section className="section-padding relative" id="about">
+  return <section className="section-padding relative" id="about">
       <div className="container mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">What is <span className="gradient-text">Busty Berry</span>?</h2>
@@ -24,11 +21,7 @@ const AboutSection = () => {
               <CardTitle className="text-2xl">Memecoin With Potential</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-300">
-                $BUSTYBERRY isn't just another memecoin. Built on the Solana blockchain for lightning-fast 
-                transactions and minimal fees, our token combines virality with real utility through our
-                AI chat platform. Our tokenomics are designed with community growth and sustainability in mind.
-              </p>
+              <p className="text-gray-300">$BUSTYBERRY isn't just another memecoin. Built on the Solana blockchain for lightning-fast transactions and minimal fees, our token combines virality with realUtility through ai chat bot and exclusive access to VIP Busty Berry Girls rooms and opportunities to provide content. </p>
             </CardContent>
           </Card>
           
@@ -50,8 +43,6 @@ const AboutSection = () => {
           </Card>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default AboutSection;
