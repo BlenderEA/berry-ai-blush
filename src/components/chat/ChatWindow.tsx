@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send } from 'lucide-react';
 import ChatMessage from './ChatMessage';
-import { useTTS } from '@/hooks/use-tts';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -42,18 +41,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const { speak, stop, isLoading: isTTSLoading, isPlaying } = useTTS({
-    onEnd: () => setSpeakingMessageId(null),
-    onError: (error) => {
-      console.error('TTS error:', error);
-      setSpeakingMessageId(null);
-      toast.error('Failed to generate speech. Please try again later.');
-    }
-  });
 
   // Generate AI response using Hugging Face models via Supabase Edge Function
   const generateResponse = async (userMessage: string): Promise<string> => {
@@ -142,34 +131,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       };
       
       setMessages(prev => [...prev, assistantMessage]);
-      
-      // Auto-speak the assistant message
-      setTimeout(() => {
-        handleSpeakMessage(assistantMessage.id, responseText);
-      }, 300);
-      
     } catch (error) {
       console.error('Error generating response:', error);
       toast.error('Failed to generate response');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleSpeakMessage = (messageId: string, content: string) => {
-    if (speakingMessageId === messageId) {
-      stop();
-      setSpeakingMessageId(null);
-    } else {
-      if (speakingMessageId) {
-        stop(); // Stop any currently playing audio
-      }
-      setSpeakingMessageId(messageId);
-      speak(content, personalityId).catch(error => {
-        console.error('Speech generation error:', error);
-        toast.error('Failed to generate speech');
-        setSpeakingMessageId(null);
-      });
     }
   };
 
@@ -191,9 +157,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             avatarSrc={message.role === 'assistant' ? avatarSrc : undefined}
             avatarFallback={message.role === 'assistant' ? avatarFallback : undefined}
             avatarColor={message.role === 'assistant' ? avatarColor : undefined}
-            onSpeakMessage={message.role === 'assistant' ? 
-              () => handleSpeakMessage(message.id, message.content) : undefined}
-            isSpeaking={speakingMessageId === message.id && isPlaying}
           />
         ))}
         <div ref={messagesEndRef} />

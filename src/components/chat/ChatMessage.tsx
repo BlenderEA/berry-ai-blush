@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX } from 'lucide-react';
 
 export interface ChatMessageProps {
   content: string;
@@ -11,8 +9,6 @@ export interface ChatMessageProps {
   avatarSrc?: string;
   avatarFallback?: string;
   avatarColor?: string;
-  onSpeakMessage?: () => void;
-  isSpeaking?: boolean;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -22,8 +18,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   avatarSrc,
   avatarFallback,
   avatarColor,
-  onSpeakMessage,
-  isSpeaking
 }) => {
   const isAssistant = role === 'assistant';
   const formattedTime = new Intl.DateTimeFormat('en', {
@@ -53,17 +47,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         
         <div className={`flex items-center text-xs text-gray-400 ${isAssistant ? 'flex-row' : 'flex-row-reverse'}`}>
           <span>{formattedTime}</span>
-          
-          {isAssistant && onSpeakMessage && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-6 w-6 p-0 ml-2 text-gray-400 hover:text-berry"
-              onClick={onSpeakMessage}
-            >
-              {isSpeaking ? <VolumeX size={14} /> : <Volume2 size={14} />}
-            </Button>
-          )}
         </div>
       </div>
     </div>
