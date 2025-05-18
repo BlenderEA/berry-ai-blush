@@ -9,32 +9,273 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      wallet_auth: {
+      content_purchases: {
         Row: {
-          created_at: string
+          buyer_id: string
+          content_id: string
           id: string
-          updated_at: string
-          user_id: string
-          wallet_address: string
-          wallet_type: string
+          price_paid: number
+          purchase_date: string | null
+          transaction_id: string | null
         }
         Insert: {
-          created_at?: string
+          buyer_id: string
+          content_id: string
           id?: string
-          updated_at?: string
-          user_id: string
-          wallet_address: string
-          wallet_type: string
+          price_paid: number
+          purchase_date?: string | null
+          transaction_id?: string | null
         }
         Update: {
-          created_at?: string
+          buyer_id?: string
+          content_id?: string
           id?: string
-          updated_at?: string
-          user_id?: string
-          wallet_address?: string
-          wallet_type?: string
+          price_paid?: number
+          purchase_date?: string | null
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_purchases_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_purchases_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "creator_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_content: {
+        Row: {
+          content_type: string
+          created_at: string | null
+          creator_id: string
+          description: string | null
+          id: string
+          media_url: string | null
+          price: number
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content_type?: string
+          created_at?: string | null
+          creator_id: string
+          description?: string | null
+          id?: string
+          media_url?: string | null
+          price?: number
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content_type?: string
+          created_at?: string | null
+          creator_id?: string
+          description?: string | null
+          id?: string
+          media_url?: string | null
+          price?: number
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_content_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          content_text: string | null
+          created_at: string | null
+          creator_id: string
+          id: string
+          is_premium: boolean | null
+          media_urls: string[] | null
+          price: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_text?: string | null
+          created_at?: string | null
+          creator_id: string
+          id?: string
+          is_premium?: boolean | null
+          media_urls?: string[] | null
+          price?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_text?: string | null
+          created_at?: string | null
+          creator_id?: string
+          id?: string
+          is_premium?: boolean | null
+          media_urls?: string[] | null
+          price?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          full_name: string
+          id: string
+          is_creator: boolean | null
+          updated_at: string | null
+          username: string
+          website: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          full_name: string
+          id: string
+          is_creator?: boolean | null
+          updated_at?: string | null
+          username: string
+          website?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          is_creator?: boolean | null
+          updated_at?: string | null
+          username?: string
+          website?: string | null
         }
         Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          creator_id: string
+          currency: string
+          end_date: string
+          id: string
+          start_date: string | null
+          status: string
+          subscriber_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          creator_id: string
+          currency?: string
+          end_date: string
+          id?: string
+          start_date?: string | null
+          status: string
+          subscriber_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          creator_id?: string
+          currency?: string
+          end_date?: string
+          id?: string
+          start_date?: string | null
+          status?: string
+          subscriber_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: string
+          currency: string
+          date: string | null
+          id: string
+          status: string | null
+          to_user_id: string | null
+          tx_hash: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: string
+          currency?: string
+          date?: string | null
+          id?: string
+          status?: string | null
+          to_user_id?: string | null
+          tx_hash?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: string
+          currency?: string
+          date?: string | null
+          id?: string
+          status?: string | null
+          to_user_id?: string | null
+          tx_hash?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_to_user_id_fkey"
+            columns: ["to_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
