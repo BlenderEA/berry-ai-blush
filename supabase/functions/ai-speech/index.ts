@@ -1,20 +1,20 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const HUGGINGFACE_API_KEY = Deno.env.get('HUGGINGFACE_API_KEY');
+const HUGGINGFACE_API_KEY = Deno.env.get('HUGGING_FACE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Voice models for each personality
+// Voice models for each personality - Updated with more available models
 const voiceModels = {
-  'blueberry-babe': 'facebook/mms-tts-eng',
-  'berry-bold': 'microsoft/speecht5_tts',
-  'white-berry': 'espnet/kan-bayashi_ljspeech_vits',
+  'blueberry-babe': 'espnet/kan-bayashi_ljspeech_vits',
+  'berry-bold': 'espnet/kan-bayashi_ljspeech_tacotron2',
+  'white-berry': 'espnet/kan-bayashi_ljspeech_fastspeech',
   'blue-frost': 'facebook/fastspeech2-en-ljspeech',
-  'raspberry-queen': 'microsoft/speecht5_hifigan',
+  'raspberry-queen': 'espnet/kan-bayashi_ljspeech_fastspeech2',
   'blackberry-dream': 'espnet/kan-bayashi_ljspeech_joint_finetune_conformer_fastspeech2_hifigan'
 };
 
@@ -37,6 +37,10 @@ serve(async (req) => {
 
     const modelId = voiceModels[personalityId];
     
+    console.log("Calling Hugging Face TTS API with model:", modelId);
+    console.log("Text prompt (first 50 chars):", text.substring(0, 50));
+    console.log("Using API key (first 4 chars):", HUGGINGFACE_API_KEY ? HUGGINGFACE_API_KEY.substring(0, 4) + '...' : 'undefined');
+    
     // Call Hugging Face Inference API for text-to-speech
     const response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
       method: 'POST',
@@ -55,6 +59,12 @@ serve(async (req) => {
 
     // Get the audio data as ArrayBuffer
     const audioArrayBuffer = await response.arrayBuffer();
+    
+    if (!audioArrayBuffer || audioArrayBuffer.byteLength === 0) {
+      throw new Error('Received empty audio response from Hugging Face API');
+    }
+    
+    console.log("Received audio data of size:", audioArrayBuffer.byteLength, "bytes");
     
     // Convert to base64 for easier handling in the frontend
     const audioBase64 = btoa(

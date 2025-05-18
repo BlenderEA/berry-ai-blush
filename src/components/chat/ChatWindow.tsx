@@ -50,6 +50,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     onError: (error) => {
       console.error('TTS error:', error);
       setSpeakingMessageId(null);
+      toast.error('Failed to generate speech. Please try again later.');
     }
   });
 
@@ -60,6 +61,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       const messageHistory = messages
         .slice(-10)
         .map(msg => ({ role: msg.role, content: msg.content }));
+
+      console.log("Sending to AI chat function:", {
+        text: userMessage,
+        personalityId,
+        messageHistoryLength: messageHistory.length
+      });
 
       // Call Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('ai-chat', {
@@ -75,10 +82,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         throw new Error(error.message || 'Failed to generate response');
       }
 
-      return data?.response || `I'm ${personalityName} and I seem to be having trouble thinking right now. Can you try again?`;
+      if (!data || !data.response) {
+        console.error('Invalid response from AI chat function:', data);
+        throw new Error('Received invalid response format from AI');
+      }
+
+      console.log("Received AI response:", data.response.substring(0, 100));
+      return data.response;
     } catch (error) {
       console.error('Error generating AI response:', error);
-      return `Sorry, I'm having trouble connecting to my thoughts right now. Could you try again in a moment?`;
+      toast.error('Failed to generate AI response. Please try again later.');
+      return `I'm ${personalityName} and I seem to be having trouble thinking right now. Can you try again?`;
     }
   };
 
@@ -134,7 +148,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         stop(); // Stop any currently playing audio
       }
       setSpeakingMessageId(messageId);
-      speak(content, personalityId);
+      speak(content, personalityId).catch(error => {
+        console.error('Speech generation error:', error);
+        toast.error('Failed to generate speech');
+        setSpeakingMessageId(null);
+      });
     }
   };
 

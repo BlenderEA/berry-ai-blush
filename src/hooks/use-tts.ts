@@ -21,18 +21,27 @@ export const useTTS = (options: UseTTSOptions = {}) => {
       setIsLoading(true);
       options.onStart?.();
 
+      console.log("Calling TTS function with:", {
+        personalityId,
+        textLength: text.length
+      });
+
       // Call our Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('ai-speech', {
         body: { text, personalityId }
       });
 
       if (error) {
+        console.error('TTS function error:', error);
         throw new Error(error.message || 'Failed to generate speech');
       }
 
       if (!data || !data.audio) {
+        console.error('Invalid TTS response:', data);
         throw new Error('No audio data received');
       }
+
+      console.log("Received audio data of length:", data.audio.length);
 
       // Stop any currently playing audio
       if (audio) {
@@ -49,19 +58,29 @@ export const useTTS = (options: UseTTSOptions = {}) => {
       newAudio.onended = () => {
         setIsPlaying(false);
         options.onEnd?.();
+        URL.revokeObjectURL(audioUrl); // Clean up
       };
-      newAudio.onerror = () => {
+      newAudio.onerror = (e) => {
+        console.error('Audio playback error:', e);
         setIsPlaying(false);
         options.onError?.('Error playing audio');
         toast.error('Failed to play audio');
+        URL.revokeObjectURL(audioUrl); // Clean up
       };
 
       setAudio(newAudio);
-      await newAudio.play();
+
+      try {
+        await newAudio.play();
+      } catch (playError) {
+        console.error('Audio play error:', playError);
+        throw new Error('Failed to play audio: ' + (playError instanceof Error ? playError.message : String(playError)));
+      }
     } catch (error) {
       console.error('TTS error:', error);
       options.onError?.(error instanceof Error ? error.message : 'Unknown error');
       toast.error('Speech generation failed');
+      throw error; // Re-throw to allow the caller to handle the error
     } finally {
       setIsLoading(false);
     }
@@ -78,14 +97,19 @@ export const useTTS = (options: UseTTSOptions = {}) => {
 
   // Helper function to convert base64 to Blob
   const base64ToBlob = (base64: string, type: string): Blob => {
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+    try {
+      const binaryString = atob(base64);
+      const bytes = new Uint8Array(binaryString.length);
+      
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      return new Blob([bytes], { type });
+    } catch (error) {
+      console.error('Error converting base64 to blob:', error);
+      throw new Error('Invalid audio data format');
     }
-    
-    return new Blob([bytes], { type });
   };
 
   return {

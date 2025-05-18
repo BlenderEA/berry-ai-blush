@@ -8,14 +8,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Model IDs for different personalities
+// Model IDs for different personalities - Updated with widely available models
 const textModels = {
-  'blueberry-babe': 'mistralai/Mistral-7B-Instruct-v0.2',
-  'berry-bold': 'mistralai/Mistral-7B-Instruct-v0.2',
-  'white-berry': 'mistralai/Mistral-7B-Instruct-v0.2',
-  'blue-frost': 'mistralai/Mistral-7B-Instruct-v0.2',
-  'raspberry-queen': 'mistralai/Mistral-7B-Instruct-v0.2',
-  'blackberry-dream': 'mistralai/Mistral-7B-Instruct-v0.2'
+  'blueberry-babe': 'facebook/blenderbot-400M-distill',
+  'berry-bold': 'facebook/opt-350m',
+  'white-berry': 'distilgpt2',
+  'blue-frost': 'gpt2',
+  'raspberry-queen': 'EleutherAI/gpt-neo-125M',
+  'blackberry-dream': 'microsoft/DialoGPT-medium'
 };
 
 // Personality prompts
@@ -48,15 +48,15 @@ serve(async (req) => {
     const modelId = textModels[personalityId];
     const systemPrompt = personalityPrompts[personalityId];
     
-    // Format conversation history for the model
-    const messages = [
-      { role: "system", content: systemPrompt },
-      ...messageHistory.map((msg: { role: string; content: string }) => ({
-        role: msg.role === 'assistant' ? 'assistant' : 'user',
-        content: msg.content
-      })),
-      { role: "user", content: text }
-    ];
+    // For older models that don't use chat format, convert to a single text prompt
+    const combinedPrompt = `${systemPrompt}\n\nConversation history:\n${
+      messageHistory.map((msg: { role: string; content: string }) => 
+        `${msg.role === 'assistant' ? personalityId : 'User'}: ${msg.content}`
+      ).join('\n')
+    }\n\nUser: ${text}\n\n${personalityId}:`;
+
+    console.log("Calling Hugging Face API with model:", modelId);
+    console.log("Combined prompt (first 100 chars):", combinedPrompt.substring(0, 100));
     
     // Call Hugging Face Inference API for text generation
     const response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
@@ -66,26 +66,56 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        inputs: {
-          messages: messages
-        },
+        inputs: combinedPrompt,
         parameters: {
           max_new_tokens: 250,
           temperature: 0.7,
           top_p: 0.9,
-          do_sample: true
+          do_sample: true,
+          return_full_text: false
         }
       }),
     });
 
+    const responseText = await response.text();
+    console.log("Raw API response:", responseText.substring(0, 100));
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Hugging Face API error:', errorText);
-      throw new Error(`Hugging Face API returned ${response.status}: ${errorText}`);
+      console.error('Hugging Face API error:', responseText);
+      throw new Error(`Hugging Face API returned ${response.status}: ${responseText}`);
     }
 
-    const result = await response.json();
-    const generatedText = result.generated_text || result[0]?.generated_text;
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (e) {
+      console.error("Failed to parse JSON response:", e);
+      throw new Error("Invalid response format from Hugging Face API");
+    }
+
+    // Handle different response formats from various models
+    let generatedText = '';
+    if (Array.isArray(result) && result.length > 0) {
+      if (result[0].generated_text) {
+        generatedText = result[0].generated_text;
+      } else if (typeof result[0] === 'string') {
+        generatedText = result[0];
+      }
+    } else if (result.generated_text) {
+      generatedText = result.generated_text;
+    } else if (typeof result === 'string') {
+      generatedText = result;
+    }
+
+    // Clean up the response if needed
+    if (generatedText.includes(`${personalityId}:`)) {
+      generatedText = generatedText.split(`${personalityId}:`)[1].trim();
+    }
+    if (generatedText.includes("User:")) {
+      generatedText = generatedText.split("User:")[0].trim();
+    }
+
+    console.log("Final generated text:", generatedText.substring(0, 100));
 
     return new Response(
       JSON.stringify({ response: generatedText || "I'm not sure how to respond to that." }),
