@@ -8,14 +8,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Updated with highly available TTS models
+// Updated with more reliable open source TTS models
 const voiceModels = {
-  'blueberry-babe': 'espnet/kan-bayashi_ljspeech_vits',
-  'berry-bold': 'facebook/fastspeech2-en-ljspeech',
-  'white-berry': 'espnet/kan-bayashi_ljspeech_fastspeech',
-  'blue-frost': 'espnet/kan-bayashi_ljspeech_tacotron2',
-  'raspberry-queen': 'microsoft/speecht5_tts',
-  'blackberry-dream': 'facebook/mms-tts-eng'
+  'blueberry-babe': 'facebook/mms-tts-eng',
+  'berry-bold': 'microsoft/speecht5_tts',
+  'white-berry': 'speechbrain/tts-tacotron2-ljspeech',
+  'blue-frost': 'facebook/fastspeech2-en-ljspeech',
+  'raspberry-queen': 'microsoft/speecht5_hifigan',
+  'blackberry-dream': 'microsoft/speecht5_tts'
 };
 
 serve(async (req) => {
@@ -33,6 +33,12 @@ serve(async (req) => {
 
     if (!personalityId || !voiceModels[personalityId]) {
       throw new Error('Valid personality ID is required');
+    }
+
+    // Check if API key is available
+    if (!HUGGINGFACE_API_KEY) {
+      console.error('HUGGING_FACE_API_KEY is not set');
+      throw new Error('Hugging Face API key is not configured');
     }
 
     const modelId = voiceModels[personalityId];
@@ -57,7 +63,7 @@ serve(async (req) => {
       throw new Error(`Network error: ${fetchError.message}`);
     }
 
-    // Handle HTTP errors
+    // Enhanced error handling
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Hugging Face API error (${response.status}):`, errorText);
@@ -65,7 +71,9 @@ serve(async (req) => {
       if (response.status === 401) {
         throw new Error("Authentication failed. Please check your Hugging Face API key.");
       } else if (response.status === 404) {
-        throw new Error(`Model not found: ${modelId}. This model may not be publicly available.`);
+        throw new Error(`Model not found: ${modelId}. Please try a different personality.`);
+      } else if (response.status === 503) {
+        throw new Error("Hugging Face service is currently unavailable. Please try again later.");
       } else {
         throw new Error(`Hugging Face API returned ${response.status}: ${errorText}`);
       }
