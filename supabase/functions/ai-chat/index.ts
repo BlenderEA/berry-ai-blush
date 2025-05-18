@@ -38,7 +38,7 @@ serve(async (req) => {
       throw new Error('Valid personality ID is required');
     }
 
-    // Enhanced API key validation with more descriptive error
+    // Validate API key more thoroughly
     if (!OPENAI_API_KEY) {
       console.error('OPENAI_API_KEY is not set in the environment variables');
       return new Response(
@@ -49,6 +49,25 @@ serve(async (req) => {
         }),
         { 
           status: 500, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    }
+
+    // Check if the API key starts with "sk-" (OpenAI API keys format)
+    if (!OPENAI_API_KEY.startsWith('sk-')) {
+      console.error('Invalid OPENAI_API_KEY format');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid API Key Format',
+          details: 'The provided OpenAI API key does not appear to be in the correct format. API keys should start with "sk-".',
+          help: "Please verify your OpenAI API key is correct in Supabase Edge Function secrets."
+        }),
+        { 
+          status: 400, 
           headers: { 
             ...corsHeaders, 
             'Content-Type': 'application/json' 
@@ -85,77 +104,130 @@ serve(async (req) => {
     console.log("API Key first 5 chars:", OPENAI_API_KEY ? OPENAI_API_KEY.substring(0, 5) + "..." : "undefined");
     console.log("Sending messages length:", messages.length);
     
-    // Call OpenAI API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: CHAT_MODEL,
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 300
-      }),
-    });
-
-    if (!response.ok) {
-      const statusCode = response.status;
-      let errorText;
-      
-      try {
-        const errorData = await response.json();
-        errorText = errorData.error?.message || JSON.stringify(errorData);
-      } catch (e) {
-        errorText = await response.text() || `Status code: ${statusCode}`;
-      }
-      
-      console.error(`OpenAI API error (${statusCode}):`, errorText);
-      
-      if (statusCode === 401) {
-        return new Response(
-          JSON.stringify({ 
-            error: "Invalid API Key",
-            details: "The OpenAI API key is invalid or revoked. Please update your API key.",
-            help: "You need to replace your OPENAI_API_KEY with a valid key in Supabase Edge Function secrets."
-          }),
-          { 
-            status: 401, 
-            headers: { 
-              ...corsHeaders, 
-              'Content-Type': 'application/json' 
-            } 
+    try {
+      // Call OpenAI API with more detailed error handling
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: CHAT_MODEL,
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 300
+        }),
+      });
+  
+      if (!response.ok) {
+        const statusCode = response.status;
+        let errorData;
+        
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          // If we can't parse JSON, use text
+          const errorText = await response.text();
+          console.error(`OpenAI API error (${statusCode}):`, errorText);
+          
+          if (statusCode === 401) {
+            return new Response(
+              JSON.stringify({ 
+                error: "Invalid API Key",
+                details: "The OpenAI API key is invalid or revoked. Please update your API key.",
+                help: "You need to replace your OPENAI_API_KEY with a valid key in Supabase Edge Function secrets."
+              }),
+              { 
+                status: 401, 
+                headers: { 
+                  ...corsHeaders, 
+                  'Content-Type': 'application/json' 
+                } 
+              }
+            );
+          } else {
+            throw new Error(`OpenAI API returned ${statusCode}: ${errorText}`);
           }
-        );
-      } else {
-        throw new Error(`OpenAI API returned ${statusCode}: ${errorText}`);
+        }
+        
+        console.error(`OpenAI API error (${statusCode}):`, errorData);
+        
+        if (statusCode === 401) {
+          return new Response(
+            JSON.stringify({ 
+              error: "Invalid API Key",
+              details: "The OpenAI API key is invalid or revoked. Please update your API key.",
+              help: "You need to replace your OPENAI_API_KEY with a valid key in Supabase Edge Function secrets."
+            }),
+            { 
+              status: 401, 
+              headers: { 
+                ...corsHeaders, 
+                'Content-Type': 'application/json' 
+              } 
+            }
+          );
+        } else if (errorData?.error) {
+          return new Response(
+            JSON.stringify({ 
+              error: errorData.error.type || "OpenAI API Error",
+              details: errorData.error.message || "An error occurred with the OpenAI API.",
+              help: "Check the OpenAI status page or update your API key."
+            }),
+            { 
+              status: statusCode, 
+              headers: { 
+                ...corsHeaders, 
+                'Content-Type': 'application/json' 
+              } 
+            }
+          );
+        } else {
+          throw new Error(`OpenAI API returned ${statusCode}: Unknown error`);
+        }
       }
-    }
-
-    // Process the response
-    const responseData = await response.json();
-    
-    if (!responseData.choices || !responseData.choices[0] || !responseData.choices[0].message) {
-      console.error("Invalid response format from OpenAI:", responseData);
-      throw new Error("Received invalid response format from OpenAI");
-    }
-    
-    const generatedText = responseData.choices[0].message.content;
-    console.log("Generated text length:", generatedText.length);
-
-    return new Response(
-      JSON.stringify({ 
-        response: generatedText,
-        model_used: CHAT_MODEL
-      }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
+  
+      // Process the response
+      const responseData = await response.json();
+      
+      if (!responseData.choices || !responseData.choices[0] || !responseData.choices[0].message) {
+        console.error("Invalid response format from OpenAI:", responseData);
+        throw new Error("Received invalid response format from OpenAI");
       }
-    );
+      
+      const generatedText = responseData.choices[0].message.content;
+      console.log("Generated text length:", generatedText.length);
+  
+      return new Response(
+        JSON.stringify({ 
+          response: generatedText,
+          model_used: CHAT_MODEL
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    } catch (openAiError) {
+      console.error("OpenAI API call error:", openAiError);
+      return new Response(
+        JSON.stringify({ 
+          error: openAiError.message || "Error calling OpenAI API",
+          details: "There was a problem communicating with the OpenAI API. This could be due to an invalid API key, rate limiting, or a service outage.",
+          help: "Please verify your API key and try again later."
+        }),
+        { 
+          status: 500, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    }
   } catch (error) {
     console.error('Error in ai-chat function:', error);
     

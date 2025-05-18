@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,13 +51,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   // Use the TTS hook to access apiKeyError
   const { speak, isLoading: ttsLoading, isPlaying, apiKeyError } = useTTS();
 
-  // Generate AI response using Hugging Face models via Supabase Edge Function
+  // Generate AI response using OpenAI via Supabase Edge Function
   const generateResponse = async (userMessage: string): Promise<string> => {
     try {
       setErrorMessage(null);
       setErrorDetails(null);
       
-      // Format message history for the AI (limited to last 10 messages for context)
+      // Format message history for the AI (limited to last 10 messages)
       const messageHistory = messages
         .slice(-10)
         .map(msg => ({ role: msg.role, content: msg.content }));
@@ -69,7 +68,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         messageHistoryLength: messageHistory.length
       });
 
-      // Call Supabase Edge Function
+      // Call Supabase Edge Function with improved error handling
       const { data, error } = await supabase.functions.invoke('ai-chat', {
         body: { 
           text: userMessage, 
@@ -80,6 +79,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
       if (error) {
         console.error('AI chat function error:', error);
+        
+        // Check if it's likely an API key issue
+        if (error.message && error.message.includes('non-2xx status code')) {
+          throw new Error('API key may be invalid or missing. Please check your OpenAI API key configuration.');
+        }
+        
         throw new Error(error.message || 'Failed to generate response');
       }
 
@@ -187,9 +192,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   return (
     <div className="flex flex-col h-[400px] bg-dark border border-dark-border rounded-lg">
       {/* Show API Key Warning if there's an apiKeyError from the TTS hook */}
-      {apiKeyError && (
+      {(apiKeyError || errorMessage === 'API key may be invalid or missing. Please check your OpenAI API key configuration.') && (
         <div className="p-4">
-          <ApiKeyWarning message={apiKeyError.message} details={apiKeyError.details} />
+          <ApiKeyWarning 
+            message={apiKeyError?.message || "Your OpenAI API key appears to be missing or invalid."} 
+            details={apiKeyError?.details || "Please make sure you've added a valid OpenAI API key to your Supabase Edge Function secrets."} 
+          />
         </div>
       )}
       
@@ -221,7 +229,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         )}
         
         {/* Error message with retry button */}
-        {errorMessage && (
+        {errorMessage && !apiKeyError && errorMessage !== 'API key may be invalid or missing. Please check your OpenAI API key configuration.' && (
           <Alert variant="destructive" className="bg-red-900/30 border border-red-800 text-white">
             <AlertTitle className="font-semibold">Error with AI service:</AlertTitle>
             <AlertDescription>
