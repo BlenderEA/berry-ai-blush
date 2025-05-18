@@ -28,6 +28,7 @@ const Header = () => {
     { name: 'Home', path: '/' },
     { name: 'AI Chat', path: '/ai-chat' },
     { name: 'Token', path: '/token' },
+    { name: 'NFTs', path: '/nft' },
     { name: 'Whitepaper', path: '/whitepaper' },
     { name: 'Creators', path: '/creators' },
     { name: 'Community', path: '/community' },
