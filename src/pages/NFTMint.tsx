@@ -37,24 +37,29 @@ const NFTMint = () => {
       <main className="container mx-auto px-4 py-8 flex justify-center items-center">
         {/* Hero Banner Section with Countdown */}
         <div className="flex flex-col items-center mb-12 max-w-5xl w-full">
-          <div className="relative w-full max-w-5xl mx-auto mb-6 overflow-hidden rounded-2xl">
+          {/* Teaser image with more space */}
+          <div className="w-full max-w-5xl mx-auto mb-10 overflow-hidden rounded-2xl">
             <div className="aspect-[16/9] overflow-hidden">
-              <img src="/lovable-uploads/7ba95f21-690e-49fa-87bb-f8b65bcd73bc.png" alt="Busty Berry NFTitties Memorial Day Edition" className="w-full object-cover rounded-2xl shadow-2xl" />
-              <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent"></div>
-            </div>
-            
-            {/* Countdown overlay */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-dark p-6">
-              <div className="flex flex-col items-center">
-                <h2 className="text-2xl md:text-3xl font-bold mb-2 text-white">LAUNCHING</h2>
-                <CountdownTimer targetDate={launchDate} />
-              </div>
+              <img 
+                src="/lovable-uploads/7ba95f21-690e-49fa-87bb-f8b65bcd73bc.png" 
+                alt="Busty Berry NFTitties Memorial Day Edition" 
+                className="w-full object-cover rounded-2xl shadow-2xl" 
+              />
             </div>
           </div>
           
+          {/* Title and countdown moved below the image */}
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center gradient-text">Busty Berry NFTitties</h1>
           <div className="bg-berry px-6 py-3 rounded-full text-white font-bold text-xl mb-8 shadow-glow flex items-center">
             <Flag className="mr-2 h-5 w-5" /> MEMORIAL DAY EDITION <Flag className="ml-2 h-5 w-5" />
+          </div>
+          
+          {/* Countdown timer moved below image */}
+          <div className="bg-dark-lighter rounded-xl p-6 mb-8 border border-berry/30 w-full max-w-md">
+            <div className="flex flex-col items-center">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">LAUNCHING</h2>
+              <CountdownTimer targetDate={launchDate} />
+            </div>
           </div>
           
           {/* Description */}
