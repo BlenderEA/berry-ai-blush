@@ -3,8 +3,20 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Eye, Video, MessageSquare, Image, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const CreatorInsights = () => {
+  // Sample revenue data for the chart
+  const revenueData = [
+    { day: 'Mon', amount: 420 },
+    { day: 'Tue', amount: 580 },
+    { day: 'Wed', amount: 450 },
+    { day: 'Thu', amount: 700 },
+    { day: 'Fri', amount: 500 },
+    { day: 'Sat', amount: 890 },
+    { day: 'Sun', amount: 750 },
+  ];
+
   const upcomingFeatures = [
     {
       icon: <Image className="h-12 w-12 text-berry" />,
@@ -95,15 +107,47 @@ const CreatorInsights = () => {
                   </select>
                 </div>
                 <div className="h-48 flex items-center justify-center">
-                  <div className="w-full h-32 flex items-end justify-around">
-                    <div className="h-40% w-8 bg-berry-purple/40 rounded-t-lg"></div>
-                    <div className="h-60% w-8 bg-berry-purple/40 rounded-t-lg"></div>
-                    <div className="h-45% w-8 bg-berry-purple/40 rounded-t-lg"></div>
-                    <div className="h-70% w-8 bg-berry-purple/40 rounded-t-lg"></div>
-                    <div className="h-50% w-8 bg-berry-purple/40 rounded-t-lg"></div>
-                    <div className="h-90% w-8 bg-berry/70 rounded-t-lg"></div>
-                    <div className="h-75% w-8 bg-berry/70 rounded-t-lg"></div>
-                  </div>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={revenueData}
+                      margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                    >
+                      <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#D946EF" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#D946EF" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis 
+                        dataKey="day" 
+                        tick={{ fill: '#888' }} 
+                        axisLine={{ stroke: '#444' }}
+                        tickLine={{ stroke: '#444' }}
+                      />
+                      <YAxis 
+                        hide={true}
+                        domain={['dataMin - 100', 'dataMax + 100']} 
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#262B38',
+                          borderColor: '#2D334A',
+                          borderRadius: '0.375rem',
+                          color: '#fff'
+                        }}
+                        formatter={(value) => [`$${value}`, 'Revenue']}
+                        labelFormatter={(label) => `${label}`}
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="amount" 
+                        stroke="#D946EF" 
+                        strokeWidth={2}
+                        fill="url(#colorRevenue)" 
+                        activeDot={{ r: 6, stroke: '#D946EF', strokeWidth: 2, fill: '#fff' }} 
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
               <div className="bg-dark-lighter rounded-lg p-4">
