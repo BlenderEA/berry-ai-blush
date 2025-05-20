@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CalendarDays, Bell } from 'lucide-react';
 import Header from '@/components/Header';
@@ -6,11 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+
 const NFTMint = () => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [email, setEmail] = React.useState('');
+  
   const handleNotify = () => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       toast({
@@ -27,14 +28,26 @@ const NFTMint = () => {
     });
     setEmail('');
   };
-  return <div className="min-h-screen bg-dark text-white">
+
+  return (
+    <div className="min-h-screen bg-dark text-white">
       <Header />
       
       <main className="container mx-auto px-4 py-16">
-        <div className="flex flex-col items-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center gradient-text">Busty Berry NFTitties</h1>
-          <div className="bg-berry px-4 py-2 rounded-full text-white font-bold text-lg mb-8 animate-pulse">
-            Coming Soon!
+        {/* Hero Image Section */}
+        <div className="flex flex-col items-center mb-12 mt-8">
+          <div className="relative w-full max-w-4xl mx-auto mb-8">
+            <img 
+              src="/lovable-uploads/7ba95f21-690e-49fa-87bb-f8b65bcd73bc.png" 
+              alt="Busty Berry NFTitties Collection" 
+              className="w-full rounded-2xl shadow-2xl"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent rounded-2xl"></div>
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center gradient-text">Busty Berry NFTitties</h1>
+          <div className="bg-berry px-6 py-3 rounded-full text-white font-bold text-xl mb-8 animate-pulse shadow-glow">
+            COMING SOON!
           </div>
           <p className="text-xl mb-8 text-center max-w-2xl">
             Our exclusive NFT collection will be available for minting soon. Be among the first to get your hands on these unique digital assets!
@@ -130,6 +143,14 @@ const NFTMint = () => {
       </main>
       
       <Footer />
-    </div>;
+      
+      <style jsx>{`
+        .shadow-glow {
+          box-shadow: 0 0 15px 5px rgba(217, 70, 239, 0.5);
+        }
+      `}</style>
+    </div>
+  );
 };
+
 export default NFTMint;
