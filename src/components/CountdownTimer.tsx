@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -73,7 +72,7 @@ const CountdownTimer = () => {
           <div className="bg-dark-card/80 backdrop-blur-sm border border-dark-border rounded-xl p-6 sm:p-8 shadow-lg">
             <div className="text-center mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-                <span className="text-berry">Memorial Day NFT</span> Launch Countdown
+                <span className="text-berry">Memorial Day NFTitties</span> Launch Collection
               </h2>
               <p className="text-gray-300">
                 138 unique 1/1 NFTs - 69 Regular Edition & 69 Pink Edition
