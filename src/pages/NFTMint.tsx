@@ -89,8 +89,8 @@ const NFTMint = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Banner Image */}
-        <div className="w-full mb-8 rounded-xl overflow-hidden shadow-lg">
+        {/* Banner Image - Now with max width and height constraints */}
+        <div className="max-w-3xl mx-auto mb-8 rounded-xl overflow-hidden shadow-lg">
           <img 
             src="/lovable-uploads/2fa7f246-e7e0-42f6-a543-313c3247fa40.png" 
             alt="Busty Berry Memorial Day Edition" 
