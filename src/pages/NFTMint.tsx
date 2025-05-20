@@ -111,17 +111,40 @@ const NFTMint = () => {
             Busty Berries Memorial Day Edition
           </h1>
           
-          {/* Description with better typography */}
-          <p className="text-xl md:text-2xl mb-12 text-center text-gray-200 leading-relaxed max-w-3xl mx-auto">
-            A bold and juicy NFT collection featuring seductive, sexy women with curves and luscious berries. This limited drop blends sex appeal with vibrant fruit-inspired aesthetics and adds a patriotic twist and military theme in honor of Memorial Day. A playful, provocative twist on digital art, this collection is for collectors who crave something wild, ripe, and unforgettable.
-          </p>
+          {/* Description with better typography and 1/1 info */}
+          <div className="mb-10">
+            <p className="text-xl md:text-2xl mb-6 text-center text-gray-200 leading-relaxed max-w-3xl mx-auto">
+              A bold and juicy 1/1 NFT collection featuring seductive, sexy women with curves and luscious berries. This limited drop blends sex appeal with vibrant fruit-inspired aesthetics and adds a patriotic twist and military theme in honor of Memorial Day.
+            </p>
+            
+            {/* NFT Collection Details Banner */}
+            <div className="bg-gradient-to-r from-berry-purple/20 to-berry/20 p-4 rounded-xl border border-berry/40 max-w-2xl mx-auto">
+              <h2 className="text-center text-2xl font-bold mb-4 text-berry-light">Exclusive 1/1 Collection</h2>
+              <div className="flex flex-col md:flex-row justify-center items-center gap-6 text-center">
+                <div className="flex-1">
+                  <p className="text-3xl font-bold text-white mb-1">138</p>
+                  <p className="text-sm text-gray-300">Total Unique NFTs</p>
+                </div>
+                <div className="h-12 w-px bg-berry-purple/50 hidden md:block"></div>
+                <div className="flex-1">
+                  <p className="text-3xl font-bold text-white mb-1">69</p>
+                  <p className="text-sm text-gray-300">Regular Edition</p>
+                </div>
+                <div className="h-12 w-px bg-berry-purple/50 hidden md:block"></div>
+                <div className="flex-1">
+                  <p className="text-3xl font-bold text-berry-light mb-1">69</p>
+                  <p className="text-sm text-gray-300">Pink Edition</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Key Features Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-16">
             <Card className="bg-dark-card border-dark-border text-white hover:border-berry transition-colors">
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-2 text-berry">Limited Edition</h3>
-                <p className="text-gray-300">Only 100 unique NFTs available in this special Memorial Day collection</p>
+                <h3 className="text-lg font-bold mb-2 text-berry">1/1 Unique Art</h3>
+                <p className="text-gray-300">Each NFT is completely unique with no duplicates - true digital ownership</p>
               </CardContent>
             </Card>
             <Card className="bg-dark-card border-dark-border text-white hover:border-berry transition-colors">
@@ -156,7 +179,7 @@ const NFTMint = () => {
           {/* Notification Sign-up with better styling */}
           <div className="bg-dark-card border border-dark-border p-8 rounded-xl max-w-md mx-auto shadow-lg">
             <h3 className="text-2xl font-bold mb-4 text-center">Get Early Access</h3>
-            <p className="text-center text-gray-300 mb-6">Be the first to know when the collection goes live</p>
+            <p className="text-center text-gray-300 mb-6">Be the first to know when these 138 unique 1/1 NFTs drop</p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Input
                 type="email"
