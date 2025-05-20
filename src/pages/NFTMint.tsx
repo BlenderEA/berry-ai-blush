@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { CalendarDays, Clock, Bell, Flag } from 'lucide-react';
+import React from 'react';
+import { CalendarDays, Bell } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import CountdownTimer from '@/components/NFT/CountdownTimer';
 const NFTMint = () => {
   const {
     toast
   } = useToast();
-  const [email, setEmail] = useState('');
-  const launchDate = new Date('2025-05-23T12:00:00-04:00'); // Noon EST this Friday
-
+  const [email, setEmail] = React.useState('');
   const handleNotify = () => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       toast({
@@ -33,40 +30,17 @@ const NFTMint = () => {
   return <div className="min-h-screen bg-dark text-white">
       <Header />
       
-      <main className="container mx-auto flex justify-center items-center px-0 py-0">
-        {/* Hero Banner Section with Countdown */}
-        <div className="flex flex-col items-center mb-12 max-w-5xl w-full">
-          {/* Teaser image with more space */}
-          <div className="w-full max-w-5xl mx-auto mb-10 overflow-hidden rounded-2xl">
-            <div className="aspect-[16/9] overflow-hidden">
-              <img src="/lovable-uploads/7ba95f21-690e-49fa-87bb-f8b65bcd73bc.png" alt="Busty Berry NFTitties Memorial Day Edition" className="w-full object-cover rounded-2xl shadow-2xl" />
-            </div>
+      <main className="container mx-auto px-4 py-16">
+        <div className="flex flex-col items-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center gradient-text">Busty Berry NFTitties</h1>
+          <div className="bg-berry px-4 py-2 rounded-full text-white font-bold text-lg mb-8 animate-pulse">
+            Coming Soon!
           </div>
-          
-          {/* Title and countdown moved below the image */}
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center gradient-text">Busty Berry NFTitties</h1>
-          <div className="bg-berry px-6 py-3 rounded-full text-white font-bold text-xl mb-8 shadow-glow flex items-center">
-            <Flag className="mr-2 h-5 w-5" /> MEMORIAL DAY EDITION <Flag className="ml-2 h-5 w-5" />
-          </div>
-          
-          {/* Countdown timer moved below image */}
-          <div className="bg-dark-lighter rounded-xl p-6 mb-8 border border-berry/30 w-full max-w-md">
-            <div className="flex flex-col items-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">LAUNCHING</h2>
-              <CountdownTimer targetDate={launchDate} />
-            </div>
-          </div>
-          
-          {/* Description */}
-          <div className="bg-dark-lighter rounded-xl p-6 max-w-3xl mx-auto mb-10 border border-berry/30">
-            <p className="text-lg text-center">
-              Busty Berries Memorial Day Edition is a bold and juicy NFT collection featuring seductive, sexy women with curves and luscious berries. This limited drop blends sex appeal with vibrant fruit-inspired aesthetics and adds a patriotic twist and military theme in honor of Memorial Day. A playful, provocative twist on digital art, this collection is for collectors who crave something wild, ripe, and unforgettable.
-            </p>
-          </div>
+          <p className="text-xl mb-8 text-center max-w-2xl">
+            Our exclusive NFT collection will be available for minting soon. Be among the first to get your hands on these unique digital assets!
+          </p>
         </div>
-      </main>
 
-      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* NFT Preview */}
           <div className="flex flex-col items-center">
@@ -75,8 +49,7 @@ const NFTMint = () => {
                 <div className="text-center p-6">
                   <CalendarDays size={80} className="mx-auto mb-4 text-white/50" />
                   <h3 className="text-2xl font-bold mb-2">Launch Date</h3>
-                  <p className="text-lg text-white/80">Friday, May 23rd, 2025</p>
-                  <p className="text-md text-white/80">12:00 PM EST</p>
+                  <p className="text-lg text-white/80">Coming Q3 2025</p>
                 </div>
               </div>
             </div>
@@ -85,70 +58,78 @@ const NFTMint = () => {
               <ul className="space-y-2 text-sm">
                 <li className="flex justify-between">
                   <span className="text-gray-400">Collection:</span>
-                  <span className="font-medium">Busty Berry NFTitties: Memorial Day Edition</span>
+                  <span className="font-medium">Busty Berry NFTitties</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text-gray-400">Total Supply:</span>
-                  <span className="font-medium">1,776</span>
+                  <span className="font-medium">10,000</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text-gray-400">Blockchain:</span>
                   <span className="font-medium">Solana</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-gray-400">Mint Price:</span>
-                  <span className="font-medium">0.42 SOL</span>
+                  <span className="text-gray-400">Price:</span>
+                  <span className="font-medium">TBA</span>
                 </li>
               </ul>
             </div>
           </div>
 
           {/* Notification Sign-up */}
-          <div className="flex flex-col items-center justify-center">
-            <Card className="w-full max-w-md bg-dark-card border-berry/30">
-              <CardContent className="pt-6">
-                <h3 className="text-xl font-bold mb-4 text-center">Get Notified at Launch</h3>
-                <p className="text-sm text-white/70 mb-6 text-center">
-                  Enter your email to receive a notification when Busty Berry NFTitties are available for minting.
-                </p>
-                <div className="flex flex-col space-y-4">
-                  <Input value={email} onChange={e => setEmail(e.target.value)} placeholder="Your email address" className="bg-dark-lighter border-dark-border" />
-                  <Button onClick={handleNotify} className="w-full bg-berry hover:bg-berry-light">
-                    <Bell className="mr-2 h-4 w-4" /> Notify Me
-                  </Button>
+          <Card className="bg-dark-card border-dark-border">
+            <CardContent className="pt-6">
+              <div className="text-center mb-6">
+                <Bell className="h-12 w-12 mx-auto mb-4 text-berry" />
+                <h2 className="text-2xl font-bold mb-2">Get Notified</h2>
+                <p className="text-gray-400">Be the first to know when minting goes live</p>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
+                  <Input id="email" type="email" placeholder="your@email.com" className="bg-dark-lighter border-dark-border" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                
+                <Button className="w-full bg-berry hover:bg-berry-light text-white font-bold py-3 h-auto" onClick={handleNotify}>
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notify Me When Live
+                </Button>
+                
+                <p className="text-xs text-center text-gray-500 mt-4">
+                  We respect your privacy. No spam, just important updates.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Collection Info */}
         <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center">Memorial Day Edition Benefits</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center">About Busty Berry NFTitties</h2>
+          <div className="bg-dark-lighter rounded-xl p-6 mb-8">
+            <p className="mb-4">Busty Berry NFTitties is a limited collection of 10,000 unique NFTs on the Solana blockchain. Each NFT will feature unique attributes and varying rarities, making them valuable digital collectibles.</p>
+            <p>Holding Busty Berry NFTitties will grant you exclusive access to community events, airdrops, and upcoming releases in the Busty Berry ecosystem.</p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-dark-card p-5 rounded-lg text-center border border-dark-border">
               <h3 className="font-bold text-xl mb-2 text-berry">Exclusive Access</h3>
-              <p className="text-sm">Priority access to future Busty Berry drops and events</p>
+              <p className="text-sm">Join our private community and get early access to future drops</p>
             </div>
             <div className="bg-dark-card p-5 rounded-lg text-center border border-dark-border">
-              <h3 className="font-bold text-xl mb-2 text-berry">Patriotic Perks</h3>
-              <p className="text-sm">Special Memorial Day airdrops for holders</p>
+              <h3 className="font-bold text-xl mb-2 text-berry">Token Rewards</h3>
+              <p className="text-sm">Earn $BUSTY tokens as staking rewards for your NFTs</p>
             </div>
             <div className="bg-dark-card p-5 rounded-lg text-center border border-dark-border">
-              <h3 className="font-bold text-xl mb-2 text-berry">Community</h3>
-              <p className="text-sm">Join our patriotic, berry-loving community</p>
+              <h3 className="font-bold text-xl mb-2 text-berry">Future Utility</h3>
+              <p className="text-sm">Use your NFTs across the Busty Berry ecosystem</p>
             </div>
           </div>
         </div>
-      </div>
+      </main>
       
       <Footer />
-      
-      <style>
-        {`.shadow-glow {
-          box-shadow: 0 0 15px 5px rgba(217, 70, 239, 0.5);
-        }`}
-      </style>
     </div>;
 };
 export default NFTMint;
