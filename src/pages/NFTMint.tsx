@@ -5,6 +5,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 
 const NFTMint = () => {
   const { toast } = useToast();
@@ -78,7 +80,7 @@ const NFTMint = () => {
   };
   
   const CountdownUnit = ({ value, label }: { value: number, label: string }) => (
-    <div className="flex flex-col items-center bg-dark-card p-3 sm:p-4 rounded-lg min-w-[70px] sm:min-w-[90px]">
+    <div className="flex flex-col items-center bg-dark-card p-3 sm:p-4 rounded-lg min-w-[70px] sm:min-w-[90px] border border-dark-border shadow-lg">
       <span className="text-2xl sm:text-3xl font-bold text-berry">{value}</span>
       <span className="text-xs sm:text-sm text-gray-400">{label}</span>
     </div>
@@ -88,9 +90,14 @@ const NFTMint = () => {
     <div className="min-h-screen bg-dark text-white">
       <Header />
       
-      <main className="container mx-auto px-4 py-8 mt-20">
-        {/* Banner Image - Now with max width and height constraints */}
-        <div className="max-w-3xl mx-auto mb-8 rounded-xl overflow-hidden shadow-lg">
+      <div className="relative w-full h-24 sm:h-32 md:h-40 bg-gradient-to-r from-berry-purple to-berry overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/lovable-uploads/2fa7f246-e7e0-42f6-a543-313c3247fa40.png')] bg-center opacity-20 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-dark"></div>
+      </div>
+      
+      <main className="container mx-auto px-4 py-12 -mt-8 relative z-10">
+        {/* Banner Image with glow effect */}
+        <div className="max-w-3xl mx-auto mb-12 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(217,70,239,0.3)]">
           <img 
             src="/lovable-uploads/2fa7f246-e7e0-42f6-a543-313c3247fa40.png" 
             alt="Busty Berry Memorial Day Edition" 
@@ -99,44 +106,67 @@ const NFTMint = () => {
         </div>
         
         <div className="max-w-4xl mx-auto">
-          {/* NFT Collection Title */}
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-center gradient-text">
+          {/* NFT Collection Title with animated gradient */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center animate-gradient-flow bg-clip-text text-transparent bg-gradient-to-r from-berry-purple via-berry to-berry-light">
             Busty Berries Memorial Day Edition
           </h1>
           
-          {/* Description */}
-          <p className="text-xl mb-10 text-center text-gray-200">
+          {/* Description with better typography */}
+          <p className="text-xl md:text-2xl mb-12 text-center text-gray-200 leading-relaxed max-w-3xl mx-auto">
             A bold and juicy NFT collection featuring seductive, sexy women with curves and luscious berries. This limited drop blends sex appeal with vibrant fruit-inspired aesthetics and adds a patriotic twist and military theme in honor of Memorial Day. A playful, provocative twist on digital art, this collection is for collectors who crave something wild, ripe, and unforgettable.
           </p>
+
+          {/* Key Features Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-16">
+            <Card className="bg-dark-card border-dark-border text-white hover:border-berry transition-colors">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold mb-2 text-berry">Limited Edition</h3>
+                <p className="text-gray-300">Only 100 unique NFTs available in this special Memorial Day collection</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-dark-card border-dark-border text-white hover:border-berry transition-colors">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold mb-2 text-berry">Exclusive Benefits</h3>
+                <p className="text-gray-300">Holders get special access to future drops and community events</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-dark-card border-dark-border text-white hover:border-berry transition-colors">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold mb-2 text-berry">Solana Network</h3>
+                <p className="text-gray-300">Minted on Solana for low fees and lightning-fast transactions</p>
+              </CardContent>
+            </Card>
+          </div>
           
-          {/* Countdown Timer */}
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold mb-4 text-center">Launch Countdown</h2>
-            <div className="flex justify-center items-center gap-3 sm:gap-4 mb-2">
+          {/* Countdown Timer with enhanced styling */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">Launch Countdown</h2>
+            <div className="flex justify-center items-center gap-3 sm:gap-6 mb-4">
               <CountdownUnit value={timeRemaining.days} label="DAYS" />
               <CountdownUnit value={timeRemaining.hours} label="HOURS" />
               <CountdownUnit value={timeRemaining.minutes} label="MINS" />
               <CountdownUnit value={timeRemaining.seconds} label="SECS" />
             </div>
-            <p className="text-center text-gray-400 mt-2">
-              <Clock className="inline-block mr-1" size={16} />
+            <p className="text-center text-gray-400 flex items-center justify-center gap-2">
+              <Clock className="inline-block" size={18} />
               Launching at 12:00 PM EST this Friday
             </p>
           </div>
           
-          {/* Notification Sign-up */}
-          <div className="bg-dark-card border border-dark-border p-6 rounded-xl max-w-md mx-auto">
-            <h3 className="text-xl font-bold mb-4 text-center">Get Notified at Launch</h3>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
+          {/* Notification Sign-up with better styling */}
+          <div className="bg-dark-card border border-dark-border p-8 rounded-xl max-w-md mx-auto shadow-lg">
+            <h3 className="text-2xl font-bold mb-4 text-center">Get Early Access</h3>
+            <p className="text-center text-gray-300 mb-6">Be the first to know when the collection goes live</p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input
                 type="email"
                 placeholder="your@email.com"
-                className="flex-1 px-4 py-2 bg-dark-lighter border border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-berry"
+                className="flex-1 bg-dark-lighter border border-dark-border text-white"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <Button
-                className="bg-berry hover:bg-berry-light text-white"
+                className="bg-berry hover:bg-berry-light text-white font-semibold"
                 onClick={handleNotify}
               >
                 Notify Me
