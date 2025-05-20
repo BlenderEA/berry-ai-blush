@@ -88,7 +88,7 @@ const NFTMint = () => {
     <div className="min-h-screen bg-dark text-white">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 mt-20">
         {/* Banner Image - Now with max width and height constraints */}
         <div className="max-w-3xl mx-auto mb-8 rounded-xl overflow-hidden shadow-lg">
           <img 
