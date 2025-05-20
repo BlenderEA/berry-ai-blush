@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { CalendarDays, Clock, Bell, Flag } from 'lucide-react';
 import Header from '@/components/Header';
@@ -8,13 +7,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import CountdownTimer from '@/components/NFT/CountdownTimer';
-
 const NFTMint = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [email, setEmail] = useState('');
-  
   const launchDate = new Date('2025-05-23T12:00:00-04:00'); // Noon EST this Friday
-  
+
   const handleNotify = () => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       toast({
@@ -31,9 +30,7 @@ const NFTMint = () => {
     });
     setEmail('');
   };
-
-  return (
-    <div className="min-h-screen bg-dark text-white">
+  return <div className="min-h-screen bg-dark text-white">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
@@ -41,11 +38,7 @@ const NFTMint = () => {
         <div className="flex flex-col items-center mb-12">
           <div className="relative w-full max-w-5xl mx-auto mb-6 overflow-hidden rounded-2xl">
             <div className="aspect-[16/9] overflow-hidden">
-              <img 
-                src="/lovable-uploads/7ba95f21-690e-49fa-87bb-f8b65bcd73bc.png" 
-                alt="Busty Berry NFTitties Memorial Day Edition" 
-                className="w-full object-cover rounded-2xl shadow-2xl"
-              />
+              <img src="/lovable-uploads/7ba95f21-690e-49fa-87bb-f8b65bcd73bc.png" alt="Busty Berry NFTitties Memorial Day Edition" className="w-full object-cover rounded-2xl shadow-2xl" />
               <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent"></div>
             </div>
             
@@ -108,31 +101,7 @@ const NFTMint = () => {
           </div>
 
           {/* Notification Sign-up */}
-          <Card className="bg-dark-card border-dark-border">
-            <CardContent className="pt-6">
-              <div className="text-center mb-6">
-                <Bell className="h-12 w-12 mx-auto mb-4 text-berry" />
-                <h2 className="text-2xl font-bold mb-2">Get Notified</h2>
-                <p className="text-gray-400">Be ready when minting goes live</p>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
-                  <Input id="email" type="email" placeholder="your@email.com" className="bg-dark-lighter border-dark-border" value={email} onChange={e => setEmail(e.target.value)} />
-                </div>
-                
-                <Button className="w-full bg-berry hover:bg-berry-light text-white font-bold py-3 h-auto" onClick={handleNotify}>
-                  <Bell className="h-4 w-4 mr-2" />
-                  Notify Me When Live
-                </Button>
-                
-                <p className="text-xs text-center text-gray-500 mt-4">
-                  We respect your privacy. No spam, just important updates.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          
         </div>
 
         {/* Collection Info */}
@@ -162,8 +131,6 @@ const NFTMint = () => {
           box-shadow: 0 0 15px 5px rgba(217, 70, 239, 0.5);
         }`}
       </style>
-    </div>
-  );
+    </div>;
 };
-
 export default NFTMint;
