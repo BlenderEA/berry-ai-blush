@@ -17,23 +17,23 @@ serve(async (req) => {
     const { text, personalityId, testApiKey } = await req.json();
     
     // Determine which API key to use
-    let openaiApiKey;
+    let grokApiKey;
     
     if (testApiKey) {
       // Use the test API key provided by the client
-      openaiApiKey = testApiKey;
+      grokApiKey = testApiKey;
       console.log("Using test API key provided by client");
     } else {
-      // Get OpenAI API key from environment variables
-      openaiApiKey = Deno.env.get("OPENAI_API_KEY");
-      console.log("Using server's OpenAI API key");
+      // Get Grok API key from environment variables
+      grokApiKey = Deno.env.get("GROK_API_KEY");
+      console.log("Using server's Grok API key");
     }
     
-    if (!openaiApiKey) {
+    if (!grokApiKey) {
       return new Response(
         JSON.stringify({ 
-          error: "OpenAI API key is not configured",
-          details: "Please add your OpenAI API key to the Supabase secrets or provide a test API key."
+          error: "Grok API key is not configured",
+          details: "Please add your Grok API key to the Supabase secrets or provide a test API key."
         }),
         { 
           status: 500, 
@@ -53,17 +53,17 @@ serve(async (req) => {
     // Get the personality prompt
     const personalityPrompt = personalityPrompts[personalityId] || personalityPrompts['blueberry-babe'];
     
-    // Call OpenAI API to generate response
-    console.log("Calling OpenAI API for:", personalityId);
+    // Call Grok API to generate response
+    console.log("Calling Grok API for:", personalityId);
     
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openaiApiKey}`
+        'Authorization': `Bearer ${grokApiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Using the recommended model (fast and affordable)
+        model: 'llama3-70b-8192', // Using Groq's LLaMa 3 model
         messages: [
           { role: 'system', content: personalityPrompt },
           { role: 'user', content: text }
@@ -75,17 +75,17 @@ serve(async (req) => {
     
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('OpenAI API error:', errorData);
+      console.error('Grok API error:', errorData);
       
-      let errorMessage = "Error calling OpenAI API";
-      let errorDetails = errorData.error?.message || "Unknown OpenAI error";
+      let errorMessage = "Error calling Grok API";
+      let errorDetails = errorData.error?.message || "Unknown Grok error";
       
       // Check for specific API key related errors
       if (errorData.error?.message?.includes("API key")) {
-        errorMessage = "Invalid or expired OpenAI API key";
-        errorDetails = "Please check that your API key is valid and has access to the OpenAI API.";
+        errorMessage = "Invalid or expired Grok API key";
+        errorDetails = "Please check that your API key is valid and has access to the Grok API.";
       } else if (errorData.error?.message?.includes("authenticate")) {
-        errorMessage = "Authentication failed with OpenAI";
+        errorMessage = "Authentication failed with Grok";
         errorDetails = "Please check your API key is valid.";
       }
       
@@ -107,12 +107,12 @@ serve(async (req) => {
     const data = await response.json();
     const aiResponse = data.choices[0].message.content;
     
-    console.log("Generated OpenAI response:", aiResponse.substring(0, 100) + "...");
+    console.log("Generated Grok response:", aiResponse.substring(0, 100) + "...");
 
     return new Response(
       JSON.stringify({ 
         response: aiResponse,
-        model_used: data.model || "gpt-4o-mini"
+        model_used: data.model || "llama3-70b-8192"
       }),
       { 
         headers: { 

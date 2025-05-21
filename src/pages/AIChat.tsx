@@ -56,9 +56,9 @@ const AIChat = () => {
             <div className="max-w-4xl mx-auto">
               <Card className="glass-card mb-6">
                 <CardHeader>
-                  <CardTitle className="text-xl mb-2">API Key Settings</CardTitle>
+                  <CardTitle className="text-xl mb-2">API Key Settings (Powered by Grok)</CardTitle>
                   <p className="text-gray-300 text-sm">
-                    By default, the AI chat uses the server's OpenAI API key. Enable test mode to use your own API key.
+                    By default, the AI chat uses the server's Grok API key. Enable test mode to use your own API key.
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -66,7 +66,7 @@ const AIChat = () => {
                     {testApiKeyError && (
                       <ApiKeyWarning 
                         message={testApiKeyError} 
-                        details="Please check that your API key is valid and has access to the OpenAI API."
+                        details="Please check that your API key is valid and has access to the Grok API."
                       />
                     )}
                     
@@ -77,7 +77,7 @@ const AIChat = () => {
                           checked={isTestMode} 
                           onCheckedChange={handleToggleTestMode}
                         />
-                        <Label htmlFor="test-mode">Use my own OpenAI API key</Label>
+                        <Label htmlFor="test-mode">Use my own Grok API key</Label>
                       </div>
                       {isTestMode && (
                         <Button 
@@ -98,7 +98,7 @@ const AIChat = () => {
                             <KeyRound className="absolute left-2 top-2.5 h-5 w-5 text-gray-400" />
                             <Input
                               type={showApiKey ? "text" : "password"}
-                              placeholder="sk-..." 
+                              placeholder="gsk_..." 
                               className="pl-9 pr-12 bg-dark border-dark-border"
                               value={testApiKey}
                               onChange={(e) => setTestApiKey(e.target.value)}
