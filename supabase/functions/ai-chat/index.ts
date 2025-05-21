@@ -1,12 +1,23 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { HfInference } from "https://esm.sh/@huggingface/inference@2.3.2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Personality responses
+// Personality prompts to guide the model response style
+const personalityPrompts = {
+  'blueberry-babe': "You are Luna, a glamorous fashionista. You're enthusiastic, flirty, and love luxury brands. Keep responses under 100 words, be playful and fun. Add occasional emojis like 💙 or 💅.",
+  'berry-bold': "You are Zoe, an edgy photographer. You're direct, confident, and a bit sassy. Keep responses under 100 words, be straightforward with strong opinions. Occasionally use phrases like 'Look,' or 'Let's be real.'",
+  'white-berry': "You are Sofia, a sophisticated model. You're elegant, thoughtful, and articulate. Keep responses under 100 words, use refined language and occasionally reference philosophy or art. Add occasional sparkle emoji ✨.",
+  'blue-frost': "You are Mia, a fitness enthusiast. You're calm, supportive, and nurturing. Keep responses under 100 words, be reassuring and occasionally offer advice. Sometimes add emojis like ❄️ or 💪.",
+  'raspberry-queen': "You are Aria, a beach-loving influencer. You're SUPER enthusiastic and energetic! Keep responses under 100 words, use LOTS of capital letters and exclamation points!!! Add many emojis like 👑 or 🌊.",
+  'blackberry-dream': "You are Jade, a mystical adventurer. You're mysterious, enigmatic, and speak in riddles sometimes. Keep responses under 100 words, use cosmic and mystical language. Occasionally add moon emoji 🌙."
+};
+
+// Backup responses in case the API call fails
 const personalityResponses = {
   'blueberry-babe': [
     "Hey sweetie! 💙 I'm just hanging out in my blueberry patch today. What's up with you?",
@@ -79,25 +90,79 @@ serve(async (req) => {
       );
     }
 
-    // Get random response for the selected personality
-    const responses = personalityResponses[personalityId];
-    const randomIndex = Math.floor(Math.random() * responses.length);
-    const response = responses[randomIndex];
+    // Get personality prompt
+    const personalityPrompt = personalityPrompts[personalityId] || "";
     
-    console.log("Generated generic response for:", personalityId);
+    try {
+      // Access the Hugging Face API token from Supabase secrets
+      const hfToken = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
 
-    return new Response(
-      JSON.stringify({ 
-        response: response,
-        model_used: "generic-responses"
-      }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
+      if (!hfToken) {
+        throw new Error("Hugging Face API token not configured");
       }
-    );
+
+      // Initialize Hugging Face Inference
+      const hf = new HfInference(hfToken);
+
+      console.log(`Using HuggingFace API for ${personalityId}...`);
+
+      // Generate response with Hugging Face model
+      const result = await hf.textGeneration({
+        model: 'google/flan-t5-base',
+        inputs: `${personalityPrompt}\n\nUser: ${text}\n\nResponse:`,
+        parameters: {
+          max_new_tokens: 120,
+          temperature: 0.8,
+          repetition_penalty: 1.2
+        }
+      });
+
+      const generatedResponse = result.generated_text?.trim() || "";
+      
+      // Clean up the response if needed
+      const finalResponse = generatedResponse
+        .replace(/^Response:/i, '') // Remove any "Response:" prefix the model might add
+        .trim();
+
+      console.log("Generated AI response length:", finalResponse.length);
+      
+      return new Response(
+        JSON.stringify({ 
+          response: finalResponse,
+          model_used: "google/flan-t5-base"
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    } catch (aiError) {
+      // Log the error but don't fail - fall back to predefined responses
+      console.error('Error using Hugging Face API:', aiError);
+      
+      // Fallback to predefined responses
+      const responses = personalityResponses[personalityId];
+      const randomIndex = Math.floor(Math.random() * responses.length);
+      const response = responses[randomIndex];
+      
+      console.log("Falling back to generic response");
+
+      return new Response(
+        JSON.stringify({ 
+          response: response,
+          model_used: "generic-responses",
+          note: "Using fallback response due to AI error"
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    }
   } catch (error) {
     console.error('Error in ai-chat function:', error);
     
