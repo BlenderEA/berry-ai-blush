@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ const Header = () => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'AI Chat', path: '/ai-chat' },
+    { name: 'AI Models', path: '/ai-models' },
     { name: 'Token', path: '/token' },
     { name: 'NFTs', path: '/nft' },
     { name: 'Whitepaper', path: '/whitepaper' },

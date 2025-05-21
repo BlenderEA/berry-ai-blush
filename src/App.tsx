@@ -16,6 +16,8 @@ import Whitepaper from "./pages/Whitepaper";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RiskDisclaimer from "./pages/RiskDisclaimer";
 import NFTMint from "./pages/NFTMint";
+import AIModels from "./pages/AIModels";
+import AIModelDetail from "./pages/AIModelDetail";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +39,8 @@ const App = () => (
           <Route path="/disclaimer" element={<RiskDisclaimer />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
           <Route path="/nft" element={<NFTMint />} />
+          <Route path="/ai-models" element={<AIModels />} />
+          <Route path="/ai-models/:id" element={<AIModelDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
