@@ -16,10 +16,12 @@ serve(async (req) => {
 
   try {
     const { text, personalityId } = await req.json();
+    console.log("Received request with text:", text.substring(0, 50), "and personality:", personalityId);
     
     // Get the Grok API key from environment variables
     const apiKey = Deno.env.get("GROK_API_KEY");
     if (!apiKey) {
+      console.error("Missing Grok API key");
       return new Response(
         JSON.stringify({ 
           error: "Missing Grok API key",
@@ -48,36 +50,65 @@ serve(async (req) => {
     console.log("User message:", text.substring(0, 100));
 
     // Call Grok API
-    const response = await fetch('https://api.x.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'grok-2-1212',
-        messages: [
-          { role: 'system', content: systemMessage },
-          { role: 'user', content: text }
-        ],
-        temperature: 0.7,
-        max_tokens: 800,
-      }),
+    const requestBody = JSON.stringify({
+      model: 'grok-2-1212',
+      messages: [
+        { role: 'system', content: systemMessage },
+        { role: 'user', content: text }
+      ],
+      temperature: 0.7,
+      max_tokens: 800,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Grok API error:', errorData);
+    console.log("Request body:", requestBody);
+
+    try {
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: requestBody,
+      });
+
+      console.log("API response status:", response.status);
       
-      // Special handling for API key related errors
-      if (response.status === 401 || response.status === 403) {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Grok API error response:', errorText);
+        
+        let errorData = {};
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          console.error("Failed to parse error response as JSON:", e);
+        }
+        
+        // Special handling for API key related errors
+        if (response.status === 401 || response.status === 403) {
+          return new Response(
+            JSON.stringify({ 
+              error: "Invalid Grok API key",
+              details: "Your API key was rejected by the Grok AI service."
+            }),
+            { 
+              status: 401, 
+              headers: { 
+                ...corsHeaders, 
+                'Content-Type': 'application/json' 
+              } 
+            }
+          );
+        }
+        
         return new Response(
           JSON.stringify({ 
-            error: "Invalid Grok API key",
-            details: "Your API key was rejected by the Grok AI service."
+            error: "Grok API error",
+            details: errorData.error?.message || errorText || "Unknown error occurred" 
           }),
           { 
-            status: 401, 
+            status: 500, 
             headers: { 
               ...corsHeaders, 
               'Content-Type': 'application/json' 
@@ -85,27 +116,46 @@ serve(async (req) => {
           }
         );
       }
+
+      const data = await response.json();
+      console.log("API response data:", JSON.stringify(data).substring(0, 200) + "...");
       
-      throw new Error(`Grok API error: ${errorData.error?.message || JSON.stringify(errorData)}`);
-    }
-
-    const data = await response.json();
-    const grokResponse = data.choices[0].message.content;
-    
-    console.log("Generated response:", grokResponse.substring(0, 100));
-
-    return new Response(
-      JSON.stringify({ 
-        response: grokResponse,
-        model_used: "grok-2-1212"
-      }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        console.error("Unexpected API response format:", data);
+        throw new Error("Received invalid response format from Grok API");
       }
-    );
+      
+      const grokResponse = data.choices[0].message.content;
+      console.log("Generated response:", grokResponse.substring(0, 100) + "...");
+
+      return new Response(
+        JSON.stringify({ 
+          response: grokResponse,
+          model_used: "grok-2-1212"
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    } catch (fetchError) {
+      console.error("Fetch error:", fetchError);
+      return new Response(
+        JSON.stringify({ 
+          error: "Network error while calling Grok API", 
+          details: fetchError.toString() 
+        }),
+        { 
+          status: 500, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    }
   } catch (error) {
     console.error('Error in ai-chat function:', error);
     
