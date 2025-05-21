@@ -14,8 +14,6 @@ interface ChatWindowProps {
   avatarFallback?: string;
   avatarColor?: string;
   personality: string;
-  testApiKey?: string;
-  onApiKeyError?: (error: string | null) => void;
 }
 
 interface Message {
@@ -32,9 +30,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   avatarSrc,
   avatarFallback,
   avatarColor,
-  personality,
-  testApiKey,
-  onApiKeyError
+  personality
 }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -54,24 +50,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       console.log("Sending to AI chat function:", {
         text: userMessage,
         personalityId,
-        testApiKey: testApiKey ? '(Using test API key)' : undefined
       });
 
       // Call Supabase Edge Function 
       const { data, error } = await supabase.functions.invoke('ai-chat', {
         body: { 
           text: userMessage, 
-          personalityId,
-          testApiKey
+          personalityId
         }
       });
 
       // Handle Supabase invoke error
       if (error) {
         console.error('AI chat function error:', error);
-        if (onApiKeyError && testApiKey) {
-          onApiKeyError('Failed to connect to OpenAI API.');
-        }
         throw new Error(error.message || 'Failed to generate response');
       }
 
@@ -84,19 +75,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       // Handle specific API errors from the function
       if (data.error) {
         console.error('Error from AI chat function:', data.error);
-        
-        // Check for API key related errors
-        if (
-          data.error.includes('API key') || 
-          data.error.includes('authentication') || 
-          data.error.includes('invalid key') ||
-          data.error.includes('not configured')
-        ) {
-          if (onApiKeyError) {
-            onApiKeyError(data.error);
-          }
-        }
-        
         throw new Error(data.error || 'Error generating response');
       }
 
@@ -112,11 +90,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         console.log("Model used:", data.model_used);
       }
       
-      // Clear any previous API key errors if successful
-      if (onApiKeyError && testApiKey) {
-        onApiKeyError(null);
-      }
-      
       return data.response;
     } catch (error) {
       console.error('Error generating response:', error);
@@ -129,14 +102,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     e.preventDefault();
     
     if (!inputMessage.trim()) return;
-    
-    // Validate test API key if provided
-    if (testApiKey && !testApiKey.startsWith('sk-')) {
-      if (onApiKeyError) {
-        onApiKeyError('Invalid API key format. OpenAI API keys start with "sk-"');
-      }
-      return;
-    }
     
     // Add user message
     const userMessage: Message = {
@@ -217,7 +182,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           />
           <Button 
             type="submit" 
-            disabled={isLoading || !inputMessage.trim() || (testApiKey !== undefined && testApiKey.length === 0)}
+            disabled={isLoading || !inputMessage.trim()}
             className="bg-berry hover:bg-berry-light"
           >
             <Send size={18} />
