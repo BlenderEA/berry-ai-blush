@@ -62,7 +62,7 @@ const ThreeAnimation: React.FC<ThreeAnimationProps> = ({ isTyping, className }) 
     scene.add(cube);
     
     // Add a torus
-    const torusGeometry = new THREE.TorusGeometry(1, 0.3, 16, 32);
+    const torusGeometry = new THREE.TorusGeometry(0.7, 0.3, 16, 32);
     const torusMaterial = new THREE.MeshPhongMaterial({ 
       color: 0xe91e63,
       emissive: 0x451a3c,
@@ -74,15 +74,26 @@ const ThreeAnimation: React.FC<ThreeAnimationProps> = ({ isTyping, className }) 
     scene.add(torus);
     
     // Animation loop
+    let frameCount = 0;
     const animate = () => {
       requestRef.current = requestAnimationFrame(animate);
+      frameCount++;
       
       if (cubeRef.current && torusRef.current) {
         // Base animation
         cubeRef.current.rotation.x += 0.01;
         cubeRef.current.rotation.y += 0.01;
+        
         torusRef.current.rotation.x += 0.01;
         torusRef.current.rotation.y += 0.01;
+        
+        // Add a pulse effect when typing
+        if (isTyping) {
+          // Make the objects pulse when typing
+          const pulseFactor = Math.sin(frameCount * 0.1) * 0.1 + 1.1;
+          cubeRef.current.scale.set(pulseFactor, pulseFactor, pulseFactor);
+          torusRef.current.scale.set(pulseFactor, pulseFactor, pulseFactor);
+        }
       }
       
       renderer.render(scene, camera);
@@ -120,38 +131,22 @@ const ThreeAnimation: React.FC<ThreeAnimationProps> = ({ isTyping, className }) 
   
   // Effect to handle typing state changes
   useEffect(() => {
-    if (isTyping) {
-      // When typing starts, update animation
-      if (cubeRef.current && torusRef.current) {
-        // Make objects pulse/glow when typing
-        cubeRef.current.scale.set(1.2, 1.2, 1.2);
-        torusRef.current.scale.set(1.2, 1.2, 1.2);
-        
-        if (cubeRef.current.material instanceof THREE.MeshPhongMaterial) {
-          cubeRef.current.material.emissiveIntensity = 1;
-          cubeRef.current.material.needsUpdate = true;
-        }
-        
-        if (torusRef.current.material instanceof THREE.MeshPhongMaterial) {
-          torusRef.current.material.emissiveIntensity = 1;
-          torusRef.current.material.needsUpdate = true;
-        }
+    if (!isTyping && cubeRef.current && torusRef.current) {
+      // Reset scale when not typing
+      cubeRef.current.scale.set(1, 1, 1);
+      torusRef.current.scale.set(1, 1, 1);
+    }
+    
+    // Update materials based on typing state
+    if (cubeRef.current && torusRef.current) {
+      if (cubeRef.current.material instanceof THREE.MeshPhongMaterial) {
+        cubeRef.current.material.emissiveIntensity = isTyping ? 1 : 0.5;
+        cubeRef.current.material.needsUpdate = true;
       }
-    } else {
-      // When typing stops, revert to normal
-      if (cubeRef.current && torusRef.current) {
-        cubeRef.current.scale.set(1, 1, 1);
-        torusRef.current.scale.set(1, 1, 1);
-        
-        if (cubeRef.current.material instanceof THREE.MeshPhongMaterial) {
-          cubeRef.current.material.emissiveIntensity = 0.5;
-          cubeRef.current.material.needsUpdate = true;
-        }
-        
-        if (torusRef.current.material instanceof THREE.MeshPhongMaterial) {
-          torusRef.current.material.emissiveIntensity = 0.5;
-          torusRef.current.material.needsUpdate = true;
-        }
+      
+      if (torusRef.current.material instanceof THREE.MeshPhongMaterial) {
+        torusRef.current.material.emissiveIntensity = isTyping ? 1 : 0.5;
+        torusRef.current.material.needsUpdate = true;
       }
     }
   }, [isTyping]);

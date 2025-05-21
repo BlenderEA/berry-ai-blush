@@ -47,7 +47,7 @@ serve(async (req) => {
     console.log("Using system message:", systemMessage);
     console.log("User message:", text.substring(0, 100));
 
-    // Call Grok API (similar to OpenAI API)
+    // Call Grok API
     const response = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
       headers: {

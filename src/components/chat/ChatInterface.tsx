@@ -36,9 +36,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ personalityId, setKeyErro
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Handle typing detection
+  // Enhanced typing detection
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputMessage(e.target.value);
+    const newMessage = e.target.value;
+    setInputMessage(newMessage);
     
     // Set typing state to true
     setIsTyping(true);
@@ -54,7 +55,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ personalityId, setKeyErro
     }, 1000);
   };
   
-  // Generate a response from Grok AI
+  // Generate a response from Grok AI using the grok-2-1212 model
   const generateResponse = async (userMessage: string): Promise<string> => {
     try {
       console.log("Sending to AI chat function:", {
@@ -129,6 +130,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ personalityId, setKeyErro
     
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
+    setIsTyping(false); // Reset typing state
     
     // Generate assistant response
     setIsLoading(true);
@@ -139,7 +141,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ personalityId, setKeyErro
         id: `assistant-${Date.now()}`,
         content: responseText,
         role: 'assistant',
-        timestamp: new Date()
+        timestamp: new Date(),
+        modelUsed: 'grok-2-1212' // Add model information
       };
       
       setMessages(prev => [...prev, assistantMessage]);
