@@ -1,8 +1,11 @@
+
 import React, { useState } from 'react';
 import { Send, Camera, Volume, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import ChatMessage from '@/components/chat/ChatMessage';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AIModelChatProps {
   modelId: string;
@@ -29,8 +32,19 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
       timestamp: new Date()
     }
   ]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = () => {
+  // Map model IDs to personality IDs for our AI chat function
+  const modelToPersonalityMap: Record<string, string> = {
+    '1': 'blueberry-babe', // Luna - Glamorous fashionista
+    '2': 'raspberry-queen', // Aria - Beach-loving influencer
+    '3': 'white-berry', // Sofia - Sophisticated model
+    '4': 'berry-bold', // Zoe - Edgy photographer
+    '5': 'blue-frost', // Mia - Fitness enthusiast
+    '6': 'blackberry-dream' // Jade - Adventurous traveler
+  };
+
+  const handleSendMessage = async () => {
     if (!message.trim()) return;
 
     // Add user message to chat
@@ -42,25 +56,45 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
     
     setChatHistory([...chatHistory, userMessage]);
     setMessage('');
+    setIsLoading(true);
 
-    // Simulate AI response (in a real implementation, this would call your AI model)
-    setTimeout(() => {
-      const aiResponses = [
-        "That's really interesting! Tell me more about it.",
-        "I've been thinking about that too! What do you think?",
-        "Haha, you're so fun to talk with! I'm enjoying our conversation.",
-        "I'd love to share a picture of me doing that someday!",
-        `That's the kind of thing I love talking about with you!`,
-      ];
+    try {
+      // Get the personality ID for this model
+      const personalityId = modelToPersonalityMap[modelId] || 'blueberry-babe';
       
-      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+      // Call Supabase Edge Function to get AI response
+      const { data, error } = await supabase.functions.invoke('ai-chat', {
+        body: { 
+          text: message,
+          personalityId: personalityId
+        }
+      });
       
-      setChatHistory(prev => [...prev, {
-        content: randomResponse,
-        role: 'assistant',
+      if (error) {
+        console.error('Error calling AI chat function:', error);
+        toast.error('Failed to get AI response. Please try again.');
+        return;
+      }
+      
+      // Add AI response to chat
+      const aiMessage = {
+        content: data.response || "I'm sorry, I couldn't process that message.",
+        role: 'assistant' as const,
         timestamp: new Date()
-      }]);
-    }, 1000);
+      };
+      
+      setChatHistory(prev => [...prev, aiMessage]);
+      
+      if (data.model_used) {
+        console.log('AI Model used:', data.model_used);
+      }
+      
+    } catch (error) {
+      console.error('Error in AI chat:', error);
+      toast.error('Something went wrong with the AI chat. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -104,6 +138,18 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
             avatarColor={chat.role === 'assistant' ? 'bg-berry text-white' : undefined}
           />
         ))}
+        
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="flex items-center space-x-2">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-berry/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-berry/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-berry/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+            <span className="text-sm text-gray-400">{modelName} is typing...</span>
+          </div>
+        )}
       </div>
 
       {/* Premium Features */}
@@ -134,10 +180,12 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            disabled={isLoading}
           />
           <Button
             onClick={handleSendMessage}
             className="bg-berry hover:bg-berry-dark text-white rounded-l-none rounded-r-md h-full"
+            disabled={isLoading || !message.trim()}
           >
             <Send className="h-5 w-5" />
           </Button>
