@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { HfInference } from "https://esm.sh/@huggingface/inference@2.3.2";
 
@@ -6,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Personality prompts to guide the model response style
+// Personality prompts for different AI models
 const personalityPrompts = {
   'blueberry-babe': "You are Luna, a glamorous fashionista. You're enthusiastic, flirty, and love luxury brands. Keep responses under 100 words, be playful and fun. Add occasional emojis like 💙 or 💅.",
   'berry-bold': "You are Zoe, an edgy photographer. You're direct, confident, and a bit sassy. Keep responses under 100 words, be straightforward with strong opinions. Occasionally use phrases like 'Look,' or 'Let's be real.'",
@@ -91,7 +92,7 @@ serve(async (req) => {
     const { text, personalityId } = await req.json();
     
     // Validate personality ID
-    if (!personalityId || !personalityResponses[personalityId]) {
+    if (!personalityId || !personalityPrompts[personalityId]) {
       return createErrorResponse(
         "Invalid personality ID",
         "The requested personality does not exist.",
@@ -106,7 +107,7 @@ serve(async (req) => {
       // Access the Hugging Face API token from Supabase secrets
       const hfToken = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
 
-      // Detailed token validation
+      // More detailed token validation and logging
       if (!hfToken) {
         console.error("Hugging Face token is missing in environment variables");
         throw new Error("Hugging Face API token not configured");
@@ -118,67 +119,97 @@ serve(async (req) => {
       }
       
       console.log(`Token configured: ${hfToken.substring(0, 4)}...${hfToken.substring(hfToken.length - 4)}`);
-      console.log(`Using HuggingFace API for ${personalityId}...`);
+      
+      // Initialize Hugging Face Inference
+      const hf = new HfInference(hfToken);
+      
+      // Use a more reliable model
+      const modelToUse = "gpt2";
+      console.log(`Using model: ${modelToUse} for personality: ${personalityId}`);
+      console.log(`User message: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
+      
+      // Generate response with a reliable model
+      const result = await hf.textGeneration({
+        model: modelToUse,
+        inputs: `${personalityPrompt}\n\nUser: ${text}\n\nResponse:`,
+        parameters: {
+          max_new_tokens: 100,
+          temperature: 0.7,
+          repetition_penalty: 1.2
+        }
+      });
 
-      // Initialize Hugging Face Inference with token validation
-      try {
-        const hf = new HfInference(hfToken);
-        
-        // Use a smaller, more reliable model for testing
-        const modelToUse = "distilbert-base-uncased";
-        console.log(`Attempting text generation with model: ${modelToUse}`);
-        
-        // Generate response with Hugging Face model - simpler input format
-        const result = await hf.textGeneration({
-          model: modelToUse,
-          inputs: `${personalityPrompt}\n\nUser: ${text}\n\nResponse:`,
-          parameters: {
-            max_new_tokens: 100,  // Keep responses shorter to avoid timeouts
-            temperature: 0.7,
-            repetition_penalty: 1.2
+      console.log("API response received successfully");
+      
+      // Extract and clean the generated text
+      const generatedResponse = result.generated_text?.trim() || "";
+      const finalResponse = generatedResponse
+        .replace(/^Response:/i, '')
+        .trim();
+
+      console.log(`Generated response: "${finalResponse.substring(0, 50)}${finalResponse.length > 50 ? '...' : ''}"`);
+      
+      return new Response(
+        JSON.stringify({ 
+          response: finalResponse,
+          model_used: modelToUse
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    } catch (aiError) {
+      // Detailed error logging
+      console.error('Error using Hugging Face API:', aiError.message);
+      if (aiError.stack) {
+        console.error('Error stack:', aiError.stack);
+      }
+      
+      if (aiError.response) {
+        try {
+          const errorResponseText = await aiError.response.text();
+          console.error('API response status:', aiError.response.status);
+          console.error('API error response:', errorResponseText);
+          
+          // Try to parse as JSON for more details
+          try {
+            const errorJson = JSON.parse(errorResponseText);
+            console.error('API error details:', errorJson);
+          } catch (_) {
+            // Not JSON, already logged as text
           }
-        });
-
-        console.log("API response received:", JSON.stringify(result).substring(0, 200) + "...");
-        
-        const generatedResponse = result.generated_text?.trim() || "";
-        
-        // Clean up the response if needed
-        const finalResponse = generatedResponse
-          .replace(/^Response:/i, '') // Remove any "Response:" prefix the model might add
-          .trim();
-
-        console.log("Generated AI response length:", finalResponse.length);
-        console.log("Response sample:", finalResponse.substring(0, 50) + "...");
-        
+        } catch (readError) {
+          console.error('Error reading API response:', readError.message);
+        }
+      }
+      
+      // Check for specific API key or authentication errors
+      const isAuthError = aiError.message.includes('API token') || 
+                          aiError.message.includes('authentication') ||
+                          aiError.message.includes('Unauthorized') ||
+                          (aiError.response && aiError.response.status === 401);
+      
+      if (isAuthError) {
         return new Response(
           JSON.stringify({ 
-            response: finalResponse,
-            model_used: modelToUse
+            error: "Hugging Face API authentication failed. Please check your API token.",
+            error_type: "auth_error",
+            error_reason: aiError.message
           }),
           { 
             headers: { 
               ...corsHeaders, 
               'Content-Type': 'application/json' 
-            } 
+            },
+            status: 401
           }
         );
-      } catch (tokenError) {
-        console.error("Error initializing HfInference:", tokenError.message);
-        console.error("Token validation failed or class initialization error");
-        throw new Error(`Error initializing Hugging Face client: ${tokenError.message}`);
-      }
-    } catch (aiError) {
-      // Log detailed error and stack trace
-      console.error('Error using Hugging Face API:', aiError.message);
-      console.error('Error stack:', aiError.stack);
-      
-      if (aiError.response) {
-        console.error('API response status:', aiError.response.status);
-        console.error('API response data:', await aiError.response.text());
       }
       
-      // Fallback to predefined responses
+      // Fallback to predefined responses for other errors
       const responses = personalityResponses[personalityId];
       const randomIndex = Math.floor(Math.random() * responses.length);
       const response = responses[randomIndex];
