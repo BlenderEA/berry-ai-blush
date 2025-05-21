@@ -1,144 +1,22 @@
 
-import { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Send, MessageSquare, Image } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-
-// Define chat message type
-type Message = {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  imageUrl?: string;
-};
-
-// Personalities for the AI companion
-const personalities = {
-  default: {
-    name: "Berry Buddy",
-    greeting: "Hey there! I'm your Berry Buddy, ready to chat about $BUSTY and the crypto world! What can I help you with today?",
-    avatar: "/lovable-uploads/303b3657-5efd-47fc-bdfe-818534132a87.png"
-  },
-  "raspberry-queen": {
-    name: "Raspberry Queen",
-    greeting: "Hello darling! Raspberry Queen at your service. Let's talk about $BUSTY, the juiciest token on Solana!",
-    avatar: "/lovable-uploads/dd62bd68-7508-43dd-86fc-6dde896d8568.png"
-  },
-  "crypto-guru": {
-    name: "Crypto Guru",
-    greeting: "Greetings, seeker of crypto knowledge. The Crypto Guru is here to enlighten you about $BUSTY and the ways of Solana.",
-    avatar: "/lovable-uploads/bff1c9ab-ee76-4e59-9da2-6108d4000c9d.png"
-  }
-};
+import { PersonalityType, personalities } from '@/types/chat';
+import ChatMessages from '@/components/chat/ChatMessages';
+import ChatInput from '@/components/chat/ChatInput';
+import PersonalitySelector from '@/components/chat/PersonalitySelector';
+import PremiumFeatures from '@/components/chat/PremiumFeatures';
+import { useAIChat } from '@/hooks/use-ai-chat';
 
 const AIChat = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [searchParams] = useSearchParams();
-  const personality = searchParams.get('personality') || 'default';
-  const chatBottomRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
+  const personality = (searchParams.get('personality') || 'default') as PersonalityType;
+  const { messages, isLoading, sendMessage } = useAIChat(personality);
   
-  // Initialize chat with greeting message
-  useEffect(() => {
-    const currentPersonality = personalities[personality as keyof typeof personalities] || personalities.default;
-    setMessages([{
-      id: '1',
-      role: 'assistant',
-      content: currentPersonality.greeting,
-      timestamp: new Date(),
-    }]);
-  }, [personality]);
-
-  // Auto scroll to bottom of chat
-  useEffect(() => {
-    if (chatBottomRef.current) {
-      chatBottomRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
-  // Handle sending a message to the AI
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
-    
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputMessage,
-      timestamp: new Date(),
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
-    setIsLoading(true);
-    
-    try {
-      // Call our Supabase Edge Function for AI response
-      const { data, error } = await supabase.functions.invoke("ai-chat", {
-        body: {
-          message: inputMessage,
-          personality: personality
-        }
-      });
-      
-      if (error) {
-        console.error('Error from edge function:', error);
-        throw new Error(error.message || 'Failed to get response from AI');
-      }
-      
-      if (!data || data.error) {
-        console.error('Error in response data:', data);
-        throw new Error(data?.message || 'Unexpected response format from AI service');
-      }
-      
-      const assistantMessage: Message = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: data.content || "Sorry, I couldn't generate a response at the moment.",
-        timestamp: new Date(),
-      };
-      
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error: any) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
-      
-      // Add error message to chat
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: "Sorry, I encountered an error. Please try again later.",
-        timestamp: new Date(),
-      };
-      
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle pressing Enter to send message
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
   // Get current personality
-  const currentPersonality = personalities[personality as keyof typeof personalities] || personalities.default;
+  const currentPersonality = personalities[personality];
 
   return (
     <div className="flex flex-col min-h-screen bg-dark">
@@ -161,133 +39,21 @@ const AIChat = () => {
               </div>
               
               {/* Personality Selector */}
-              <div className="mb-6">
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  <a 
-                    href="/ai-chat?personality=default" 
-                    className={`px-4 py-2 rounded-full whitespace-nowrap ${personality === 'default' ? 'bg-berry text-white' : 'bg-dark-lighter text-gray-300'}`}
-                  >
-                    Berry Buddy
-                  </a>
-                  <a 
-                    href="/ai-chat?personality=raspberry-queen" 
-                    className={`px-4 py-2 rounded-full whitespace-nowrap ${personality === 'raspberry-queen' ? 'bg-berry text-white' : 'bg-dark-lighter text-gray-300'}`}
-                  >
-                    Raspberry Queen
-                  </a>
-                  <a 
-                    href="/ai-chat?personality=crypto-guru" 
-                    className={`px-4 py-2 rounded-full whitespace-nowrap ${personality === 'crypto-guru' ? 'bg-berry text-white' : 'bg-dark-lighter text-gray-300'}`}
-                  >
-                    Crypto Guru
-                  </a>
-                </div>
-              </div>
+              <PersonalitySelector selectedPersonality={personality} />
               
               {/* Chat Messages */}
               <Card className="mb-4 flex-grow bg-dark-card border-dark-border">
-                <CardContent className="p-4 h-[60vh] overflow-y-auto flex flex-col gap-4">
-                  {messages.map((message) => (
-                    <div 
-                      key={message.id} 
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div 
-                        className={`max-w-[80%] rounded-lg p-3 ${
-                          message.role === 'user' 
-                            ? 'bg-berry text-white ml-auto' 
-                            : 'bg-dark-lighter text-white'
-                        }`}
-                      >
-                        {message.content}
-                        {message.imageUrl && (
-                          <img 
-                            src={message.imageUrl} 
-                            alt="Generated" 
-                            className="mt-2 rounded-md max-w-full" 
-                          />
-                        )}
-                        <div className={`text-xs mt-1 ${message.role === 'user' ? 'text-gray-200' : 'text-gray-400'}`}>
-                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-dark-lighter text-white rounded-lg p-4 max-w-[80%]">
-                        <div className="flex space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-berry-light animate-bounce"></div>
-                          <div className="w-2 h-2 rounded-full bg-berry-light animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                          <div className="w-2 h-2 rounded-full bg-berry-light animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={chatBottomRef} />
+                <CardContent className="p-0"> {/* Remove padding, it's handled by ChatMessages */}
+                  <ChatMessages messages={messages} isLoading={isLoading} />
                 </CardContent>
               </Card>
               
               {/* Chat Input */}
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Type your message..."
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="bg-dark-lighter border-dark-border"
-                  disabled={isLoading}
-                />
-                <Button 
-                  onClick={handleSendMessage} 
-                  disabled={isLoading || !inputMessage.trim()}
-                  className="bg-berry hover:bg-berry-light"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
+              <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
             </div>
             
             {/* Right Sidebar - Premium Features */}
-            <div className="w-full md:w-80 space-y-4">
-              <Card className="bg-dark-card border-dark-border">
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-3 text-berry">Premium Features</h3>
-                  <p className="text-sm text-gray-400 mb-4">Connect your wallet to unlock premium features:</p>
-                  <ul className="text-sm text-gray-300 space-y-2">
-                    <li className="flex items-center">
-                      <MessageSquare className="h-4 w-4 mr-2 text-berry" />
-                      Unlimited chat messages
-                    </li>
-                    <li className="flex items-center">
-                      <Image className="h-4 w-4 mr-2 text-berry" />
-                      AI image generation
-                    </li>
-                  </ul>
-                  <div className="mt-4">
-                    <Button className="w-full bg-dark-lighter hover:bg-dark-card border border-dark-border">
-                      Connect Wallet
-                    </Button>
-                    <p className="text-xs text-gray-500 mt-2 text-center">
-                      Only 10 $BUSTY/month
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-dark-card border-dark-border">
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-3 gradient-text">Coming Soon</h3>
-                  <ul className="text-sm text-gray-300 space-y-2">
-                    <li>• AI Image Generation</li>
-                    <li>• Voice Chat</li>
-                    <li>• Token Price Alerts</li>
-                    <li>• Personalized Memes</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
+            <PremiumFeatures />
           </div>
         </div>
       </main>
