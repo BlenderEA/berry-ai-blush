@@ -47,10 +47,9 @@ serve(async (req) => {
     }
     
     console.log("Using system message:", systemMessage);
-    console.log("User message:", text.substring(0, 100));
 
     // Call Grok API
-    const requestBody = JSON.stringify({
+    const requestBody = {
       model: 'grok-2-1212',
       messages: [
         { role: 'system', content: systemMessage },
@@ -58,18 +57,18 @@ serve(async (req) => {
       ],
       temperature: 0.7,
       max_tokens: 800,
-    });
+    };
 
-    console.log("Request body:", requestBody);
+    console.log("Request body:", JSON.stringify(requestBody));
 
     try {
       const response = await fetch('https://api.x.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
         },
-        body: requestBody,
+        body: JSON.stringify(requestBody),
       });
 
       console.log("API response status:", response.status);
