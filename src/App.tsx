@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import AIChat from "./pages/AIChat";
 import Token from "./pages/Token";
-import Creators from "./pages/Creators";
 import CreatorApplication from "./pages/CreatorApplication";
 import CommunityPage from "./pages/CommunityPage";
 import NotFound from "./pages/NotFound";
@@ -30,7 +29,6 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/ai-chat" element={<AIChat />} />
           <Route path="/token" element={<Token />} />
-          <Route path="/creators" element={<Creators />} />
           <Route path="/creator-application" element={<CreatorApplication />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/terms" element={<TermsOfService />} />
