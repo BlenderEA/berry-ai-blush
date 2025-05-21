@@ -15,11 +15,13 @@ serve(async (req) => {
 
   try {
     const { message, personality } = await req.json();
+    console.log("Request received:", { message, personality });
     
     // Use Grok API with your Grok API key
     const GROK_API_KEY = Deno.env.get('GROK_API_KEY');
     
     if (!GROK_API_KEY) {
+      console.error("Grok API key not configured");
       throw new Error('Grok API key not configured');
     }
     
@@ -37,8 +39,10 @@ serve(async (req) => {
         systemPrompt = "You are Berry Buddy, a friendly and enthusiastic AI companion for Busty Berry, a Solana meme coin with ticker $BUSTY. Respond with enthusiasm and crypto-themed humor. Use emojis occasionally.";
     }
 
+    console.log("Making Groq API call with system prompt:", systemPrompt);
+
     // Grok API call
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const apiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${GROK_API_KEY}`,
@@ -54,17 +58,28 @@ serve(async (req) => {
       })
     });
 
-    const data = await response.json();
+    // Check HTTP status
+    if (!apiResponse.ok) {
+      const errorText = await apiResponse.text();
+      console.error(`Groq API error: ${apiResponse.status}`, errorText);
+      throw new Error(`Groq API returned ${apiResponse.status}: ${errorText}`);
+    }
+
+    const data = await apiResponse.json();
+    console.log("Groq API response received:", data);
     
     // Check if we have a valid response
     if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Invalid response from Grok API:', data);
-      throw new Error('Invalid response from Grok API');
+      console.error('Invalid response structure from Groq API:', data);
+      throw new Error('Invalid response from Groq API');
     }
     
+    const responseContent = data.choices[0].message.content;
+    console.log("Response content:", responseContent);
+
     return new Response(
       JSON.stringify({
-        content: data.choices[0].message.content,
+        content: responseContent,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

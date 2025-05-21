@@ -90,7 +90,13 @@ const AIChat = () => {
       });
       
       if (error) {
-        throw new Error(error.message);
+        console.error('Error from edge function:', error);
+        throw new Error(error.message || 'Failed to get response from AI');
+      }
+      
+      if (!data || data.error) {
+        console.error('Error in response data:', data);
+        throw new Error(data?.message || 'Unexpected response format from AI service');
       }
       
       const assistantMessage: Message = {
@@ -101,11 +107,11 @@ const AIChat = () => {
       };
       
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
       
