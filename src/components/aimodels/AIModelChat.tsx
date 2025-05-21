@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Send, Camera, Volume, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import ChatMessage from '@/components/chat/ChatMessage';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import ApiKeyWarning from '@/components/chat/ApiKeyWarning';
 
 interface AIModelChatProps {
   modelId: string;
@@ -33,6 +33,7 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
 
   // Map model IDs to personality IDs for our AI chat function
   const modelToPersonalityMap: Record<string, string> = {
@@ -57,6 +58,7 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
     setChatHistory([...chatHistory, userMessage]);
     setMessage('');
     setIsLoading(true);
+    setApiKeyError(null); // Reset any previous API key errors
 
     try {
       // Get the personality ID for this model
@@ -76,6 +78,26 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
         return;
       }
       
+      // Check for API key error
+      if (data.error && (
+        data.error.includes('API token') || 
+        data.error.includes('Hugging Face') || 
+        data.error.includes('authentication')
+      )) {
+        setApiKeyError(data.error);
+        toast.error('API key issue detected. Please check your Hugging Face API token.');
+        return;
+      }
+
+      // Log details for debugging
+      if (data.model_used) {
+        console.log('AI Model used:', data.model_used);
+      }
+
+      if (data.error_reason) {
+        console.log('Error reason:', data.error_reason);
+      }
+      
       // Add AI response to chat
       const aiMessage = {
         content: data.response || "I'm sorry, I couldn't process that message.",
@@ -84,10 +106,6 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
       };
       
       setChatHistory(prev => [...prev, aiMessage]);
-      
-      if (data.model_used) {
-        console.log('AI Model used:', data.model_used);
-      }
       
     } catch (error) {
       console.error('Error in AI chat:', error);
@@ -108,6 +126,7 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-dark-border bg-dark-lighter">
+        {/* ... keep existing code (header components) */}
         <div className="flex items-center">
           <Avatar className="h-10 w-10 mr-3">
             <AvatarImage src={modelImage} alt={modelName} />
@@ -124,6 +143,16 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
           </Button>
         )}
       </div>
+
+      {/* API Key Error Warning */}
+      {apiKeyError && (
+        <div className="p-4 bg-dark">
+          <ApiKeyWarning 
+            message="There's an issue with the Hugging Face API key" 
+            details={apiKeyError}
+          />
+        </div>
+      )}
 
       {/* Chat Messages */}
       <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-dark">

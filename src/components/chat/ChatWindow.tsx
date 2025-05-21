@@ -6,6 +6,7 @@ import { Send } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import ApiKeyWarning from './ApiKeyWarning';
 
 interface ChatWindowProps {
   personalityId: string;
@@ -42,6 +43,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Generate a response
@@ -72,9 +74,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         throw new Error('Received empty response');
       }
 
-      // Handle specific API errors from the function
+      // Check for API key errors
       if (data.error) {
         console.error('Error from AI chat function:', data.error);
+        
+        // Check if this is an API key issue
+        if (data.error.includes('API token') || 
+            data.error.includes('Hugging Face') || 
+            data.error.includes('authentication')) {
+          setApiKeyError(data.error);
+        }
+        
         throw new Error(data.error || 'Error generating response');
       }
 
@@ -90,10 +100,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         console.log("Model used:", data.model_used);
       }
       
+      if (data.error_reason) {
+        console.log("Error reason:", data.error_reason);
+      }
+      
       return data.response;
     } catch (error) {
       console.error('Error generating response:', error);
-      toast.error('Failed to generate response. Please try again later.');
+      
+      // Only show toast for non-API key errors
+      if (!apiKeyError) {
+        toast.error('Failed to generate response. Please try again later.');
+      }
+      
       return `I'm ${personalityName} and I seem to be having trouble thinking right now. Can you try again?`;
     }
   };
@@ -113,6 +132,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
+    setApiKeyError(null); // Reset any previous API key errors
     
     // Generate assistant response
     setIsLoading(true);
@@ -129,7 +149,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error generating response:', error);
-      toast.error('Failed to generate response');
+      if (!apiKeyError) {  // Only show if not an API key error (already shown)
+        toast.error('Failed to generate response');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -142,8 +164,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   return (
     <div className="flex flex-col h-[400px] bg-dark border border-dark-border rounded-lg">
+      {/* API Key Error Warning */}
+      {apiKeyError && (
+        <div className="p-3 bg-dark">
+          <ApiKeyWarning 
+            message="There's an issue with the Hugging Face API key" 
+            details={apiKeyError}
+          />
+        </div>
+      )}
+      
       {/* Chat messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${apiKeyError ? 'max-h-[300px]' : ''}`}>
         {messages.map(message => (
           <ChatMessage
             key={message.id}
