@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Send, Camera, VolumeUp, Sparkles, X } from 'lucide-react';
+import { Send, Camera, Volume, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import ChatMessage from '@/components/chat/ChatMessage';
@@ -115,7 +114,7 @@ const AIModelChat: React.FC<AIModelChatProps> = ({
             Request Image
           </Button>
           <Button variant="outline" size="sm" className="text-gray-300 border-dark-border">
-            <VolumeUp className="mr-2 h-4 w-4" />
+            <Volume className="mr-2 h-4 w-4" />
             Voice Message
           </Button>
           <Button variant="outline" size="sm" className="text-gray-300 border-dark-border">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -8,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AIModelChat from '@/components/aimodels/AIModelChat';
 import { getAIModel, AIModel } from '@/utils/aiUtils';
-import { MessageSquare, Image, VolumeUp, Lock, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Image, Volume, Lock, ArrowLeft } from 'lucide-react';
 
 const AIModelDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -131,7 +130,7 @@ const AIModelDetail = () => {
                       Images
                     </TabsTrigger>
                     <TabsTrigger value="voice" className="flex-1 data-[state=active]:bg-dark-lighter">
-                      <VolumeUp className="mr-2 h-4 w-4" />
+                      <Volume className="mr-2 h-4 w-4" />
                       Voice
                     </TabsTrigger>
                   </TabsList>
@@ -157,7 +156,7 @@ const AIModelDetail = () => {
                   </TabsContent>
                   <TabsContent value="voice" className="p-6">
                     <div className="text-center py-10">
-                      <VolumeUp className="h-12 w-12 mx-auto mb-4 text-gray-500" />
+                      <Volume className="h-12 w-12 mx-auto mb-4 text-gray-500" />
                       <h3 className="text-xl font-medium mb-2">Voice Messages</h3>
                       <p className="text-gray-400 mb-6">
                         Receive voice messages from {model.name} in her unique voice.
