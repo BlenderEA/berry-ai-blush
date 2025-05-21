@@ -1,10 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import ChatWindow from '@/components/chat/ChatWindow';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { KeyRound, Eye, EyeOff } from 'lucide-react';
+import ApiKeyWarning from '@/components/chat/ApiKeyWarning';
 
 const AIChat = () => {
   // Single AI personality
@@ -16,6 +22,22 @@ const AIChat = () => {
     avatarColor: 'bg-blue-300',
     avatarText: '💙',
     personality: "Hey there! I'm Blueberry Babe, your sweet and playful companion. I love spending my days surrounded by blueberries - they match my vibe perfectly! I'm always up for fun conversations and might surprise you with my mischievous side once we get to know each other better.",
+  };
+  
+  // API Key test mode state
+  const [testApiKey, setTestApiKey] = useState('');
+  const [isTestMode, setIsTestMode] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [testApiKeyError, setTestApiKeyError] = useState<string | null>(null);
+  
+  const handleToggleTestMode = () => {
+    setIsTestMode(!isTestMode);
+    setTestApiKeyError(null);
+  };
+  
+  const handleClearTestKey = () => {
+    setTestApiKey('');
+    setTestApiKeyError(null);
   };
   
   return (
@@ -32,6 +54,73 @@ const AIChat = () => {
             </div>
             
             <div className="max-w-4xl mx-auto">
+              <Card className="glass-card mb-6">
+                <CardHeader>
+                  <CardTitle className="text-xl mb-2">API Key Settings</CardTitle>
+                  <p className="text-gray-300 text-sm">
+                    By default, the AI chat uses the server's OpenAI API key. Enable test mode to use your own API key.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {testApiKeyError && (
+                      <ApiKeyWarning 
+                        message={testApiKeyError} 
+                        details="Please check that your API key is valid and has access to the OpenAI API."
+                      />
+                    )}
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          id="test-mode" 
+                          checked={isTestMode} 
+                          onCheckedChange={handleToggleTestMode}
+                        />
+                        <Label htmlFor="test-mode">Use my own OpenAI API key</Label>
+                      </div>
+                      {isTestMode && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={handleClearTestKey}
+                          disabled={!testApiKey}
+                        >
+                          Clear
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {isTestMode && (
+                      <div className="relative">
+                        <div className="flex">
+                          <div className="relative flex-1">
+                            <KeyRound className="absolute left-2 top-2.5 h-5 w-5 text-gray-400" />
+                            <Input
+                              type={showApiKey ? "text" : "password"}
+                              placeholder="sk-..." 
+                              className="pl-9 pr-12 bg-dark border-dark-border"
+                              value={testApiKey}
+                              onChange={(e) => setTestApiKey(e.target.value)}
+                            />
+                            <button 
+                              type="button"
+                              onClick={() => setShowApiKey(!showApiKey)}
+                              className="absolute right-2 top-2.5 text-gray-400 hover:text-gray-200"
+                            >
+                              {showApiKey ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                          </div>
+                        </div>
+                        <p className="mt-2 text-xs text-gray-400">
+                          Your API key is never stored on our servers. It's only used for your current session.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            
               <Card className="glass-card">
                 <CardHeader className="flex flex-col md:flex-row gap-6 items-center">
                   <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-berry/30">
@@ -67,6 +156,8 @@ const AIChat = () => {
                       avatarFallback={personality.avatarText}
                       avatarColor={personality.avatarColor}
                       personality={personality.personality}
+                      testApiKey={isTestMode ? testApiKey : undefined}
+                      onApiKeyError={setTestApiKeyError}
                     />
                   </div>
                 </CardContent>

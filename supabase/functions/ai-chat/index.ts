@@ -14,15 +14,26 @@ serve(async (req) => {
   }
 
   try {
-    const { text, personalityId } = await req.json();
+    const { text, personalityId, testApiKey } = await req.json();
     
-    // Get OpenAI API key from environment variables
-    const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
+    // Determine which API key to use
+    let openaiApiKey;
+    
+    if (testApiKey) {
+      // Use the test API key provided by the client
+      openaiApiKey = testApiKey;
+      console.log("Using test API key provided by client");
+    } else {
+      // Get OpenAI API key from environment variables
+      openaiApiKey = Deno.env.get("OPENAI_API_KEY");
+      console.log("Using server's OpenAI API key");
+    }
+    
     if (!openaiApiKey) {
       return new Response(
         JSON.stringify({ 
           error: "OpenAI API key is not configured",
-          details: "Please add your OpenAI API key to the Supabase secrets."
+          details: "Please add your OpenAI API key to the Supabase secrets or provide a test API key."
         }),
         { 
           status: 500, 
@@ -66,10 +77,22 @@ serve(async (req) => {
       const errorData = await response.json();
       console.error('OpenAI API error:', errorData);
       
+      let errorMessage = "Error calling OpenAI API";
+      let errorDetails = errorData.error?.message || "Unknown OpenAI error";
+      
+      // Check for specific API key related errors
+      if (errorData.error?.message?.includes("API key")) {
+        errorMessage = "Invalid or expired OpenAI API key";
+        errorDetails = "Please check that your API key is valid and has access to the OpenAI API.";
+      } else if (errorData.error?.message?.includes("authenticate")) {
+        errorMessage = "Authentication failed with OpenAI";
+        errorDetails = "Please check your API key is valid.";
+      }
+      
       return new Response(
         JSON.stringify({ 
-          error: "Error calling OpenAI API",
-          details: errorData.error?.message || "Unknown OpenAI error"
+          error: errorMessage,
+          details: errorDetails
         }),
         { 
           status: 500, 
