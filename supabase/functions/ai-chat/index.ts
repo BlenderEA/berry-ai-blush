@@ -107,12 +107,13 @@ serve(async (req) => {
       console.log(`Using HuggingFace API for ${personalityId}...`);
 
       // Generate response with Hugging Face model
+      // Using a better model that's more capable for chat/conversation
       const result = await hf.textGeneration({
-        model: 'google/flan-t5-base',
+        model: 'google/flan-t5-large', // Using a more powerful model for better chat responses
         inputs: `${personalityPrompt}\n\nUser: ${text}\n\nResponse:`,
         parameters: {
           max_new_tokens: 120,
-          temperature: 0.8,
+          temperature: 0.9,  // Slightly higher for more creative responses
           repetition_penalty: 1.2
         }
       });
@@ -129,7 +130,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           response: finalResponse,
-          model_used: "google/flan-t5-base"
+          model_used: "google/flan-t5-large"
         }),
         { 
           headers: { 
