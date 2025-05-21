@@ -75,3 +75,4 @@ url = ""
 [functions]
 [functions.ai-chat]
 verify_jwt = false
+

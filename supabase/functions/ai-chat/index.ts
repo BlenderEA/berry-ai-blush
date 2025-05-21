@@ -16,36 +16,36 @@ serve(async (req) => {
   try {
     const { message, personality } = await req.json();
     
-    // For now, we'll use OpenAI, but you can replace with Grok or any other API
-    // when you have the API key
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    // Use Grok API with your Grok API key
+    const GROK_API_KEY = Deno.env.get('GROK_API_KEY');
     
-    if (!OPENAI_API_KEY) {
-      throw new Error('API key not configured');
+    if (!GROK_API_KEY) {
+      throw new Error('Grok API key not configured');
     }
     
     // Determine system prompt based on personality
-    let systemPrompt = "You are a friendly AI assistant for Busty Berry, a Solana meme coin.";
+    let systemPrompt = "Act as a friendly AI assistant for Busty Berry, a Solana meme coin with ticker $BUSTY.";
     
     switch (personality) {
       case "raspberry-queen":
-        systemPrompt = "You are the Raspberry Queen, a sassy and glamorous AI personality for Busty Berry, a Solana meme coin. Respond with enthusiasm, sass, and crypto-themed jokes. Use emojis occasionally.";
+        systemPrompt = "You are the Raspberry Queen, a sassy and glamorous AI personality for Busty Berry, a Solana meme coin with ticker $BUSTY. Respond with enthusiasm, sass, and crypto-themed jokes. Use emojis occasionally.";
         break;
       case "crypto-guru":
-        systemPrompt = "You are a Crypto Guru, a knowledgeable AI assistant specialized in cryptocurrency, particularly for Busty Berry, a Solana meme coin. Provide informative responses while maintaining a friendly tone. Share crypto insights and occasional jokes.";
+        systemPrompt = "You are a Crypto Guru, a knowledgeable AI assistant specialized in cryptocurrency, particularly for Busty Berry, a Solana meme coin with ticker $BUSTY. Provide informative responses while maintaining a friendly tone. Share crypto insights and occasional jokes.";
         break;
       default:
-        systemPrompt = "You are Berry Buddy, a friendly and enthusiastic AI companion for Busty Berry, a Solana meme coin. Respond with enthusiasm and crypto-themed humor. Use emojis occasionally.";
+        systemPrompt = "You are Berry Buddy, a friendly and enthusiastic AI companion for Busty Berry, a Solana meme coin with ticker $BUSTY. Respond with enthusiasm and crypto-themed humor. Use emojis occasionally.";
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Grok API call
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${GROK_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'llama3-70b-8192', // Using Llama3 model through Groq
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -55,6 +55,12 @@ serve(async (req) => {
     });
 
     const data = await response.json();
+    
+    // Check if we have a valid response
+    if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid response from Grok API:', data);
+      throw new Error('Invalid response from Grok API');
+    }
     
     return new Response(
       JSON.stringify({
