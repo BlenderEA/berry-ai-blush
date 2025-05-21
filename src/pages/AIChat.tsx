@@ -8,6 +8,7 @@ import { Send, MessageSquare, Image } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define chat message type
 type Message = {
@@ -18,21 +19,21 @@ type Message = {
   imageUrl?: string;
 };
 
-// Mock personalities for the AI companion
+// Personalities for the AI companion
 const personalities = {
   default: {
     name: "Berry Buddy",
-    greeting: "Hey there! I'm your Berry Buddy, ready to chat about Busty Berry and the crypto world! What can I help you with today?",
+    greeting: "Hey there! I'm your Berry Buddy, ready to chat about $BUSTY and the crypto world! What can I help you with today?",
     avatar: "/lovable-uploads/303b3657-5efd-47fc-bdfe-818534132a87.png"
   },
   "raspberry-queen": {
     name: "Raspberry Queen",
-    greeting: "Hello darling! Raspberry Queen at your service. Let's talk about Busty Berry, the juiciest token on Solana!",
+    greeting: "Hello darling! Raspberry Queen at your service. Let's talk about $BUSTY, the juiciest token on Solana!",
     avatar: "/lovable-uploads/dd62bd68-7508-43dd-86fc-6dde896d8568.png"
   },
   "crypto-guru": {
     name: "Crypto Guru",
-    greeting: "Greetings, seeker of crypto knowledge. The Crypto Guru is here to enlighten you about Busty Berry and the ways of Solana.",
+    greeting: "Greetings, seeker of crypto knowledge. The Crypto Guru is here to enlighten you about $BUSTY and the ways of Solana.",
     avatar: "/lovable-uploads/bff1c9ab-ee76-4e59-9da2-6108d4000c9d.png"
   }
 };
@@ -64,7 +65,7 @@ const AIChat = () => {
     }
   }, [messages]);
 
-  // Handle sending a message
+  // Handle sending a message to the AI
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
     
@@ -80,29 +81,26 @@ const AIChat = () => {
     setIsLoading(true);
     
     try {
-      // For now, we'll simulate a response
-      setTimeout(() => {
-        const mockResponses = [
-          "Busty Berry is mooning today! Have you checked the charts? 🚀",
-          "You know what they say about Solana... it's fast, cheap, and never sleeps! Just like me! 😉",
-          "Thinking about buying more $BUSTYBERRY? Always a juicy decision!",
-          "Did you hear about the Solana developer who walked into a bar? He got his transaction confirmed before he ordered his drink!",
-          "Staking your Busty Berry tokens is like planting seeds - watch them grow into a whole berry farm!",
-        ];
-        
-        const assistantMessage: Message = {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: mockResponses[Math.floor(Math.random() * mockResponses.length)],
-          timestamp: new Date(),
-        };
-        
-        setMessages(prev => [...prev, assistantMessage]);
-        setIsLoading(false);
-      }, 1000);
+      // Call our Supabase Edge Function for AI response
+      const { data, error } = await supabase.functions.invoke("ai-chat", {
+        body: {
+          message: inputMessage,
+          personality: personality
+        }
+      });
       
-      // In future: Implement actual API call to chatbot service
+      if (error) {
+        throw new Error(error.message);
+      }
       
+      const assistantMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: data.content || "Sorry, I couldn't generate a response at the moment.",
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -110,6 +108,17 @@ const AIChat = () => {
         description: "Failed to send message. Please try again.",
         variant: "destructive",
       });
+      
+      // Add error message to chat
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: "Sorry, I encountered an error. Please try again later.",
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -234,7 +243,7 @@ const AIChat = () => {
               </div>
             </div>
             
-            {/* Right Sidebar - Coming Features */}
+            {/* Right Sidebar - Premium Features */}
             <div className="w-full md:w-80 space-y-4">
               <Card className="bg-dark-card border-dark-border">
                 <CardContent className="p-4">
@@ -255,7 +264,7 @@ const AIChat = () => {
                       Connect Wallet
                     </Button>
                     <p className="text-xs text-gray-500 mt-2 text-center">
-                      Only 10 $BUSTYBERRY/month
+                      Only 10 $BUSTY/month
                     </p>
                   </div>
                 </CardContent>
