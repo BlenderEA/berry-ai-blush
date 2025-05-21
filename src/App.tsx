@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Token from "./pages/Token";
+import AIChat from "./pages/AIChat";
 import CreatorApplication from "./pages/CreatorApplication";
 import CommunityPage from "./pages/CommunityPage";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/disclaimer" element={<RiskDisclaimer />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
           <Route path="/nft" element={<NFTMint />} />
+          <Route path="/ai-chat" element={<AIChat />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
