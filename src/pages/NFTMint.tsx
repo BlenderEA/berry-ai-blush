@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, ExternalLink } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const NFTMint = () => {
   const { toast } = useToast();
@@ -72,7 +73,7 @@ const NFTMint = () => {
     
     toast({
       title: "Notification Set!",
-      description: "We'll notify you when the Memorial Day Edition is available for minting.",
+      description: "We'll notify you when the NFTitties collection is available for minting.",
       variant: "default"
     });
     
@@ -85,6 +86,24 @@ const NFTMint = () => {
       <span className="text-xs sm:text-sm text-gray-400">{label}</span>
     </div>
   );
+
+  // NFT Collection Rarities
+  const rarities = [
+    { type: "Vibrant NFTs", rarity: "Common", count: 58 },
+    { type: "Pink NFTs", rarity: "Common", count: 58 },
+    { type: "Vibrant Topless NFTs", rarity: "Rare", count: 10 },
+    { type: "Pink Topless NFTs", rarity: "Rare", count: 10 },
+    { type: "Vibrant Triple Nipple NFT", rarity: "Ultra-Rare", count: 1 },
+    { type: "Pink Triple Nipple NFT", rarity: "Ultra-Rare", count: 1 }
+  ];
+
+  // Golden Ticket Rewards
+  const goldenTicketRewards = [
+    { marketCap: "1M", tickets: 3, reward: "$500 worth of $Busty" },
+    { marketCap: "3M", tickets: 3, reward: "Weekend Airbnb stay ($1,000 value)" },
+    { marketCap: "5M", tickets: 4, reward: "Airline travel voucher ($3,000 value)" },
+    { marketCap: "10M", tickets: 7, reward: "VIP Las Vegas Package ($10,000 value)" }
+  ];
 
   return (
     <div className="min-h-screen bg-dark text-white">
@@ -100,7 +119,7 @@ const NFTMint = () => {
         <div className="max-w-3xl mx-auto mb-12 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(217,70,239,0.3)]">
           <img 
             src="/lovable-uploads/2fa7f246-e7e0-42f6-a543-313c3247fa40.png" 
-            alt="Busty Berry Memorial Day Edition" 
+            alt="NFTitties Collection" 
             className="w-full h-auto object-cover"
           />
         </div>
@@ -108,57 +127,165 @@ const NFTMint = () => {
         <div className="max-w-4xl mx-auto">
           {/* NFT Collection Title with animated gradient */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center animate-gradient-flow bg-clip-text text-transparent bg-gradient-to-r from-berry-purple via-berry to-berry-light">
-            Busty Berries Memorial Day Edition
+            NFTitties Utility & Rewards
           </h1>
           
-          {/* Description with better typography and 1/1 info */}
+          {/* Description with better typography */}
           <div className="mb-10">
             <p className="text-xl md:text-2xl mb-6 text-center text-gray-200 leading-relaxed max-w-3xl mx-auto">
-              A bold and juicy 1/1 NFT collection featuring seductive, sexy women with curves and luscious berries. This limited drop blends sex appeal with vibrant fruit-inspired aesthetics and adds a patriotic twist and military theme in honor of Memorial Day.
+              Our NFTitties collection isn't just spicy eye candy — it comes with real utility and rewards based on rarity!
             </p>
-            
-            {/* NFT Collection Details Banner */}
-            <div className="bg-gradient-to-r from-berry-purple/20 to-berry/20 p-4 rounded-xl border border-berry/40 max-w-2xl mx-auto">
-              <h2 className="text-center text-2xl font-bold mb-4 text-berry-light">Exclusive 1/1 Collection</h2>
-              <div className="flex flex-col md:flex-row justify-center items-center gap-6 text-center">
-                <div className="flex-1">
-                  <p className="text-3xl font-bold text-white mb-1">138</p>
-                  <p className="text-sm text-gray-300">Total Unique NFTs</p>
-                </div>
-                <div className="h-12 w-px bg-berry-purple/50 hidden md:block"></div>
-                <div className="flex-1">
-                  <p className="text-3xl font-bold text-white mb-1">69</p>
-                  <p className="text-sm text-gray-300">Regular Edition</p>
-                </div>
-                <div className="h-12 w-px bg-berry-purple/50 hidden md:block"></div>
-                <div className="flex-1">
-                  <p className="text-3xl font-bold text-berry-light mb-1">69</p>
-                  <p className="text-sm text-gray-300">Pink Edition</p>
-                </div>
+          </div>
+
+          {/* Rarity Breakdown */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">Rarity Breakdown</h2>
+            <div className="bg-dark-card rounded-xl p-6 border border-dark-border mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {rarities.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center p-4 rounded-lg bg-dark-lighter border border-dark-border">
+                    <div>
+                      <span className="font-medium">{item.count} {item.type}</span>
+                    </div>
+                    <span className={`px-3 py-1 rounded text-xs font-semibold ${
+                      item.rarity === "Ultra-Rare" ? "bg-gradient-to-r from-yellow-400 to-yellow-600 text-black" : 
+                      item.rarity === "Rare" ? "bg-purple-700" : "bg-gray-700"
+                    }`}>
+                      {item.rarity}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 text-center font-bold text-xl border-t border-dark-border pt-4">
+                Total = 69 Vibrant NFTs + 69 Pink NFTs
               </div>
             </div>
           </div>
 
-          {/* Key Features Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-16">
-            <Card className="bg-dark-card border-dark-border text-white hover:border-berry transition-colors">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-2 text-berry">1/1 Unique Art</h3>
-                <p className="text-gray-300">Each NFT is completely unique with no duplicates - true digital ownership</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-dark-card border-dark-border text-white hover:border-berry transition-colors">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-2 text-berry">Exclusive Benefits</h3>
-                <p className="text-gray-300">Holders get special access to future drops and community events</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-dark-card border-dark-border text-white hover:border-berry transition-colors">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-2 text-berry">Solana Network</h3>
-                <p className="text-gray-300">Minted on Solana for low fees and lightning-fast transactions</p>
-              </CardContent>
-            </Card>
+          {/* Golden Ticket Utility */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">Golden Ticket Utility</h2>
+            <div className="bg-dark-card rounded-xl p-6 border border-dark-border mb-6">
+              <p className="text-center mb-6 text-lg">
+                Triple Nipple NFTs double as Golden Tickets. Collect and redeem Golden Tickets for major rewards tied to $Busty Berry coin's market cap:
+              </p>
+              <div className="space-y-4">
+                {goldenTicketRewards.map((reward, index) => (
+                  <div key={index} className="flex flex-col md:flex-row justify-between items-center p-4 rounded-lg bg-dark-lighter border border-dark-border">
+                    <div className="flex items-center mb-3 md:mb-0">
+                      <span className="bg-yellow-600 text-black px-3 py-1 rounded-full text-xs font-bold mr-3">
+                        {reward.tickets} Tickets
+                      </span>
+                      <span className="text-berry font-medium">${reward.marketCap} Market Cap</span>
+                    </div>
+                    <p className="text-white font-medium">{reward.reward}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* NFT Holder Perks */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">NFT Holder Perks</h2>
+            <div className="bg-dark-card rounded-xl p-6 border border-dark-border mb-6">
+              <p className="text-center mb-6 text-lg">
+                Each NFT comes with a $Busty redemption bonus:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-dark-lighter p-6 rounded-lg border border-dark-border text-center">
+                  <h3 className="text-xl font-bold mb-2">Topless NFTs</h3>
+                  <p className="text-2xl font-bold text-berry">Redeem $100k in $Busty</p>
+                </div>
+                <div className="bg-dark-lighter p-6 rounded-lg border border-dark-border text-center">
+                  <h3 className="text-xl font-bold mb-2">Triple Nipple NFTs</h3>
+                  <p className="text-2xl font-bold text-berry">Redeem $1M in $Busty</p>
+                </div>
+              </div>
+              <div className="mt-6 p-4 bg-dark-border bg-opacity-40 rounded-lg">
+                <p className="text-center font-medium">
+                  <span className="text-berry">*</span> In order to redeem your supply redemption bonus, all NFTs must be purchased.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* How to Buy */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">How to Buy Your NFTitties</h2>
+            <div className="bg-dark-card rounded-xl p-6 border border-dark-border">
+              <ol className="space-y-6">
+                <li className="flex">
+                  <div className="flex-shrink-0 mr-4">
+                    <div className="w-8 h-8 rounded-full bg-dark-lighter border border-berry flex items-center justify-center font-bold text-sm shadow-lg shadow-berry/10">
+                      1
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">Set Up a Solana Wallet</h3>
+                    <p className="text-gray-300 text-sm">Phantom (Recommended) or Solflare. Save your recovery phrase securely.</p>
+                  </div>
+                </li>
+                
+                <li className="flex">
+                  <div className="flex-shrink-0 mr-4">
+                    <div className="w-8 h-8 rounded-full bg-dark-lighter border border-berry flex items-center justify-center font-bold text-sm shadow-lg shadow-berry/10">
+                      2
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">Load Your Wallet with SOL</h3>
+                    <p className="text-gray-300 text-sm">Buy SOL on an exchange and transfer it to your wallet.</p>
+                  </div>
+                </li>
+                
+                <li className="flex">
+                  <div className="flex-shrink-0 mr-4">
+                    <div className="w-8 h-8 rounded-full bg-dark-lighter border border-berry flex items-center justify-center font-bold text-sm shadow-lg shadow-berry/10">
+                      3
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">Go to LaunchMyNFT.io</h3>
+                    <p className="text-gray-300 text-sm">Connect your wallet using the button in the top right.</p>
+                  </div>
+                </li>
+                
+                <li className="flex">
+                  <div className="flex-shrink-0 mr-4">
+                    <div className="w-8 h-8 rounded-full bg-dark-lighter border border-berry flex items-center justify-center font-bold text-sm shadow-lg shadow-berry/10">
+                      4
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">Find the Busty Berry Collection</h3>
+                    <p className="text-gray-300 text-sm">
+                      <a 
+                        href="https://tinyurl.com/BustyBerry"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-berry hover:text-berry-light flex items-center group"
+                      >
+                        Visit https://tinyurl.com/BustyBerry
+                        <ExternalLink className="ml-1 h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                      </a>
+                    </p>
+                  </div>
+                </li>
+                
+                <li className="flex">
+                  <div className="flex-shrink-0 mr-4">
+                    <div className="w-8 h-8 rounded-full bg-dark-lighter border border-berry flex items-center justify-center font-bold text-sm shadow-lg shadow-berry/10">
+                      5
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">Mint or Buy Your NFTitty</h3>
+                    <p className="text-gray-300 text-sm">Click Mint Now, approve the transaction, and wait for confirmation.</p>
+                  </div>
+                </li>
+              </ol>
+            </div>
           </div>
           
           {/* Countdown Timer with enhanced styling */}
@@ -176,10 +303,26 @@ const NFTMint = () => {
             </p>
           </div>
           
+          {/* Direct Buy Link */}
+          <div className="text-center mb-16">
+            <a 
+              href="https://tinyurl.com/BustyBerry"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button 
+                className="bg-berry hover:bg-berry-light text-white font-semibold px-8 py-6 text-lg"
+              >
+                Buy Now on LaunchMyNFT.io
+                <ExternalLink className="ml-2 h-5 w-5" />
+              </Button>
+            </a>
+          </div>
+          
           {/* Notification Sign-up with better styling */}
           <div className="bg-dark-card border border-dark-border p-8 rounded-xl max-w-md mx-auto shadow-lg">
             <h3 className="text-2xl font-bold mb-4 text-center">Get Early Access</h3>
-            <p className="text-center text-gray-300 mb-6">Be the first to know when these 138 unique 1/1 NFTs drop</p>
+            <p className="text-center text-gray-300 mb-6">Be the first to know when our spicy NFTitties drop</p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Input
                 type="email"
