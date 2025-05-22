@@ -36,6 +36,8 @@ export const useAIChat = (personalityType: PersonalityType = 'default') => {
     
     try {
       // Call our Supabase Edge Function for AI response
+      console.log("Calling Supabase Edge Function with:", { message: inputMessage, personality: personalityType });
+      
       const { data, error } = await supabase.functions.invoke("ai-chat", {
         body: {
           message: inputMessage,
@@ -48,9 +50,16 @@ export const useAIChat = (personalityType: PersonalityType = 'default') => {
         throw new Error(error.message || 'Failed to get response from AI');
       }
       
-      if (!data || data.error) {
+      console.log("Edge function response:", data);
+      
+      if (!data) {
+        console.error('No data returned from edge function');
+        throw new Error('No response data from AI service');
+      }
+      
+      if (data.error) {
         console.error('Error in response data:', data);
-        throw new Error(data?.message || 'Unexpected response format from AI service');
+        throw new Error(data.message || 'Unexpected response format from AI service');
       }
       
       const assistantMessage: Message = {
@@ -73,7 +82,7 @@ export const useAIChat = (personalityType: PersonalityType = 'default') => {
       const errorMessage: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: "Sorry, I encountered an error. Please try again later.",
+        content: "Sorry, I encountered an error processing your request. Please try again later.",
         timestamp: new Date(),
       };
       

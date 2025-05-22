@@ -17,12 +17,15 @@ serve(async (req) => {
     const { message, personality } = await req.json();
     console.log("Request received:", { message, personality });
     
-    // Use Grok API with your Grok API key
+    // Use Groq API with your Groq API key
     const GROK_API_KEY = Deno.env.get('GROK_API_KEY');
     
     if (!GROK_API_KEY) {
-      console.error("Grok API key not configured");
-      throw new Error('Grok API key not configured');
+      console.error("Groq API key not configured");
+      return new Response(
+        JSON.stringify({ error: true, message: 'Groq API key not configured' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
     }
     
     // Determine system prompt based on personality
@@ -41,7 +44,7 @@ serve(async (req) => {
 
     console.log("Making Groq API call with system prompt:", systemPrompt);
 
-    // Grok API call
+    // Groq API call
     const apiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -60,9 +63,25 @@ serve(async (req) => {
 
     // Check HTTP status
     if (!apiResponse.ok) {
-      const errorText = await apiResponse.text();
-      console.error(`Groq API error: ${apiResponse.status}`, errorText);
-      throw new Error(`Groq API returned ${apiResponse.status}: ${errorText}`);
+      const errorStatus = apiResponse.status;
+      let errorText = "";
+      try {
+        errorText = await apiResponse.text();
+      } catch (e) {
+        errorText = "Failed to read error response";
+      }
+      console.error(`Groq API error: ${errorStatus}`, errorText);
+      
+      return new Response(
+        JSON.stringify({ 
+          error: true, 
+          message: `Groq API returned status ${errorStatus}: ${errorText}` 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500
+        }
+      );
     }
 
     const data = await apiResponse.json();
@@ -71,7 +90,10 @@ serve(async (req) => {
     // Check if we have a valid response
     if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
       console.error('Invalid response structure from Groq API:', data);
-      throw new Error('Invalid response from Groq API');
+      return new Response(
+        JSON.stringify({ error: true, message: 'Invalid response from Groq API' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      );
     }
     
     const responseContent = data.choices[0].message.content;
