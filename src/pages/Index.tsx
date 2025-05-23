@@ -8,7 +8,6 @@ import Community from '@/components/Community';
 import AgeVerification from '@/components/AgeVerification';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import CountdownTimer from '@/components/CountdownTimer';
 import NFTSection from '@/components/NFTSection';
 
 const Index = () => {
@@ -18,7 +17,6 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
-        <CountdownTimer />
         <AboutSection />
         <NFTSection />
         <AIPersonalities />

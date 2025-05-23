@@ -1,65 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
-import { Clock, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { ExternalLink } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const NFTMint = () => {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
-  const [timeRemaining, setTimeRemaining] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
-  
-  // Set the launch date to noon EST this Friday
-  const calculateLaunchDate = () => {
-    const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 is Sunday, 5 is Friday
-    const daysUntilFriday = dayOfWeek <= 5 ? 5 - dayOfWeek : 5 + (7 - dayOfWeek);
-    
-    const fridayDate = new Date(now);
-    fridayDate.setDate(fridayDate.getDate() + daysUntilFriday);
-    fridayDate.setHours(12, 0, 0, 0); // Noon EST
-    
-    return fridayDate;
-  };
-  
-  const launchDate = calculateLaunchDate();
-  
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date();
-      const difference = launchDate.getTime() - now.getTime();
-      
-      if (difference <= 0) {
-        clearInterval(timer);
-        setTimeRemaining({
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0
-        });
-        return;
-      }
-      
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-      
-      setTimeRemaining({ days, hours, minutes, seconds });
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, []);
   
   const handleNotify = () => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
@@ -79,13 +29,6 @@ const NFTMint = () => {
     
     setEmail('');
   };
-  
-  const CountdownUnit = ({ value, label }: { value: number, label: string }) => (
-    <div className="flex flex-col items-center bg-dark-card p-3 sm:p-4 rounded-lg min-w-[70px] sm:min-w-[90px] border border-dark-border shadow-lg">
-      <span className="text-2xl sm:text-3xl font-bold text-berry">{value}</span>
-      <span className="text-xs sm:text-sm text-gray-400">{label}</span>
-    </div>
-  );
 
   // NFT Collection Rarities
   const rarities = [
@@ -286,21 +229,6 @@ const NFTMint = () => {
                 </li>
               </ol>
             </div>
-          </div>
-          
-          {/* Countdown Timer with enhanced styling */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold mb-6 text-center text-white">Launch Countdown</h2>
-            <div className="flex justify-center items-center gap-3 sm:gap-6 mb-4">
-              <CountdownUnit value={timeRemaining.days} label="DAYS" />
-              <CountdownUnit value={timeRemaining.hours} label="HOURS" />
-              <CountdownUnit value={timeRemaining.minutes} label="MINS" />
-              <CountdownUnit value={timeRemaining.seconds} label="SECS" />
-            </div>
-            <p className="text-center text-gray-400 flex items-center justify-center gap-2">
-              <Clock className="inline-block" size={18} />
-              Launching at 12:00 PM EST this Friday
-            </p>
           </div>
           
           {/* Direct Buy Link */}
