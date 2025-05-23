@@ -11,17 +11,13 @@ const CountdownTimer = () => {
     seconds: 0
   });
   
-  // Set the launch date to noon EST this Friday (same as NFT launch)
+  // Set the launch date to 13 minutes from now
   const calculateLaunchDate = () => {
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 is Sunday, 5 is Friday
-    const daysUntilFriday = dayOfWeek <= 5 ? 5 - dayOfWeek : 5 + (7 - dayOfWeek);
+    const launchDate = new Date(now);
+    launchDate.setMinutes(launchDate.getMinutes() + 13);
     
-    const fridayDate = new Date(now);
-    fridayDate.setDate(fridayDate.getDate() + daysUntilFriday);
-    fridayDate.setHours(12, 0, 0, 0); // Noon EST
-    
-    return fridayDate;
+    return launchDate;
   };
   
   const launchDate = calculateLaunchDate();
@@ -89,7 +85,7 @@ const CountdownTimer = () => {
             <div className="text-center">
               <p className="flex items-center justify-center gap-2 text-gray-400 mb-4">
                 <Clock className="inline-block" size={16} />
-                Launching at 12:00 PM EST this Friday
+                Launching in 13 minutes
               </p>
               
               <Link to="/nft">
