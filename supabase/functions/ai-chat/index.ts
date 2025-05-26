@@ -17,13 +17,13 @@ serve(async (req) => {
     const { message, personality } = await req.json();
     console.log("Request received:", { message, personality });
     
-    // Use OpenAI API with your OpenAI API key
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    // Use Groq API with your Groq API key
+    const GROK_API_KEY = Deno.env.get('GROK_API_KEY');
     
-    if (!OPENAI_API_KEY) {
-      console.error("OpenAI API key not configured");
+    if (!GROK_API_KEY) {
+      console.error("Groq API key not configured");
       return new Response(
-        JSON.stringify({ error: true, message: 'OpenAI API key not configured' }),
+        JSON.stringify({ error: true, message: 'Groq API key not configured' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       );
     }
@@ -42,23 +42,22 @@ serve(async (req) => {
         systemPrompt = "You are Berry Buddy, a friendly and enthusiastic AI companion for Busty Berry, a Solana meme coin with ticker $BUSTY. Respond with enthusiasm and crypto-themed humor. Use emojis occasionally.";
     }
 
-    console.log("Making OpenAI API call with system prompt:", systemPrompt);
+    console.log("Making Groq API call with system prompt:", systemPrompt);
 
-    // OpenAI API call
-    const apiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Groq API call
+    const apiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${GROK_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Using GPT-4o-mini model
+        model: 'llama3-70b-8192', // Using Llama3 model through Groq
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
         ],
-        max_tokens: 500,
-        temperature: 0.8
+        max_tokens: 500
       })
     });
 
@@ -71,12 +70,12 @@ serve(async (req) => {
       } catch (e) {
         errorText = "Failed to read error response";
       }
-      console.error(`OpenAI API error: ${errorStatus}`, errorText);
+      console.error(`Groq API error: ${errorStatus}`, errorText);
       
       return new Response(
         JSON.stringify({ 
           error: true, 
-          message: `OpenAI API returned status ${errorStatus}: ${errorText}` 
+          message: `Groq API returned status ${errorStatus}: ${errorText}` 
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -86,13 +85,13 @@ serve(async (req) => {
     }
 
     const data = await apiResponse.json();
-    console.log("OpenAI API response received:", data);
+    console.log("Groq API response received:", data);
     
     // Check if we have a valid response
     if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Invalid response structure from OpenAI API:', data);
+      console.error('Invalid response structure from Groq API:', data);
       return new Response(
-        JSON.stringify({ error: true, message: 'Invalid response from OpenAI API' }),
+        JSON.stringify({ error: true, message: 'Invalid response from Groq API' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       );
     }
