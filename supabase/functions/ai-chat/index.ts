@@ -18,9 +18,9 @@ serve(async (req) => {
     console.log("Request received:", { message, personality });
     
     // Use Groq API with your Groq API key
-    const GROK_API_KEY = Deno.env.get('GROK_API_KEY');
+    const GROQ_API_KEY = Deno.env.get('GROK_API_KEY');
     
-    if (!GROK_API_KEY) {
+    if (!GROQ_API_KEY) {
       console.error("Groq API key not configured");
       return new Response(
         JSON.stringify({ error: true, message: 'Groq API key not configured' }),
@@ -44,20 +44,21 @@ serve(async (req) => {
 
     console.log("Making Groq API call with system prompt:", systemPrompt);
 
-    // Groq API call
+    // Groq API call with proper headers
     const apiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${GROK_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama3-70b-8192', // Using Llama3 model through Groq
+        model: 'llama3-70b-8192',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
         ],
-        max_tokens: 500
+        max_tokens: 500,
+        temperature: 0.7
       })
     });
 
