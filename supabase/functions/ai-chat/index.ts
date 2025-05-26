@@ -7,6 +7,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Hardcoded Venice.ai API configuration
+const VENICE_API_KEY = 'eH8_SieGmQiRNiTdUsjx-Vwe2uQC_YWAEhYMnNL4Re';
+const VENICE_API_URL = 'https://api.venice.ai/api/v1/chat/completions';
+const VENICE_CHAT_URL = 'https://api.venice.ai/api/v1/chat/completions';
+const VENICE_IMAGE_URL = 'https://api.venice.ai/api/v1/image/generate';
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -16,9 +22,6 @@ serve(async (req) => {
   try {
     const { message, personality } = await req.json();
     console.log("Request received:", { message, personality });
-    
-    // Use the hardcoded Venice.ai API key
-    const VENICE_API_KEY = 'eH8_SieGmQiRNiTdUsjx';
     
     if (!VENICE_API_KEY) {
       console.error("Venice.ai API key not configured");
@@ -59,8 +62,8 @@ serve(async (req) => {
 
     console.log("Making Venice.ai API call with system prompt:", systemPrompt);
 
-    // Venice.ai API call
-    const apiResponse = await fetch('https://api.venice.ai/api/v1/chat/completions', {
+    // Venice.ai API call using the chat URL
+    const apiResponse = await fetch(VENICE_CHAT_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${VENICE_API_KEY}`,
