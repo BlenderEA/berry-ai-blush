@@ -17,13 +17,13 @@ serve(async (req) => {
     const { message, personality } = await req.json();
     console.log("Request received:", { message, personality });
     
-    // Use Groq API with your Groq API key
-    const GROQ_API_KEY = Deno.env.get('GROK_API_KEY');
+    // Use Venice.ai API with your Venice.ai API key
+    const VENICE_API_KEY = 'zOc8Ie08rhtepS1t-BWsoxWQLjMCbrHzvYwVPuc9LZ';
     
-    if (!GROQ_API_KEY) {
-      console.error("Groq API key not configured");
+    if (!VENICE_API_KEY) {
+      console.error("Venice.ai API key not configured");
       return new Response(
-        JSON.stringify({ error: true, message: 'Groq API key not configured' }),
+        JSON.stringify({ error: true, message: 'Venice.ai API key not configured' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       );
     }
@@ -42,17 +42,17 @@ serve(async (req) => {
         systemPrompt = "You are Berry Buddy, a friendly and enthusiastic AI companion for Busty Berry, a Solana meme coin with ticker $BUSTY. Respond with enthusiasm and crypto-themed humor. Use emojis occasionally.";
     }
 
-    console.log("Making Groq API call with system prompt:", systemPrompt);
+    console.log("Making Venice.ai API call with system prompt:", systemPrompt);
 
-    // Groq API call with proper headers
-    const apiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    // Venice.ai API call
+    const apiResponse = await fetch('https://api.venice.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Authorization': `Bearer ${VENICE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama3-70b-8192',
+        model: 'llama-3.1-8b-instruct',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -71,12 +71,12 @@ serve(async (req) => {
       } catch (e) {
         errorText = "Failed to read error response";
       }
-      console.error(`Groq API error: ${errorStatus}`, errorText);
+      console.error(`Venice.ai API error: ${errorStatus}`, errorText);
       
       return new Response(
         JSON.stringify({ 
           error: true, 
-          message: `Groq API returned status ${errorStatus}: ${errorText}` 
+          message: `Venice.ai API returned status ${errorStatus}: ${errorText}` 
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -86,13 +86,13 @@ serve(async (req) => {
     }
 
     const data = await apiResponse.json();
-    console.log("Groq API response received:", data);
+    console.log("Venice.ai API response received:", data);
     
     // Check if we have a valid response
     if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Invalid response structure from Groq API:', data);
+      console.error('Invalid response structure from Venice.ai API:', data);
       return new Response(
-        JSON.stringify({ error: true, message: 'Invalid response from Groq API' }),
+        JSON.stringify({ error: true, message: 'Invalid response from Venice.ai API' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       );
     }
