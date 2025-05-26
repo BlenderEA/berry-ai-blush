@@ -17,8 +17,8 @@ serve(async (req) => {
     const { message, personality } = await req.json();
     console.log("Request received:", { message, personality });
     
-    // Get Venice.ai API key from environment variables
-    const VENICE_API_KEY = Deno.env.get('VENICE_API_KEY');
+    // Use the hardcoded Venice.ai API key
+    const VENICE_API_KEY = 'eH8_SieGmQiRNiTdUsjx';
     
     if (!VENICE_API_KEY) {
       console.error("Venice.ai API key not configured");
