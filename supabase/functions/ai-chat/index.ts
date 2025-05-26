@@ -17,13 +17,14 @@ serve(async (req) => {
     const { message, personality } = await req.json();
     console.log("Request received:", { message, personality });
     
-    // Use Venice.ai API key from Supabase secrets
-    const VENICE_API_KEY = Deno.env.get('VENICE_API_KEY');
+    // Use your Venice.ai API key directly
+    const VENICE_API_KEY = 'eH8_SieGmQiRNiTdUsjx-Vwe2uQC_YWAEhYMnNL4Re';
+    const VENICE_API_URL = 'https://api.venice.ai/api/v1/chat/completions';
     
     if (!VENICE_API_KEY) {
-      console.error("Venice.ai API key not configured in secrets");
+      console.error("Venice.ai API key not configured");
       return new Response(
-        JSON.stringify({ error: true, message: 'Venice.ai API key not configured. Please add VENICE_API_KEY to Supabase secrets.' }),
+        JSON.stringify({ error: true, message: 'Venice.ai API key not configured' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       );
     }
@@ -45,7 +46,7 @@ serve(async (req) => {
     console.log("Making Venice.ai API call with system prompt:", systemPrompt);
 
     // Venice.ai API call
-    const apiResponse = await fetch('https://api.venice.ai/api/v1/chat/completions', {
+    const apiResponse = await fetch(VENICE_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${VENICE_API_KEY}`,
