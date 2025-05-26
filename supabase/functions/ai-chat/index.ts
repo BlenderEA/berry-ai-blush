@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
@@ -20,6 +19,8 @@ serve(async (req) => {
     // Use your Venice.ai API key directly
     const VENICE_API_KEY = 'eH8_SieGmQiRNiTdUsjx-Vwe2uQC_YWAEhYMnNL4Re';
     const VENICE_API_URL = 'https://api.venice.ai/api/v1/chat/completions';
+    const VENICE_CHAT_URL = 'https://api.venice.ai/api/v1/chat/completions';
+    const VENICE_IMAGE_URL = 'https://api.venice.ai/api/v1/image/generate';
     
     if (!VENICE_API_KEY) {
       console.error("Venice.ai API key not configured");
