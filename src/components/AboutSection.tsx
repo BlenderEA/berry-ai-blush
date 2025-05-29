@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { DollarSign, MessageCircle, UserPlus, Zap, Shield, TrendingUp } from 'lucide-react';
+import { DollarSign, MessageCircle, Zap, Shield, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -11,9 +11,9 @@ const AboutSection = () => {
       icon: DollarSign,
       title: "Revolutionary Tokenomics",
       description: "$BUSTYBERRY isn't just another memecoin. Built on Solana for lightning-fast transactions and minimal fees, our token combines viral potential with real utility through AI chatbots, exclusive VIP access, and creator opportunities.",
-      cta: "Apply as Creator",
-      ctaLink: "/creator-application",
-      ctaIcon: UserPlus,
+      cta: "Learn More",
+      ctaLink: "/token",
+      ctaIcon: DollarSign,
       gradient: "from-green-500/20 to-emerald-500/20",
       borderColor: "hover:border-green-500/30"
     },
