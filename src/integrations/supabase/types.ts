@@ -9,6 +9,85 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bot_analytics: {
+        Row: {
+          command: string | null
+          created_at: string | null
+          data: Json | null
+          event_type: string
+          id: string
+          message_length: number | null
+          personality: string | null
+          response_time_ms: number | null
+          telegram_user_id: string | null
+        }
+        Insert: {
+          command?: string | null
+          created_at?: string | null
+          data?: Json | null
+          event_type: string
+          id?: string
+          message_length?: number | null
+          personality?: string | null
+          response_time_ms?: number | null
+          telegram_user_id?: string | null
+        }
+        Update: {
+          command?: string | null
+          created_at?: string | null
+          data?: Json | null
+          event_type?: string
+          id?: string
+          message_length?: number | null
+          personality?: string | null
+          response_time_ms?: number | null
+          telegram_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_analytics_telegram_user_id_fkey"
+            columns: ["telegram_user_id"]
+            isOneToOne: false
+            referencedRelation: "telegram_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          current_personality: string | null
+          id: string
+          last_message: string | null
+          message_count: number | null
+          session_start: string | null
+          telegram_user_id: string | null
+        }
+        Insert: {
+          current_personality?: string | null
+          id?: string
+          last_message?: string | null
+          message_count?: number | null
+          session_start?: string | null
+          telegram_user_id?: string | null
+        }
+        Update: {
+          current_personality?: string | null
+          id?: string
+          last_message?: string | null
+          message_count?: number | null
+          session_start?: string | null
+          telegram_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_sessions_telegram_user_id_fkey"
+            columns: ["telegram_user_id"]
+            isOneToOne: false
+            referencedRelation: "telegram_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_purchases: {
         Row: {
           buyer_id: string
@@ -225,6 +304,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      telegram_users: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string
+          last_active: string | null
+          last_name: string | null
+          preferred_personality: string | null
+          telegram_id: number
+          username: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          last_active?: string | null
+          last_name?: string | null
+          preferred_personality?: string | null
+          telegram_id: number
+          username?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          last_active?: string | null
+          last_name?: string | null
+          preferred_personality?: string | null
+          telegram_id?: number
+          username?: string | null
+        }
+        Relationships: []
       }
       transactions: {
         Row: {
