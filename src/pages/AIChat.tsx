@@ -1,13 +1,10 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import TelegramBotIntegration from '@/components/chat/TelegramBotIntegration';
 import PremiumFeatures from '@/components/chat/PremiumFeatures';
-
 const AIChat = () => {
-  return (
-    <div className="flex flex-col min-h-screen bg-dark">
+  return <div className="flex flex-col min-h-screen bg-dark">
       <Header />
       
       <main className="flex-grow container mx-auto px-4 py-8 mt-20">
@@ -28,16 +25,12 @@ const AIChat = () => {
             </div>
             
             {/* Premium Features */}
-            <div className="flex-1 max-w-md">
-              <PremiumFeatures />
-            </div>
+            
           </div>
         </div>
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default AIChat;
