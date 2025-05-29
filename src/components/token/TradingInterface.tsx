@@ -13,6 +13,7 @@ const TradingInterface = () => {
 
   const quickAmounts = [100, 500, 1000, 5000];
   const slippageOptions = [0.1, 0.5, 1, 3];
+  const contractAddress = "6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump";
 
   useEffect(() => {
     const fetchMarketData = async () => {
@@ -36,7 +37,7 @@ const TradingInterface = () => {
             
             trades.push({
               wallet: `${Math.random().toString(36).substr(2, 2)}...${Math.random().toString(36).substr(2, 4)}`,
-              action: isBy ? "BUY" : "SELL",
+              action: isBuy ? "BUY" : "SELL",
               amount: `$${amount.toLocaleString()}`,
               time: `${timeAgo}m ago`
             });
@@ -137,10 +138,17 @@ const TradingInterface = () => {
             </div>
 
             {/* Buy Button */}
-            <Button className="w-full berry-button text-lg py-6">
-              Buy ${selectedAmount} of BUSTYBERRY
-              <TrendingUp className="ml-2 h-5 w-5" />
-            </Button>
+            <a 
+              href={`https://jup.ag/swap/SOL-${contractAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <Button className="w-full berry-button text-lg py-6">
+                Buy ${selectedAmount} of BUSTYBERRY
+                <TrendingUp className="ml-2 h-5 w-5" />
+              </Button>
+            </a>
 
             {/* Quick Links */}
             <div className="grid grid-cols-2 gap-3">
