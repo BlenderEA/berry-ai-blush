@@ -9,7 +9,6 @@ const TokenHero = () => {
   const [copied, setCopied] = useState(false);
   const [priceData, setPriceData] = useState<any>(null);
   
-  // Updated contract address
   const contractAddress = "6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump";
   
   useEffect(() => {
@@ -27,8 +26,6 @@ const TokenHero = () => {
     };
     
     fetchPriceData();
-    
-    // Refresh price data every 60 seconds
     const intervalId = setInterval(fetchPriceData, 60000);
     
     return () => clearInterval(intervalId);
@@ -139,26 +136,26 @@ const TokenHero = () => {
               </div>
               <div className="flex justify-between items-center border-b border-dark-border pb-3">
                 <span className="text-gray-300">24h Change</span>
-                <span className={`flex items-center ${priceData.priceChange.h24 >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {priceData.priceChange.h24 >= 0 ? (
+                <span className={`flex items-center ${priceData.priceChange?.h24 >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {priceData.priceChange?.h24 >= 0 ? (
                     <TrendingUp className="h-4 w-4 mr-1" />
                   ) : (
                     <TrendingDown className="h-4 w-4 mr-1" />
                   )}
-                  {Math.abs(priceData.priceChange.h24).toFixed(2)}%
+                  {Math.abs(priceData.priceChange?.h24 || 0).toFixed(2)}%
                 </span>
               </div>
               <div className="flex justify-between items-center border-b border-dark-border pb-3">
                 <span className="text-gray-300">Liquidity</span>
-                <span className="font-medium">${parseInt(priceData.liquidity.usd).toLocaleString()}</span>
+                <span className="font-medium">${parseInt(priceData.liquidity?.usd || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center border-b border-dark-border pb-3">
                 <span className="text-gray-300">Volume 24h</span>
-                <span className="font-medium">${parseInt(priceData.volume.h24).toLocaleString()}</span>
+                <span className="font-medium">${parseInt(priceData.volume?.h24 || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-300">Fully Diluted Valuation</span>
-                <span className="font-medium">${(parseFloat(priceData.priceUsd) * 1000000000).toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+                <span className="text-gray-300">Market Cap</span>
+                <span className="font-medium">${parseInt(priceData.marketCap || 0).toLocaleString()}</span>
               </div>
             </div>
           ) : (
