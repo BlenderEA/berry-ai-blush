@@ -12,9 +12,7 @@ const AIChat = () => {
         <div className="max-w-6xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-6">
-              🔥 Meet Your Dream AI Girlfriends
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-6"> Meet Your Dream AI Girlfriend</h1>
             <p className="text-gray-300 text-xl mb-4">
               Sexy AI personalities that create custom images just for you
             </p>
