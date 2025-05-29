@@ -8,6 +8,7 @@ import ChatMessages from '@/components/chat/ChatMessages';
 import ChatInput from '@/components/chat/ChatInput';
 import PersonalitySelector from '@/components/chat/PersonalitySelector';
 import PremiumFeatures from '@/components/chat/PremiumFeatures';
+import TelegramBotIntegration from '@/components/chat/TelegramBotIntegration';
 import { useAIChat } from '@/hooks/use-ai-chat';
 
 const AIChat = () => {
@@ -43,7 +44,7 @@ const AIChat = () => {
               
               {/* Chat Messages */}
               <Card className="mb-4 flex-grow bg-dark-card border-dark-border">
-                <CardContent className="p-0"> {/* Remove padding, it's handled by ChatMessages */}
+                <CardContent className="p-0">
                   <ChatMessages messages={messages} isLoading={isLoading} />
                 </CardContent>
               </Card>
@@ -52,8 +53,14 @@ const AIChat = () => {
               <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
             </div>
             
-            {/* Right Sidebar - Premium Features */}
-            <PremiumFeatures />
+            {/* Right Sidebar */}
+            <div className="w-full md:w-80 space-y-4">
+              {/* Telegram Bot Integration */}
+              <TelegramBotIntegration />
+              
+              {/* Premium Features */}
+              <PremiumFeatures />
+            </div>
           </div>
         </div>
       </main>
