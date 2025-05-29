@@ -1,14 +1,11 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import TelegramBotIntegration from '@/components/chat/TelegramBotIntegration';
 import PremiumFeatures from '@/components/chat/PremiumFeatures';
 import AIPersonalityShowcase from '@/components/chat/AIPersonalityShowcase';
-
 const AIChat = () => {
-  return (
-    <div className="flex flex-col min-h-screen bg-dark">
+  return <div className="flex flex-col min-h-screen bg-dark">
       <Header />
       
       <main className="flex-grow container mx-auto px-4 py-8 mt-20">
@@ -50,23 +47,14 @@ const AIChat = () => {
             <p className="text-gray-300 mb-6">
               Join thousands of users already chatting with our AI beauties on Telegram
             </p>
-            <a 
-              href="https://t.me/BustyBettyBot" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-block"
-            >
-              <button className="bg-gradient-to-r from-berry to-berry-purple hover:from-berry-light hover:to-berry text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 text-lg">
-                🎯 Start Chatting Now - FREE!
-              </button>
+            <a href="https://t.me/BustyBettyBot" target="_blank" rel="noopener noreferrer" className="inline-block">
+              <button className="bg-gradient-to-r from-berry to-berry-purple hover:from-berry-light hover:to-berry text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 text-lg">🎯 Start Chatting Now !</button>
             </a>
           </div>
         </div>
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default AIChat;
