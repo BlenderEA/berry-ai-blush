@@ -3,255 +3,166 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, TrendingDown, Bell, ExternalLink, Calculator, Target } from 'lucide-react';
+import { TrendingUp, AlertCircle, Target, Zap, BarChart3, Clock } from 'lucide-react';
 
 const TradingInterface = () => {
   const [selectedAmount, setSelectedAmount] = useState(1000);
-  const [priceAlerts, setPriceAlerts] = useState([
-    { price: 0.00000150, type: 'above', active: true },
-    { price: 0.00000120, type: 'below', active: false }
-  ]);
+  const [slippage, setSlippage] = useState(1);
 
-  const quickAmounts = [100, 500, 1000, 2500, 5000, 10000];
-  const timeframes = ['1m', '5m', '15m', '1h', '4h', '1d'];
-  
-  const exchanges = [
-    { name: 'Jupiter', logo: '🪐', volume: '$847K', liquidity: '$2.1M', fee: '0.1%' },
-    { name: 'Raydium', logo: '⚡', volume: '$523K', liquidity: '$1.8M', fee: '0.25%' },
-    { name: 'Orca', logo: '🐋', volume: '$312K', liquidity: '$980K', fee: '0.3%' }
+  const quickAmounts = [100, 500, 1000, 5000, 10000];
+  const slippageOptions = [0.1, 0.5, 1, 3];
+
+  const priceTargets = [
+    { label: "Next Resistance", price: "$0.0001", potential: "+25%" },
+    { label: "Moon Target", price: "$0.0005", potential: "+150%" },
+    { label: "Mars Mission", price: "$0.001", potential: "+400%" }
   ];
 
-  const calculateTokens = (usdAmount: number) => {
-    const tokenPrice = 0.00012456; // Mock price
-    return (usdAmount / tokenPrice).toLocaleString(undefined, { maximumFractionDigits: 0 });
-  };
+  const whaleWatching = [
+    { wallet: "7x...9KpL", action: "BUY", amount: "$25,000", time: "2m ago" },
+    { wallet: "Bm...8TqX", action: "HOLD", amount: "$50,000", time: "5m ago" },
+    { wallet: "9P...4ReN", action: "BUY", amount: "$15,000", time: "8m ago" }
+  ];
 
   return (
     <div className="mb-12">
       <div className="text-center mb-8">
         <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
-          📈 Professional Trading Suite 📈
+          Advanced Trading Hub
         </h2>
         <p className="text-gray-300 text-lg">
-          Advanced tools for serious $BUSTY investors
+          Professional tools for serious investors
         </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Trading Panel */}
-        <div className="xl:col-span-2">
-          <Card className="glass-card border-berry/30 mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-berry" />
-                Quick Buy Calculator
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+        <Card className="glass-card border-berry/30 lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-berry" />
+              Instant Buy Interface
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Amount Selection */}
+            <div>
+              <label className="text-sm font-medium mb-3 block">Select Amount (USD)</label>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-4">
                 {quickAmounts.map((amount) => (
                   <Button
                     key={amount}
                     variant={selectedAmount === amount ? "default" : "outline"}
-                    onClick={() => setSelectedAmount(amount)}
                     className={selectedAmount === amount ? "berry-button" : "secondary-button"}
+                    onClick={() => setSelectedAmount(amount)}
                   >
                     ${amount}
                   </Button>
                 ))}
               </div>
-              
-              <div className="p-4 rounded-lg bg-dark-lighter/50 border border-dark-border mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-300">You Pay:</span>
-                  <span className="text-xl font-bold text-white">${selectedAmount}</span>
-                </div>
+              <div className="p-4 rounded-lg bg-dark-lighter/50 border border-dark-border">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300">You Get:</span>
-                  <span className="text-xl font-bold text-berry">
-                    {calculateTokens(selectedAmount)} $BUSTY
-                  </span>
+                  <span className="text-gray-300">You'll receive approximately:</span>
+                  <span className="font-bold text-berry">{(selectedAmount * 50000000).toLocaleString()} BUSTY</span>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <a 
-                  href="https://jup.ag/swap/SOL-6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button className="w-full berry-button">
-                    Buy on Jupiter 🪐
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
-                </a>
-                <a 
-                  href="https://raydium.io/swap/?inputCurrency=sol&outputCurrency=6wA6u3Y9mNpZy7z3oWDaLWUMmp5ourhM6oRFUrsSpump"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" className="w-full secondary-button">
-                    Buy on Raydium ⚡
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
-                </a>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Exchange Comparison */}
-          <Card className="glass-card border-blue-500/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-400">
-                <Target className="h-5 w-5" />
-                Exchange Comparison
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {exchanges.map((exchange, index) => (
-                  <div 
-                    key={index}
-                    className="p-4 rounded-lg bg-dark-lighter/50 border border-dark-border hover:border-blue-500/30 transition-all"
+            {/* Slippage Settings */}
+            <div>
+              <label className="text-sm font-medium mb-3 block">Slippage Tolerance</label>
+              <div className="grid grid-cols-4 gap-2">
+                {slippageOptions.map((option) => (
+                  <Button
+                    key={option}
+                    variant={slippage === option ? "default" : "outline"}
+                    className={slippage === option ? "berry-button" : "secondary-button"}
+                    onClick={() => setSlippage(option)}
+                    size="sm"
                   >
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{exchange.logo}</span>
-                        <span className="font-bold">{exchange.name}</span>
-                        {index === 0 && (
-                          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                            Best Price
-                          </Badge>
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-300">Fee: {exchange.fee}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-300">24h Volume:</span>
-                        <span className="font-medium ml-2">{exchange.volume}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-300">Liquidity:</span>
-                        <span className="font-medium ml-2">{exchange.liquidity}</span>
-                      </div>
-                    </div>
-                  </div>
+                    {option}%
+                  </Button>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
 
-        {/* Sidebar Tools */}
-        <div className="space-y-6">
-          {/* Price Alerts */}
-          <Card className="glass-card border-yellow-500/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-yellow-400">
-                <Bell className="h-5 w-5" />
-                Price Alerts
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {priceAlerts.map((alert, index) => (
-                  <div 
-                    key={index}
-                    className={`p-3 rounded-lg border transition-all ${
-                      alert.active 
-                        ? 'bg-green-500/10 border-green-500/30' 
-                        : 'bg-dark-lighter/50 border-dark-border'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">
-                        Alert {alert.type} ${alert.price.toFixed(8)}
-                      </span>
-                      <Badge 
-                        variant={alert.active ? "default" : "outline"}
-                        className={alert.active ? "bg-green-500/20 text-green-400" : ""}
-                      >
-                        {alert.active ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-                
-                <Button variant="outline" className="w-full secondary-button text-sm">
-                  + Add New Alert
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Buy Button */}
+            <Button className="w-full berry-button text-lg py-6">
+              Buy ${selectedAmount} of BUSTYBERRY
+              <TrendingUp className="ml-2 h-5 w-5" />
+            </Button>
 
-          {/* Market Sentiment */}
-          <Card className="glass-card border-purple-500/30">
-            <CardHeader>
-              <CardTitle className="text-purple-400">Market Sentiment</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Fear & Greed Index</span>
-                  <span className="text-green-400 font-bold">72 (Greed)</span>
-                </div>
-                <div className="w-full bg-dark-lighter rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-1000" 
-                    style={{ width: '72%' }}
-                  ></div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-green-400 mb-1">
-                      <TrendingUp className="h-4 w-4" />
-                      <span className="text-sm font-medium">Bull</span>
-                    </div>
-                    <span className="text-xl font-bold">68%</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-red-400 mb-1">
-                      <TrendingDown className="h-4 w-4" />
-                      <span className="text-sm font-medium">Bear</span>
-                    </div>
-                    <span className="text-xl font-bold">32%</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Quick Links */}
+            <div className="grid grid-cols-2 gap-3">
+              <Button variant="outline" className="secondary-button">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                View Chart
+              </Button>
+              <Button variant="outline" className="secondary-button">
+                <AlertCircle className="mr-2 h-4 w-4" />
+                Set Alert
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Quick Stats */}
-          <Card className="glass-card border-berry/30">
-            <CardHeader>
-              <CardTitle className="text-berry">Quick Stats</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-300">Market Cap</span>
-                  <span className="font-medium">$124.5K</span>
+        {/* Price Targets */}
+        <Card className="glass-card border-green-500/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-400">
+              <Target className="h-5 w-5" />
+              Price Targets
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {priceTargets.map((target, index) => (
+              <div key={index} className="p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-sm text-gray-300">{target.label}</span>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                    {target.potential}
+                  </Badge>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-300">Circulating Supply</span>
-                  <span className="font-medium">1B $BUSTY</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-300">Burned Tokens</span>
-                  <span className="font-medium text-red-400">2.5M</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-300">LP Locked Until</span>
-                  <span className="font-medium text-green-400">2025</span>
-                </div>
+                <div className="text-lg font-bold text-green-400">{target.price}</div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Whale Watching */}
+      <Card className="glass-card border-yellow-500/30">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-yellow-400">
+            <Clock className="h-5 w-5" />
+            Whale Activity Monitor
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {whaleWatching.map((activity, index) => (
+              <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-dark-lighter/50 border border-dark-border">
+                <div className="flex items-center gap-3">
+                  <code className="text-sm font-mono text-gray-300">{activity.wallet}</code>
+                  <Badge 
+                    className={
+                      activity.action === 'BUY' 
+                        ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                        : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                    }
+                  >
+                    {activity.action}
+                  </Badge>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-yellow-400">{activity.amount}</div>
+                  <div className="text-xs text-gray-400">{activity.time}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

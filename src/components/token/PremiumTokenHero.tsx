@@ -47,7 +47,7 @@ const PremiumTokenHero = () => {
     navigator.clipboard.writeText(contractAddress);
     setCopied(true);
     toast({
-      title: "Contract Address Copied! 🚀",
+      title: "Contract Address Copied!",
       description: "Ready to buy $BUSTYBERRY!",
     });
     

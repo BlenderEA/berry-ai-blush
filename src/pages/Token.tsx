@@ -5,7 +5,6 @@ import Footer from '@/components/Footer';
 import BustyBerryChart from '@/components/BustyBerryChart';
 import PremiumTokenHero from '@/components/token/PremiumTokenHero';
 import SocialProofSection from '@/components/token/SocialProofSection';
-import ExclusiveAccessTiers from '@/components/token/ExclusiveAccessTiers';
 import TradingInterface from '@/components/token/TradingInterface';
 import TokenFAQ from '@/components/TokenFAQ';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,7 +30,7 @@ const Token = () => {
           <div className="mb-12">
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
-                📊 Live Trading Chart 📊
+                Live Trading Chart
               </h2>
               <p className="text-gray-300 text-lg">
                 Real-time $BUSTYBERRY price action and trading data
@@ -39,9 +38,6 @@ const Token = () => {
             </div>
             <BustyBerryChart />
           </div>
-          
-          {/* Exclusive Access Tiers */}
-          <ExclusiveAccessTiers />
           
           {/* Information Tabs */}
           <div className="mb-12">

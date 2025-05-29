@@ -1,206 +1,179 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Users, DollarSign, Zap, Star, MessageCircle } from 'lucide-react';
+import { TrendingUp, Users, DollarSign, Zap, Star, Trophy } from 'lucide-react';
 
 const SocialProofSection = () => {
-  const [liveStats, setLiveStats] = useState({
-    totalHolders: 1247,
-    volume24h: 847293,
-    transactions: 15647,
-    avgHolding: 127000
+  const [stats, setStats] = useState({
+    holders: 1247,
+    volume24h: 2847,
+    marketCap: 12500000,
+    transactions: 15420
   });
-
-  const testimonials = [
-    {
-      name: "CryptoWhale47",
-      avatar: "💎",
-      text: "Best AI adult token investment I've made. The utility is insane!",
-      amount: "$50K",
-      verified: true
-    },
-    {
-      name: "AIEnthusiast",
-      avatar: "🚀",
-      text: "Finally, an adult AI project with real tokenomics. Moon bound!",
-      amount: "$25K",
-      verified: true
-    },
-    {
-      name: "DegenTrader",
-      avatar: "🔥",
-      text: "10x since I bought in. Still accumulating more $BUSTY!",
-      amount: "$100K",
-      verified: true
-    }
-  ];
-
-  const recentTransactions = [
-    { type: "buy", amount: "15,420", usd: "$2,847", time: "2m ago", whale: true },
-    { type: "buy", amount: "8,250", usd: "$1,523", time: "5m ago", whale: false },
-    { type: "buy", amount: "45,000", usd: "$8,310", time: "8m ago", whale: true },
-    { type: "buy", amount: "3,200", usd: "$590", time: "12m ago", whale: false },
-  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setLiveStats(prev => ({
-        totalHolders: prev.totalHolders + Math.floor(Math.random() * 3),
-        volume24h: prev.volume24h + Math.floor(Math.random() * 1000),
-        transactions: prev.transactions + Math.floor(Math.random() * 5),
-        avgHolding: prev.avgHolding + Math.floor(Math.random() * 100)
+      setStats(prev => ({
+        holders: prev.holders + Math.floor(Math.random() * 3),
+        volume24h: prev.volume24h + Math.floor(Math.random() * 50),
+        marketCap: prev.marketCap + Math.floor(Math.random() * 10000),
+        transactions: prev.transactions + Math.floor(Math.random() * 5)
       }));
-    }, 8000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
 
+  const testimonials = [
+    {
+      name: "CryptoWhale_88",
+      amount: "$50K",
+      text: "Best AI token project I've seen this year. The team delivers!",
+      verified: true
+    },
+    {
+      name: "SolanaKing",
+      amount: "$25K", 
+      text: "Finally, an AI project with real utility. Already 5x my investment!",
+      verified: true
+    },
+    {
+      name: "DiamondHands_2024",
+      amount: "$100K",
+      text: "This is the next big thing in AI. Early investors will be millionaires.",
+      verified: true
+    }
+  ];
+
+  const liveActivities = [
+    "Anonymous bought $15,000 worth of BUSTY",
+    "Diamond holder staked 500K BUSTY for 365 days",
+    "Whale alert: 1M BUSTY transferred to cold storage",
+    "New holder joined with $5,000 purchase",
+    "VIP member upgraded to Gold tier"
+  ];
+
+  const [currentActivity, setCurrentActivity] = useState(0);
+
+  useEffect(() => {
+    const activityInterval = setInterval(() => {
+      setCurrentActivity(prev => (prev + 1) % liveActivities.length);
+    }, 4000);
+
+    return () => clearInterval(activityInterval);
+  }, []);
+
   return (
     <div className="mb-12">
+      {/* FOMO Header */}
       <div className="text-center mb-8">
+        <Badge className="mb-4 bg-red-500/20 text-red-400 border-red-500/30 animate-pulse">
+          TRENDING NOW
+        </Badge>
         <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
-          🔥 FOMO Alert: Everyone's Buying $BUSTY! 🔥
+          Join 1,200+ Smart Investors
         </h2>
         <p className="text-gray-300 text-lg">
-          Join thousands of smart investors already earning with $BUSTYBERRY
+          Don't miss out on the AI revolution that's making millionaires
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Live Stats */}
-        <Card className="glass-card border-green-500/30 hover:border-green-500/50 transition-all">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-400">
-              <TrendingUp className="h-5 w-5" />
-              Live Statistics
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Total Holders</span>
-                <span className="font-bold text-green-400 animate-pulse">
-                  {liveStats.totalHolders.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">24h Volume</span>
-                <span className="font-bold text-green-400">
-                  ${liveStats.volume24h.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Transactions</span>
-                <span className="font-bold text-green-400">
-                  {liveStats.transactions.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Avg Holding</span>
-                <span className="font-bold text-green-400">
-                  {liveStats.avgHolding.toLocaleString()} $BUSTY
-                </span>
-              </div>
+      {/* Live Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <Card className="glass-card border-green-500/30 hover:border-green-500/50 transition-all hover:scale-105">
+          <CardContent className="p-4 text-center">
+            <Users className="h-6 w-6 text-green-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-400 animate-pulse">
+              {stats.holders.toLocaleString()}
             </div>
+            <div className="text-sm text-gray-300">Holders</div>
           </CardContent>
         </Card>
 
-        {/* Testimonials */}
-        <Card className="glass-card border-berry/30 hover:border-berry/50 transition-all">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-berry">
-              <MessageCircle className="h-5 w-5" />
-              Community Love
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="p-3 rounded-lg bg-dark-lighter/50 border border-dark-border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">{testimonial.avatar}</span>
-                    <span className="font-medium text-sm">{testimonial.name}</span>
-                    {testimonial.verified && (
-                      <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-400">
-                        Verified
-                      </Badge>
-                    )}
-                    <Badge variant="outline" className="text-xs text-green-400 border-green-400/30">
-                      {testimonial.amount}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-gray-300">{testimonial.text}</p>
-                </div>
-              ))}
+        <Card className="glass-card border-blue-500/30 hover:border-blue-500/50 transition-all hover:scale-105">
+          <CardContent className="p-4 text-center">
+            <DollarSign className="h-6 w-6 text-blue-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-400 animate-pulse">
+              ${(stats.volume24h * 1000).toLocaleString()}
             </div>
+            <div className="text-sm text-gray-300">24h Volume</div>
           </CardContent>
         </Card>
 
-        {/* Recent Transactions (Whale Watching) */}
-        <Card className="glass-card border-yellow-500/30 hover:border-yellow-500/50 transition-all">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-yellow-400">
-              <Zap className="h-5 w-5" />
-              Whale Watching 🐋
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentTransactions.map((tx, index) => (
-                <div 
-                  key={index} 
-                  className={`p-3 rounded-lg border transition-all ${
-                    tx.whale 
-                      ? 'bg-yellow-500/10 border-yellow-500/30' 
-                      : 'bg-dark-lighter/50 border-dark-border'
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      {tx.whale && <span className="text-yellow-400">🐋</span>}
-                      <span className={`text-sm font-medium ${tx.type === 'buy' ? 'text-green-400' : 'text-red-400'}`}>
-                        BUY
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-400">{tx.time}</span>
-                  </div>
-                  <div className="flex justify-between items-center mt-1">
-                    <span className="text-sm text-white">{tx.amount} $BUSTY</span>
-                    <span className="text-sm text-gray-300">{tx.usd}</span>
-                  </div>
-                </div>
-              ))}
+        <Card className="glass-card border-purple-500/30 hover:border-purple-500/50 transition-all hover:scale-105">
+          <CardContent className="p-4 text-center">
+            <TrendingUp className="h-6 w-6 text-purple-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-purple-400 animate-pulse">
+              ${(stats.marketCap / 1000000).toFixed(1)}M
             </div>
+            <div className="text-sm text-gray-300">Market Cap</div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card border-yellow-500/30 hover:border-yellow-500/50 transition-all hover:scale-105">
+          <CardContent className="p-4 text-center">
+            <Zap className="h-6 w-6 text-yellow-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-yellow-400 animate-pulse">
+              {stats.transactions.toLocaleString()}
+            </div>
+            <div className="text-sm text-gray-300">Transactions</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* FOMO Timer */}
-      <Card className="glass-card border-red-500/30 mt-8 bg-gradient-to-r from-red-500/10 to-orange-500/10">
-        <CardContent className="p-6 text-center">
-          <h3 className="text-xl font-bold text-red-400 mb-2">
-            ⚡ Early Investor Bonus Ending Soon! ⚡
-          </h3>
-          <p className="text-gray-300 mb-4">
-            Get in now before the next price tier kicks in
-          </p>
-          <div className="flex justify-center gap-4 text-2xl font-bold">
-            <div className="flex flex-col items-center">
-              <span className="text-red-400">23</span>
-              <span className="text-xs text-gray-400">Hours</span>
-            </div>
-            <span className="text-red-400">:</span>
-            <div className="flex flex-col items-center">
-              <span className="text-red-400">45</span>
-              <span className="text-xs text-gray-400">Minutes</span>
-            </div>
-            <span className="text-red-400">:</span>
-            <div className="flex flex-col items-center">
-              <span className="text-red-400">12</span>
-              <span className="text-xs text-gray-400">Seconds</span>
-            </div>
+      {/* Live Activity Feed */}
+      <Card className="glass-card border-berry/30 mb-8">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <h3 className="text-lg font-bold">Live Activity Feed</h3>
           </div>
+          <div className="bg-dark-lighter/50 rounded-lg p-4 font-mono text-sm text-green-400 animate-fade-in">
+            {liveActivities[currentActivity]}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Success Stories */}
+      <div className="mb-8">
+        <h3 className="text-2xl font-bold text-center mb-6 flex items-center justify-center gap-2">
+          <Trophy className="h-6 w-6 text-yellow-400" />
+          Success Stories from Our Community
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {testimonials.map((testimonial, index) => (
+            <Card key={index} className="glass-card border-berry/30 hover:border-berry/50 transition-all hover:scale-105">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="font-bold text-berry">{testimonial.name}</div>
+                  {testimonial.verified && (
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                      <Star className="h-3 w-3 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
+                </div>
+                <div className="text-2xl font-bold text-green-400 mb-2">{testimonial.amount}</div>
+                <p className="text-gray-300 text-sm italic">"{testimonial.text}"</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Urgency Banner */}
+      <Card className="glass-card border-red-500/30 bg-gradient-to-r from-red-500/10 to-orange-500/10">
+        <CardContent className="p-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-red-400 font-bold">LIMITED TIME OPPORTUNITY</span>
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+          </div>
+          <h3 className="text-xl font-bold mb-2">Early Bird Bonus Ending Soon</h3>
+          <p className="text-gray-300">
+            Join now before the next price discovery phase begins. Don't let FOMO be your teacher.
+          </p>
         </CardContent>
       </Card>
     </div>
