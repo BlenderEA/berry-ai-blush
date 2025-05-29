@@ -89,12 +89,12 @@ const PremiumFeatures = () => {
             className="block"
           >
             <Button className="w-full bg-gradient-to-r from-berry to-berry-purple hover:from-berry-light hover:to-berry text-white font-bold py-3 transition-all duration-300">
-              🚀 Try All Features FREE
+              🚀 Start Premium Experience
             </Button>
           </a>
           
           <p className="text-xs text-gray-500 mt-2">
-            No credit card required • Instant access
+            Premium AI girlfriend experience • Advanced features
           </p>
         </div>
       </CardContent>

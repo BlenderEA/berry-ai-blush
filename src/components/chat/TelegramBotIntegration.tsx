@@ -62,13 +62,13 @@ const TelegramBotIntegration = () => {
         >
           <Button className="w-full bg-berry hover:bg-berry-light text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg transform hover:scale-105">
             <MessageCircle className="h-5 w-5" />
-            Start Chatting FREE
+            Start Premium Chat
             <ExternalLink className="h-4 w-4" />
           </Button>
         </a>
         
         <p className="text-xs text-gray-500 mt-3">
-          🔒 Private & secure • No registration required
+          🔒 Private & secure • Premium AI experience
         </p>
       </CardContent>
     </Card>
