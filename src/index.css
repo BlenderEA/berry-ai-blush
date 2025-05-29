@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -88,7 +87,7 @@
     @apply px-4 md:px-6 lg:px-8;
   }
 
-  /* Enhanced animations */
+  /* Enhanced premium animations */
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -178,6 +177,31 @@
     }
   }
 
+  @keyframes premium-glow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(217, 70, 239, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(217, 70, 239, 0.8), 0 0 40px rgba(217, 70, 239, 0.4);
+    }
+  }
+
+  @keyframes price-flash {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(34, 197, 94, 0.2); }
+    100% { background-color: transparent; }
+  }
+
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes blink {
+    from, to { border-color: transparent; }
+    50% { border-color: rgb(217, 70, 239); }
+  }
+
   .animate-fade-in {
     animation: fadeIn 0.8s ease-out forwards;
   }
@@ -206,6 +230,10 @@
     animation: glow 2s ease-in-out infinite;
   }
 
+  .animate-premium-glow {
+    animation: premium-glow 3s ease-in-out infinite;
+  }
+
   .animate-shimmer {
     background: linear-gradient(90deg, transparent, rgba(217, 70, 239, 0.2), transparent);
     background-size: 200% 100%;
@@ -216,44 +244,72 @@
     animation: bounce-gentle 2s ease-in-out infinite;
   }
 
-  /* Hover animations */
+  .animate-price-flash {
+    animation: price-flash 0.5s ease-in-out;
+  }
+
+  .animate-typing {
+    overflow: hidden;
+    border-right: 2px solid rgb(217, 70, 239);
+    white-space: nowrap;
+    animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+  }
+
+  /* Enhanced hover animations */
   .hover-lift {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
   .hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
   }
 
   .hover-glow:hover {
-    box-shadow: 0 0 20px rgba(217, 70, 239, 0.4);
+    box-shadow: 0 0 25px rgba(217, 70, 239, 0.5);
   }
 
-  /* Gradient backgrounds */
+  .hover-premium:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(217, 70, 239, 0.3);
+    border-color: rgba(217, 70, 239, 0.8);
+  }
+
+  /* Premium gradient backgrounds */
   .bg-berry-gradient {
     background: linear-gradient(135deg, #d946ef 0%, #ec4899 100%);
   }
 
-  /* Custom scrollbar */
+  .bg-premium-gradient {
+    background: linear-gradient(135deg, #d946ef 0%, #8b5cf6 50%, #ec4899 100%);
+  }
+
+  .bg-wealth-gradient {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  }
+
+  /* Premium scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(217, 70, 239, 0.6);
-    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(217, 70, 239, 0.8), rgba(139, 92, 246, 0.8));
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(217, 70, 239, 0.3);
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(217, 70, 239, 0.8);
+    background: linear-gradient(135deg, rgba(217, 70, 239, 1), rgba(139, 92, 246, 1));
+    box-shadow: 0 0 15px rgba(217, 70, 239, 0.5);
   }
 
-  /* Particle effects */
+  /* Premium particle effects */
   .particles {
     position: relative;
     overflow: hidden;
@@ -267,12 +323,93 @@
     width: 100%;
     height: 100%;
     background-image: 
-      radial-gradient(2px 2px at 20px 30px, rgba(217, 70, 239, 0.3), transparent),
-      radial-gradient(2px 2px at 40px 70px, rgba(217, 70, 239, 0.2), transparent),
-      radial-gradient(1px 1px at 90px 40px, rgba(217, 70, 239, 0.4), transparent),
-      radial-gradient(1px 1px at 130px 80px, rgba(217, 70, 239, 0.3), transparent);
+      radial-gradient(3px 3px at 25px 35px, rgba(217, 70, 239, 0.4), transparent),
+      radial-gradient(2px 2px at 45px 75px, rgba(139, 92, 246, 0.3), transparent),
+      radial-gradient(2px 2px at 95px 45px, rgba(217, 70, 239, 0.5), transparent),
+      radial-gradient(1px 1px at 135px 85px, rgba(236, 72, 153, 0.3), transparent),
+      radial-gradient(2px 2px at 185px 25px, rgba(217, 70, 239, 0.4), transparent);
     background-repeat: repeat;
-    background-size: 150px 100px;
-    animation: float 15s ease-in-out infinite;
+    background-size: 200px 120px;
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* Money/wealth themed styles */
+  .money-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .money-rain::before {
+    content: '💰💎🚀💸⭐';
+    position: absolute;
+    top: -50px;
+    left: 0;
+    width: 100%;
+    font-size: 24px;
+    letter-spacing: 20px;
+    animation: money-fall 10s linear infinite;
+  }
+
+  @keyframes money-fall {
+    0% { transform: translateY(-50px); opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+
+  /* Premium button enhancements */
+  .premium-button {
+    background: linear-gradient(135deg, #d946ef 0%, #8b5cf6 50%, #ec4899 100%);
+    color: white;
+    font-weight: 700;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    border: 2px solid rgba(217, 70, 239, 0.3);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .premium-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .premium-button:hover::before {
+    left: 100%;
+  }
+
+  .premium-button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(217, 70, 239, 0.4);
+    border-color: rgba(217, 70, 239, 0.8);
+  }
+
+  /* Luxury card styles */
+  .luxury-card {
+    background: linear-gradient(135deg, rgba(30, 30, 46, 0.9) 0%, rgba(45, 45, 65, 0.8) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(217, 70, 239, 0.2);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .luxury-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(217, 70, 239, 0.3);
+    border-color: rgba(217, 70, 239, 0.5);
   }
 }
