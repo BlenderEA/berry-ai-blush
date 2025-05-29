@@ -90,9 +90,9 @@ const AIPersonalities = () => {
                 <p className="text-gray-300 text-center mb-6">
                   {personality.description}
                 </p>
-                <Link to={`/ai-chat?personality=${personality.id}`} className="mt-auto w-full">
+                <Link to="/ai-chat" className="mt-auto w-full">
                   <Button variant="outline" className="w-full border-gray-700 hover:bg-dark-card hover:text-berry">
-                    Chat Now
+                    Chat on Telegram
                   </Button>
                 </Link>
               </div>
@@ -103,7 +103,7 @@ const AIPersonalities = () => {
         <div className="text-center mt-12">
           <Link to="/ai-chat">
             <Button className="berry-button group">
-              Explore All AI Personalities
+              Chat on Telegram
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </Link>
