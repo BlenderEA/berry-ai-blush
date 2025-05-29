@@ -28,30 +28,30 @@ const SocialProofSection = () => {
   const testimonials = [
     {
       name: "CryptoWhale_88",
-      amount: "$50K",
+      amount: "$2.5K",
       text: "Best AI token project I've seen this year. The team delivers!",
       verified: true
     },
     {
       name: "SolanaKing",
-      amount: "$25K", 
-      text: "Finally, an AI project with real utility. Already 5x my investment!",
+      amount: "$1.2K", 
+      text: "Finally, an AI project with real utility. Already 3x my investment!",
       verified: true
     },
     {
       name: "DiamondHands_2024",
-      amount: "$100K",
-      text: "This is the next big thing in AI. Early investors will be millionaires.",
+      amount: "$5K",
+      text: "This is the next big thing in AI. Early investors will do well.",
       verified: true
     }
   ];
 
   const liveActivities = [
-    "Anonymous bought $15,000 worth of BUSTY",
-    "Diamond holder staked 500K BUSTY for 365 days",
-    "Whale alert: 1M BUSTY transferred to cold storage",
-    "New holder joined with $5,000 purchase",
-    "VIP member upgraded to Gold tier"
+    "Anonymous bought $850 worth of BUSTY",
+    "Holder staked 50K BUSTY tokens",
+    "New investor purchased $320 of BUSTY",
+    "Community member bought $1,100 worth",
+    "Early supporter added $675 to position"
   ];
 
   const [currentActivity, setCurrentActivity] = useState(0);
@@ -75,7 +75,7 @@ const SocialProofSection = () => {
           Join 1,200+ Smart Investors
         </h2>
         <p className="text-gray-300 text-lg">
-          Don't miss out on the AI revolution that's making millionaires
+          Don't miss out on the AI revolution that's creating opportunities
         </p>
       </div>
 
@@ -95,7 +95,7 @@ const SocialProofSection = () => {
           <CardContent className="p-4 text-center">
             <DollarSign className="h-6 w-6 text-blue-400 mx-auto mb-2" />
             <div className="text-2xl font-bold text-blue-400 animate-pulse">
-              ${(stats.volume24h * 1000).toLocaleString()}
+              ${(stats.volume24h * 100).toLocaleString()}
             </div>
             <div className="text-sm text-gray-300">24h Volume</div>
           </CardContent>

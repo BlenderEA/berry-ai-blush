@@ -9,7 +9,7 @@ const TradingInterface = () => {
   const [selectedAmount, setSelectedAmount] = useState(1000);
   const [slippage, setSlippage] = useState(1);
 
-  const quickAmounts = [100, 500, 1000, 5000, 10000];
+  const quickAmounts = [100, 500, 1000, 5000];
   const slippageOptions = [0.1, 0.5, 1, 3];
 
   const priceTargets = [
@@ -18,10 +18,12 @@ const TradingInterface = () => {
     { label: "Mars Mission", price: "$0.001", potential: "+400%" }
   ];
 
-  const whaleWatching = [
-    { wallet: "7x...9KpL", action: "BUY", amount: "$25,000", time: "2m ago" },
-    { wallet: "Bm...8TqX", action: "HOLD", amount: "$50,000", time: "5m ago" },
-    { wallet: "9P...4ReN", action: "BUY", amount: "$15,000", time: "8m ago" }
+  const recentTrades = [
+    { wallet: "7x...9KpL", action: "BUY", amount: "$850", time: "2m ago" },
+    { wallet: "Bm...8TqX", action: "SELL", amount: "$1,200", time: "5m ago" },
+    { wallet: "9P...4ReN", action: "BUY", amount: "$650", time: "8m ago" },
+    { wallet: "Kn...2MvZ", action: "BUY", amount: "$2,100", time: "12m ago" },
+    { wallet: "Fy...7BpQ", action: "SELL", amount: "$925", time: "15m ago" }
   ];
 
   return (
@@ -48,7 +50,7 @@ const TradingInterface = () => {
             {/* Amount Selection */}
             <div>
               <label className="text-sm font-medium mb-3 block">Select Amount (USD)</label>
-              <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
                 {quickAmounts.map((amount) => (
                   <Button
                     key={amount}
@@ -130,33 +132,33 @@ const TradingInterface = () => {
         </Card>
       </div>
 
-      {/* Whale Watching */}
+      {/* Recent Trades */}
       <Card className="glass-card border-yellow-500/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-yellow-400">
             <Clock className="h-5 w-5" />
-            Whale Activity Monitor
+            Recent Trades
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {whaleWatching.map((activity, index) => (
+            {recentTrades.map((trade, index) => (
               <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-dark-lighter/50 border border-dark-border">
                 <div className="flex items-center gap-3">
-                  <code className="text-sm font-mono text-gray-300">{activity.wallet}</code>
+                  <code className="text-sm font-mono text-gray-300">{trade.wallet}</code>
                   <Badge 
                     className={
-                      activity.action === 'BUY' 
+                      trade.action === 'BUY' 
                         ? 'bg-green-500/20 text-green-400 border-green-500/30' 
-                        : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                        : 'bg-red-500/20 text-red-400 border-red-500/30'
                     }
                   >
-                    {activity.action}
+                    {trade.action}
                   </Badge>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-yellow-400">{activity.amount}</div>
-                  <div className="text-xs text-gray-400">{activity.time}</div>
+                  <div className="font-bold text-yellow-400">{trade.amount}</div>
+                  <div className="text-xs text-gray-400">{trade.time}</div>
                 </div>
               </div>
             ))}
