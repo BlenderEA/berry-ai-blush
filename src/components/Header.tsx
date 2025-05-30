@@ -72,6 +72,14 @@ const Header = () => {
           >
             X
           </a>
+          <a 
+            href="https://t.me/+wIYulrAnMM4xMGY0" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-pink-500 hover:text-pink-400 transition-colors font-bold"
+          >
+            TELEGRAM
+          </a>
         </nav>
 
         {/* Mint Button */}
@@ -113,6 +121,15 @@ const Header = () => {
                 {link.name}
               </Link>
             ))}
+            <a 
+              href="https://t.me/+wIYulrAnMM4xMGY0" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-3 px-4 rounded-md text-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors font-bold uppercase tracking-wider"
+            >
+              JOIN TELEGRAM
+            </a>
             <Button className="acid-button mt-4">
               MINT NOW
             </Button>

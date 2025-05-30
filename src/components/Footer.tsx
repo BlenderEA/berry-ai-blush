@@ -25,6 +25,24 @@ const Footer = () => {
             <p className="text-gray-400 font-mono mb-4">
               Built in the Acid | Powered by Solana
             </p>
+            <div className="flex flex-col space-y-2">
+              <a 
+                href="https://t.me/+wIYulrAnMM4xMGY0" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-pink-500 hover:text-pink-400 transition-colors font-bold font-mono"
+              >
+                📱 JOIN TELEGRAM
+              </a>
+              <a 
+                href="https://twitter.com/acidmuttz" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-green-400 transition-colors font-mono"
+              >
+                🐦 Follow on X
+              </a>
+            </div>
           </div>
           
           {/* Lab Links */}
@@ -47,17 +65,27 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="https://twitter.com/acidmuttz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-green-400 transition-colors">
-                  X (Twitter)
-                </a>
+                <Link to="/pack" className="text-gray-400 hover:text-green-400 transition-colors">
+                  The Pack
+                </Link>
               </li>
             </ul>
           </div>
           
-          {/* Technical */}
+          {/* Community */}
           <div className="text-center md:text-right">
-            <h3 className="text-lg font-semibold mb-4 text-pink-500 font-mono">EXPERIMENT DATA</h3>
+            <h3 className="text-lg font-semibold mb-4 text-pink-500 font-mono">JOIN THE MUTATION</h3>
             <ul className="space-y-2 font-mono text-sm">
+              <li>
+                <a 
+                  href="https://t.me/+wIYulrAnMM4xMGY0" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-pink-500 hover:text-pink-400 transition-colors font-bold"
+                >
+                  💬 Telegram Chat
+                </a>
+              </li>
               <li>
                 <span className="text-gray-400">Smart Contract</span>
               </li>
@@ -66,9 +94,6 @@ const Footer = () => {
               </li>
               <li>
                 <span className="text-gray-400">Whitepaper</span>
-              </li>
-              <li>
-                <span className="text-gray-400">Contact</span>
               </li>
             </ul>
           </div>
