@@ -6,80 +6,79 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="bg-dark border-t border-dark-border py-12">
+    <footer className="bg-black border-t border-green-500/30 py-12">
       <div className="container mx-auto px-4">
+        <div className="text-center mb-8">
+          <div className="inline-block p-4 border border-red-500/50 bg-red-500/10 rounded mb-6">
+            <span className="text-red-400 font-mono text-lg tracking-wider">
+              ⚠️ WARNING: This site contains mutational content.
+            </span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
-          <div className="flex flex-col">
-            <Link to="/" className="text-2xl font-bold gradient-text font-outfit mb-4">
-              Busty<span className="text-white">Berry</span>
+          <div className="flex flex-col text-center md:text-left">
+            <Link to="/" className="text-2xl font-bold text-green-400 font-mono mb-4 glitch-text">
+              ACID<span className="text-pink-500">MUTTZ</span>
             </Link>
-            <p className="text-gray-400 mb-4">
-              The juiciest memecoin with AI spice on Solana.
-            </p>
-            <p className="text-sm text-gray-500">
-              &copy; {currentYear} Busty Berry. All rights reserved.
+            <p className="text-gray-400 font-mono mb-4">
+              Built in the Acid | Powered by Solana
             </p>
           </div>
           
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
+          {/* Lab Links */}
+          <div className="text-center">
+            <h3 className="text-lg font-semibold mb-4 text-green-400 font-mono">LAB ACCESS</h3>
+            <ul className="space-y-2 font-mono">
               <li>
-                <Link to="/" className="text-gray-400 hover:text-berry transition-colors">
-                  Home
+                <Link to="/mutants" className="text-gray-400 hover:text-green-400 transition-colors">
+                  Mutants Gallery
                 </Link>
               </li>
               <li>
-                <Link to="/ai-chat" className="text-gray-400 hover:text-berry transition-colors">
-                  AI Chat
+                <Link to="/lab" className="text-gray-400 hover:text-green-400 transition-colors">
+                  Dr. Muttz Lab
                 </Link>
               </li>
               <li>
-                <Link to="/token" className="text-gray-400 hover:text-berry transition-colors">
-                  Buy $BUSTYBERRY
+                <Link to="/prophecies" className="text-gray-400 hover:text-green-400 transition-colors">
+                  Prophecies
                 </Link>
               </li>
               <li>
-                <Link to="/community" className="text-gray-400 hover:text-berry transition-colors">
-                  Community
-                </Link>
+                <a href="https://twitter.com/acidmuttz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-green-400 transition-colors">
+                  X (Twitter)
+                </a>
               </li>
             </ul>
           </div>
           
-          {/* Legal */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2">
+          {/* Technical */}
+          <div className="text-center md:text-right">
+            <h3 className="text-lg font-semibold mb-4 text-pink-500 font-mono">EXPERIMENT DATA</h3>
+            <ul className="space-y-2 font-mono text-sm">
               <li>
-                <Link to="/terms" className="text-gray-400 hover:text-berry transition-colors">
-                  Terms of Service
-                </Link>
+                <span className="text-gray-400">Smart Contract</span>
               </li>
               <li>
-                <Link to="/privacy" className="text-gray-400 hover:text-berry transition-colors">
-                  Privacy Policy
-                </Link>
+                <span className="text-gray-400">GitHub</span>
               </li>
               <li>
-                <Link to="/content-guidelines" className="text-gray-400 hover:text-berry transition-colors">
-                  Content Guidelines
-                </Link>
+                <span className="text-gray-400">Whitepaper</span>
               </li>
               <li>
-                <Link to="/disclaimer" className="text-gray-400 hover:text-berry transition-colors">
-                  Risk Disclaimer
-                </Link>
+                <span className="text-gray-400">Contact</span>
               </li>
             </ul>
           </div>
         </div>
         
-        <div className="mt-12 pt-6 border-t border-dark-border">
-          <p className="text-center text-sm text-gray-500">
-            Cryptocurrency investments are volatile and high risk. $BUSTYBERRY is a memecoin with no intrinsic value. Always do your own research.
+        <div className="mt-12 pt-6 border-t border-green-500/30">
+          <p className="text-center text-sm text-gray-500 font-mono">
+            &copy; {currentYear} ACID MUTTZ. All rights reserved. 
+            <br />
+            Not financial advice. DYOR. Mutations may cause side effects.
           </p>
         </div>
       </div>

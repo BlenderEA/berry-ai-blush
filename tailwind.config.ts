@@ -63,20 +63,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				berry: {
-					DEFAULT: '#D946EF',
-					light: '#E980F5',
-					dark: '#B02BC7',
-					text: '#FFFFFF',
-					purple: '#8B5CF6',
-					magenta: '#D946EF',
-					red: '#ea384c',
-				},
-				dark: {
-					DEFAULT: '#1A1F2C', 
-					lighter: '#222835',
-					card: '#262B38',
-					border: '#2D334A'
+				// ACID MUTTZ Theme Colors
+				acid: {
+					green: '#00FF41',
+					pink: '#FF1493',
+					blue: '#00BFFF',
+					gray: '#2A2A2A',
+					black: '#000000'
 				}
 			},
 			borderRadius: {
@@ -101,33 +94,49 @@ export default {
 						height: '0'
 					}
 				},
-				'gradient-flow': {
-					'0%, 100%': { backgroundPosition: '0% 50%' },
-					'50%': { backgroundPosition: '100% 50%' },
+				'glitch': {
+					'0%, 100%': { transform: 'translate(0)' },
+					'20%': { transform: 'translate(-2px, 2px)' },
+					'40%': { transform: 'translate(-2px, -2px)' },
+					'60%': { transform: 'translate(2px, 2px)' },
+					'80%': { transform: 'translate(2px, -2px)' }
 				},
-				'pulse-slow': {
-					'0%, 100%': { opacity: 1 },
-					'50%': { opacity: 0.8 },
+				'mutation-pulse': {
+					'0%, 100%': { 
+						boxShadow: '0 0 5px #00FF41, 0 0 10px #00FF41, 0 0 15px #00FF41',
+						opacity: '1'
+					},
+					'50%': { 
+						boxShadow: '0 0 10px #FF1493, 0 0 20px #FF1493, 0 0 30px #FF1493',
+						opacity: '0.8'
+					}
 				},
 				'float': {
 					'0%, 100%': { transform: 'translateY(0)' },
 					'50%': { transform: 'translateY(-10px)' },
+				},
+				'fade-in': {
+					from: {
+						opacity: '0',
+						transform: 'translateY(30px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'gradient-flow': 'gradient-flow 3s ease infinite',
-				'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
-				'float': 'float 6s ease-in-out infinite'
+				'glitch': 'glitch 0.3s ease-in-out infinite',
+				'mutation-pulse': 'mutation-pulse 2s ease-in-out infinite',
+				'float': 'float 6s ease-in-out infinite',
+				'fade-in': 'fade-in 0.8s ease-out forwards'
 			},
 			fontFamily: {
-				'outfit': ['Outfit', 'sans-serif'],
-				'inter': ['Inter', 'sans-serif'],
-			},
-			backgroundImage: {
-				'berry-gradient': 'linear-gradient(102.3deg, #9327bf 5.9%, #EA9DE8 64%, #f6dbf5 89%)',
-				'purple-gradient': 'linear-gradient(90deg, #8B5CF6 0%, #D946EF 100%)',
+				'mono': ['Courier New', 'monospace'],
+				'comic': ['Comic Sans MS', 'cursive'],
 			}
 		}
 	},
