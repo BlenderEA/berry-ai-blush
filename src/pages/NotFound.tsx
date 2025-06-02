@@ -1,27 +1,24 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const NotFound = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    console.error(
+      "404 Error: User attempted to access non-existent route:",
+      location.pathname
+    );
+  }, [location.pathname]);
+
   return (
-    <div className="min-h-screen bg-black text-green-400 flex items-center justify-center font-mono">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="text-center">
-        <div className="mb-8">
-          <h1 className="text-6xl md:text-8xl font-bold mb-4 glitch-text">404</h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-6">
-            MUTATION NOT FOUND
-          </p>
-          <p className="text-gray-400 mb-8">
-            This specimen has escaped the lab...
-          </p>
-        </div>
-        
-        <Link to="/">
-          <Button className="acid-button">
-            RETURN TO LAB
-          </Button>
-        </Link>
+        <h1 className="text-4xl font-bold mb-4">404</h1>
+        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
+        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
+          Return to Home
+        </a>
       </div>
     </div>
   );
